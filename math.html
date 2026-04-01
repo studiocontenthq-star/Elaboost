@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELABoost Math — Fractions Quest</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky:#4FACFE; --sun:#FFD43B; --green:#51CF66; --red:#FF6B6B;
+  --purple:#9775FA; --orange:#FF922B; --pink:#F06595; --teal:#20C997;
+  --navy:#1a1a2e; --card:#fff; --bg:#F0F9FF;
+  --r:20px; --shadow:0 8px 32px rgba(0,0,0,0.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;overflow-x:hidden;}
+
+/* STARS BG */
+body::before{
+  content:'';position:fixed;inset:0;
+  background:linear-gradient(160deg,#e0f4ff 0%,#f0e8ff 50%,#fff8e1 100%);
+  z-index:-2;
+}
+
+/* NAV */
+nav{
+  background:var(--navy);padding:0 24px;height:58px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:200;
+  box-shadow:0 4px 20px rgba(0,0,0,0.25);
+}
+.logo{font-family:'Fredoka One',cursive;color:white;font-size:1.4rem;display:flex;align-items:center;gap:8px;}
+.logo-badge{background:var(--sun);color:var(--navy);padding:2px 10px;border-radius:20px;font-size:.8rem;}
+.nav-xp{display:flex;align-items:center;gap:8px;color:white;}
+.xp-bar{width:120px;height:10px;background:rgba(255,255,255,.2);border-radius:5px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--sun),var(--orange));border-radius:5px;transition:width .5s;}
+.xp-txt{font-size:.8rem;font-weight:800;color:var(--sun);}
+.stars-count{font-size:.9rem;font-weight:800;color:var(--sun);}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 58px);}
+
+/* SIDEBAR */
+.sidebar{background:white;border-right:3px solid #E8F4FF;padding:16px 12px;overflow-y:auto;}
+.sb-title{font-family:'Fredoka One',cursive;color:var(--navy);font-size:1rem;padding:0 8px;margin-bottom:12px;}
+.lesson-btn{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border-radius:14px;border:none;background:transparent;
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;
+  cursor:pointer;transition:all .2s;text-align:left;width:100%;
+  color:#555;margin-bottom:4px;
+}
+.lesson-btn:hover{background:#F0F9FF;color:var(--navy);}
+.lesson-btn.active{background:linear-gradient(135deg,#4FACFE,#9775FA);color:white;transform:scale(1.02);}
+.lesson-btn.locked{opacity:.4;cursor:not-allowed;}
+.lesson-btn.done{color:var(--green);}
+.lb-emoji{font-size:1.1rem;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;flex-shrink:0;}
+.lesson-btn.active .lb-emoji{background:rgba(255,255,255,.25);}
+.lesson-btn:not(.active) .lb-emoji{background:#F5F5F5;}
+.lb-info{flex:1;}
+.lb-name{display:block;}
+.lb-std{font-size:.68rem;font-weight:600;opacity:.6;}
+.lock-icon{font-size:.8rem;margin-left:auto;}
+
+.sb-stars{
+  margin-top:16px;padding:14px;background:linear-gradient(135deg,#fff8e1,#fff3cd);
+  border-radius:16px;border:2px solid var(--sun);text-align:center;
+}
+.sb-stars-title{font-family:'Fredoka One',cursive;color:var(--orange);font-size:.9rem;}
+.sb-stars-val{font-size:2rem;margin:4px 0;}
+.sb-stars-sub{font-size:.72rem;color:#888;font-weight:700;}
+
+/* MAIN */
+.main{padding:24px;overflow-y:auto;}
+
+/* LESSON HEADER */
+.lesson-header{
+  background:linear-gradient(135deg,var(--sky),var(--purple));
+  border-radius:24px;padding:24px 28px;margin-bottom:20px;
+  display:flex;align-items:center;gap:20px;
+  box-shadow:0 8px 32px rgba(79,172,254,.3);
+  position:relative;overflow:hidden;
+}
+.lesson-header::before{
+  content:'';position:absolute;right:-20px;top:-20px;
+  width:140px;height:140px;border-radius:50%;
+  background:rgba(255,255,255,.1);
+}
+.lesson-header::after{
+  content:'';position:absolute;right:40px;bottom:-30px;
+  width:80px;height:80px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+}
+.lh-emoji{font-size:3.5rem;filter:drop-shadow(0 4px 8px rgba(0,0,0,.15));position:relative;z-index:1;}
+.lh-text{position:relative;z-index:1;}
+.lh-tag{background:rgba(255,255,255,.25);color:white;font-size:.68rem;font-weight:800;
+  text-transform:uppercase;letter-spacing:1px;padding:3px 10px;border-radius:10px;display:inline-block;margin-bottom:6px;}
+.lh-title{font-family:'Fredoka One',cursive;color:white;font-size:1.8rem;line-height:1.1;}
+.lh-sub{color:rgba(255,255,255,.8);font-size:.85rem;font-weight:700;margin-top:4px;}
+.lh-progress{margin-left:auto;position:relative;z-index:1;text-align:center;}
+.progress-ring{position:relative;width:70px;height:70px;}
+.progress-ring svg{transform:rotate(-90deg);}
+.progress-ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;font-size:1.1rem;color:white;}
+
+/* TABS */
+.tabs{display:flex;gap:8px;margin-bottom:18px;}
+.tab-btn{
+  padding:10px 20px;border-radius:50px;border:2px solid #E0E0E0;
+  background:white;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;
+  cursor:pointer;transition:all .2s;color:#888;
+}
+.tab-btn:hover{border-color:var(--sky);color:var(--sky);}
+.tab-btn.active{background:var(--navy);border-color:var(--navy);color:white;}
+
+/* CONTENT PANELS */
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── LEARN PANEL ── */
+.concept-card{
+  background:white;border-radius:24px;padding:24px;margin-bottom:16px;
+  box-shadow:var(--shadow);border:3px solid transparent;
+  transition:all .3s;
+}
+.concept-card:hover{border-color:var(--sky);transform:translateY(-2px);}
+.cc-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.cc-num{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--sky),var(--purple));
+  display:flex;align-items:center;justify-content:center;font-family:'Fredoka One',cursive;color:white;font-size:1.1rem;}
+.cc-title{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--navy);}
+.cc-std{font-size:.7rem;font-weight:700;color:#999;margin-left:auto;background:#F5F5F5;padding:3px 8px;border-radius:8px;}
+
+/* VISUAL FRACTION */
+.fraction-visual{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:16px 0;}
+.pizza-wrap{text-align:center;}
+.pizza-label{font-size:.75rem;font-weight:800;color:#888;margin-bottom:6px;}
+.pizza{width:80px;height:80px;position:relative;}
+.pizza svg{width:100%;height:100%;}
+.fraction-display{
+  background:linear-gradient(135deg,#F0F9FF,#E8F4FF);
+  border-radius:16px;padding:16px 20px;text-align:center;border:2px solid #BFDBFE;
+}
+.frac{display:inline-flex;flex-direction:column;align-items:center;font-family:'Fredoka One',cursive;}
+.frac-num{font-size:1.8rem;color:var(--sky);line-height:1;}
+.frac-bar{width:40px;height:3px;background:var(--navy);margin:3px 0;}
+.frac-den{font-size:1.8rem;color:var(--purple);line-height:1;}
+.frac-label{font-size:.72rem;font-weight:800;color:#888;margin-top:6px;}
+
+/* NUMBER LINE */
+.number-line-wrap{margin:16px 0;overflow-x:auto;}
+.number-line{position:relative;height:60px;min-width:340px;}
+.nl-track{position:absolute;top:50%;left:20px;right:20px;height:4px;background:#E0E0E0;border-radius:2px;transform:translateY(-50%);}
+.nl-dot{position:absolute;top:50%;transform:translate(-50%,-50%);
+  width:16px;height:16px;border-radius:50%;background:var(--sky);border:3px solid white;box-shadow:0 2px 8px rgba(79,172,254,.5);}
+.nl-label{position:absolute;top:60%;transform:translateX(-50%);font-size:.7rem;font-weight:800;color:#888;margin-top:4px;}
+.nl-highlight{position:absolute;top:50%;height:4px;background:linear-gradient(90deg,var(--sky),var(--purple));
+  border-radius:2px;transform:translateY(-50%);}
+
+/* RULE CARD */
+.rule-card{
+  background:linear-gradient(135deg,#FFF8E1,#FFF3CD);
+  border-radius:16px;padding:16px;border:2px solid var(--sun);
+  display:flex;gap:12px;align-items:flex-start;margin:12px 0;
+}
+.rule-icon{font-size:1.5rem;flex-shrink:0;}
+.rule-text{font-size:.9rem;font-weight:700;color:#7C4D00;line-height:1.6;}
+
+/* EXAMPLE BOX */
+.example-box{
+  background:#F8F9FA;border-radius:16px;padding:16px;border-left:4px solid var(--sky);
+  margin:12px 0;
+}
+.ex-label{font-size:.7rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--sky);margin-bottom:8px;}
+.ex-problem{font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--navy);margin-bottom:8px;}
+.ex-steps{list-style:none;}
+.ex-steps li{font-size:.87rem;font-weight:700;color:#555;padding:4px 0;display:flex;gap:8px;align-items:flex-start;}
+.step-num{width:20px;height:20px;border-radius:6px;background:var(--sky);color:white;
+  font-size:.7rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+/* ── PRACTICE PANEL ── */
+.practice-area{max-width:680px;margin:0 auto;}
+.q-card{
+  background:white;border-radius:24px;padding:28px;
+  box-shadow:var(--shadow);margin-bottom:16px;
+  border:3px solid #E8F0FF;
+}
+.q-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.q-num{font-family:'Fredoka One',cursive;font-size:.9rem;color:#999;}
+.q-pts{background:linear-gradient(135deg,var(--sun),var(--orange));color:var(--navy);
+  padding:4px 12px;border-radius:20px;font-weight:900;font-size:.8rem;}
+.q-text{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--navy);margin-bottom:20px;line-height:1.4;}
+
+/* FRACTION INPUT */
+.frac-input-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:20px;}
+.frac-input-box{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:#F8F9FA;border-radius:16px;padding:16px 20px;border:2px solid #E0E0E0;
+}
+.frac-input-box input{
+  width:60px;height:44px;border:2px solid #E0E0E0;border-radius:10px;
+  font-family:'Fredoka One',cursive;font-size:1.5rem;color:var(--navy);
+  text-align:center;outline:none;transition:all .2s;
+}
+.frac-input-box input:focus{border-color:var(--sky);background:#F0F9FF;}
+.frac-input-bar{width:60px;height:3px;background:var(--navy);border-radius:2px;}
+.frac-op{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--navy);}
+
+/* MCQ OPTIONS */
+.mcq-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.mcq-opt{
+  padding:14px 16px;border-radius:16px;border:3px solid #E8E8E8;
+  background:white;font-family:'Fredoka One',cursive;font-size:1.1rem;
+  cursor:pointer;transition:all .2s;color:var(--navy);text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.mcq-opt:hover:not(.disabled){border-color:var(--sky);background:#F0F9FF;transform:scale(1.02);}
+.mcq-opt.correct{border-color:var(--green);background:#F0FFF4;color:var(--green);}
+.mcq-opt.wrong{border-color:var(--red);background:#FFF5F5;color:var(--red);}
+.mcq-opt.disabled{cursor:not-allowed;}
+.opt-key{width:26px;height:26px;border-radius:8px;background:#F0F0F0;
+  display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;flex-shrink:0;}
+.mcq-opt.correct .opt-key{background:var(--green);color:white;}
+.mcq-opt.wrong .opt-key{background:var(--red);color:white;}
+
+/* VISUAL MCQ (pizza selector) */
+.visual-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.visual-opt{
+  padding:10px;border-radius:16px;border:3px solid #E8E8E8;
+  background:white;cursor:pointer;transition:all .2s;text-align:center;
+}
+.visual-opt:hover:not(.disabled){border-color:var(--sky);transform:scale(1.05);}
+.visual-opt.correct{border-color:var(--green);background:#F0FFF4;}
+.visual-opt.wrong{border-color:var(--red);background:#FFF5F5;}
+.visual-opt svg{width:60px;height:60px;display:block;margin:0 auto 4px;}
+.visual-opt-label{font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--navy);}
+
+/* SUBMIT / FEEDBACK */
+.submit-btn{
+  width:100%;padding:14px;border-radius:16px;border:none;
+  background:linear-gradient(135deg,var(--sky),var(--purple));color:white;
+  font-family:'Fredoka One',cursive;font-size:1.2rem;cursor:pointer;
+  transition:all .2s;box-shadow:0 4px 16px rgba(79,172,254,.4);
+}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(79,172,254,.5);}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+.feedback-box{
+  border-radius:16px;padding:16px;margin-top:12px;
+  display:flex;gap:12px;align-items:flex-start;animation:popIn .3s ease;
+}
+.feedback-box.correct-fb{background:#F0FFF4;border:2px solid var(--green);}
+.feedback-box.wrong-fb{background:#FFF5F5;border:2px solid var(--red);}
+.fb-icon{font-size:1.5rem;flex-shrink:0;}
+.fb-title{font-family:'Fredoka One',cursive;font-size:1rem;margin-bottom:4px;}
+.fb-title.c{color:var(--green);}
+.fb-title.w{color:var(--red);}
+.fb-text{font-size:.84rem;font-weight:700;color:#555;line-height:1.55;}
+
+.next-btn{
+  width:100%;padding:13px;border-radius:16px;border:none;
+  background:linear-gradient(135deg,var(--green),var(--teal));color:white;
+  font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;
+  transition:all .2s;margin-top:10px;display:none;
+  box-shadow:0 4px 16px rgba(81,207,102,.4);
+}
+.next-btn:hover{transform:translateY(-2px);}
+.next-btn.show{display:block;}
+
+/* SCORE SCREEN */
+.score-screen{
+  background:white;border-radius:28px;padding:40px;text-align:center;
+  box-shadow:var(--shadow);
+}
+.score-emoji{font-size:4rem;margin-bottom:12px;animation:bounce 1s infinite alternate;}
+.score-title{font-family:'Fredoka One',cursive;font-size:2rem;color:var(--navy);margin-bottom:8px;}
+.score-val{font-family:'Fredoka One',cursive;font-size:3.5rem;background:linear-gradient(135deg,var(--sky),var(--purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px;}
+.score-stars{font-size:2rem;margin-bottom:20px;letter-spacing:4px;}
+.retry-btn{
+  padding:13px 32px;border-radius:16px;border:none;
+  background:linear-gradient(135deg,var(--sky),var(--purple));color:white;
+  font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;
+  transition:all .2s;box-shadow:0 4px 16px rgba(79,172,254,.4);
+}
+.retry-btn:hover{transform:translateY(-2px);}
+
+/* GAME PANEL */
+.game-area{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.game-card{
+  background:white;border-radius:24px;padding:22px;
+  box-shadow:var(--shadow);border:3px solid #E8F0FF;
+  cursor:pointer;transition:all .2s;text-align:center;
+}
+.game-card:hover{border-color:var(--sky);transform:translateY(-3px);}
+.game-card-emoji{font-size:2.5rem;margin-bottom:8px;}
+.game-card-title{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--navy);margin-bottom:4px;}
+.game-card-desc{font-size:.78rem;color:#888;font-weight:700;}
+.game-badge{background:linear-gradient(135deg,var(--green),var(--teal));color:white;
+  font-size:.65rem;font-weight:900;padding:2px 8px;border-radius:10px;display:inline-block;margin-top:6px;}
+
+/* FRACTION BUILDER GAME */
+.builder-game{background:white;border-radius:24px;padding:24px;box-shadow:var(--shadow);}
+.builder-title{font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--navy);margin-bottom:16px;text-align:center;}
+.builder-target{
+  background:linear-gradient(135deg,#F0F9FF,#E8F4FF);border-radius:16px;
+  padding:20px;text-align:center;margin-bottom:20px;border:2px solid #BFDBFE;
+}
+.builder-target-label{font-size:.75rem;font-weight:900;text-transform:uppercase;color:#888;margin-bottom:8px;}
+.builder-pizza-wrap{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:16px 0;}
+.builder-pizza{width:90px;height:90px;cursor:pointer;transition:transform .2s;}
+.builder-pizza:hover{transform:scale(1.1);}
+.builder-pizza.selected{filter:drop-shadow(0 0 8px rgba(79,172,254,.6));}
+.builder-submit{
+  width:100%;padding:12px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--orange),var(--sun));color:var(--navy);
+  font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;
+  transition:all .2s;font-weight:900;
+}
+.builder-submit:hover{transform:translateY(-2px);}
+
+/* MATCHING GAME */
+.matching-game{background:white;border-radius:24px;padding:24px;box-shadow:var(--shadow);}
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.match-col{display:flex;flex-direction:column;gap:8px;}
+.match-item{
+  padding:12px 16px;border-radius:14px;border:3px solid #E8E8E8;
+  background:white;cursor:pointer;transition:all .2s;
+  font-family:'Fredoka One',cursive;font-size:1rem;color:var(--navy);text-align:center;
+}
+.match-item:hover:not(.matched):not(.selected){border-color:var(--sky);}
+.match-item.selected{border-color:var(--purple);background:#F5F0FF;}
+.match-item.matched{border-color:var(--green);background:#F0FFF4;cursor:default;}
+.match-item.wrong-match{border-color:var(--red);background:#FFF5F5;animation:shake .3s;}
+
+/* ANIMATIONS */
+@keyframes popIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes star-burst{0%{transform:scale(0) rotate(0deg);opacity:1}100%{transform:scale(2) rotate(180deg);opacity:0}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.float{animation:float 3s ease-in-out infinite;}
+
+/* CONFETTI */
+.confetti-piece{
+  position:fixed;width:10px;height:10px;border-radius:2px;
+  pointer-events:none;z-index:9999;
+  animation:confetti-fall 1.5s ease-out forwards;
+}
+@keyframes confetti-fall{
+  0%{opacity:1;transform:translateY(-20px) rotate(0deg);}
+  100%{opacity:0;transform:translateY(100vh) rotate(720deg);}
+}
+
+/* TOOLTIP */
+.tooltip{
+  position:relative;display:inline-block;
+}
+.tooltip-text{
+  visibility:hidden;background:var(--navy);color:white;
+  font-size:.75rem;font-weight:700;padding:6px 10px;border-radius:8px;
+  position:absolute;bottom:110%;left:50%;transform:translateX(-50%);
+  white-space:nowrap;z-index:100;opacity:0;transition:opacity .2s;
+}
+.tooltip:hover .tooltip-text{visibility:visible;opacity:1;}
+
+@media(max-width:768px){
+  .app{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .mcq-grid{grid-template-columns:1fr;}
+  .visual-grid{grid-template-columns:repeat(2,1fr);}
+  .game-area{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ELABoost <span class="logo-badge">MATH</span></div>
+  <div class="nav-xp">
+    <span class="stars-count" id="starCount">⭐ 0</span>
+    <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+    <span class="xp-txt" id="xpTxt">0 XP</span>
+  </div>
+</nav>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-title">🧮 Grade 5 Fractions</div>
+
+    <button class="lesson-btn active" onclick="loadLesson('what',this)">
+      <div class="lb-emoji">🍕</div>
+      <div class="lb-info"><span class="lb-name">What is a Fraction?</span><span class="lb-std">5.NF.A.1</span></div>
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('equivalent',this)">
+      <div class="lb-emoji">⚖️</div>
+      <div class="lb-info"><span class="lb-name">Equivalent Fractions</span><span class="lb-std">5.NF.A.1</span></div>
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('add',this)">
+      <div class="lb-emoji">➕</div>
+      <div class="lb-info"><span class="lb-name">Adding Fractions</span><span class="lb-std">5.NF.A.1</span></div>
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('subtract',this)">
+      <div class="lb-emoji">➖</div>
+      <div class="lb-info"><span class="lb-name">Subtracting Fractions</span><span class="lb-std">5.NF.A.1</span></div>
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('multiply',this)">
+      <div class="lb-emoji">✖️</div>
+      <div class="lb-info"><span class="lb-name">Multiplying Fractions</span><span class="lb-std">5.NF.B.4</span></div>
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('divide',this)">
+      <div class="lb-emoji">➗</div>
+      <div class="lb-info"><span class="lb-name">Dividing Fractions</span><span class="lb-std">5.NF.B.7</span></div>
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('mixed',this)">
+      <div class="lb-emoji">🔢</div>
+      <div class="lb-info"><span class="lb-name">Mixed Numbers</span><span class="lb-std">5.NF.A.2</span></div>
+    </button>
+
+    <div class="sb-stars">
+      <div class="sb-stars-title">🏆 My Stars</div>
+      <div class="sb-stars-val" id="sidebarStars">⭐ 0</div>
+      <div class="sb-stars-sub">Keep practicing to earn more!</div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main" id="mainContent"></div>
+
+</div>
+
+<script>
+// ═══════════════════════════════
+// STATE
+// ═══════════════════════════════
+let xp = 0, stars = 0, currentLesson = 'what';
+let practiceState = { idx: 0, score: 0, answered: false };
+
+// ═══════════════════════════════
+// LESSON DATA
+// ═══════════════════════════════
+const LESSONS = {
+
+  what: {
+    title: 'What is a Fraction?',
+    emoji: '🍕',
+    standard: '5.NF.A',
+    color: '#4FACFE',
+    learn: `
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num">1</div>
+          <div class="cc-title">Fractions = Equal Parts of a Whole</div>
+          <div class="cc-std">5.NF.A</div>
+        </div>
+        <p style="font-size:.9rem;font-weight:700;color:#555;margin-bottom:16px;line-height:1.65;">
+          A fraction tells us <strong style="color:#4FACFE">how many parts</strong> we have out of the <strong style="color:#9775FA">total equal parts</strong>. 
+          Think of a pizza sliced into equal pieces! 🍕
+        </p>
+        <div class="fraction-visual">
+          ${makePizzaSet([
+            {slices:4, filled:1, label:'1/4'},
+            {slices:4, filled:2, label:'2/4'},
+            {slices:4, filled:3, label:'3/4'},
+            {slices:4, filled:4, label:'4/4'},
+          ])}
+        </div>
+        <div class="fraction-display">
+          <div class="frac">
+            <div class="frac-num">3</div>
+            <div class="frac-bar"></div>
+            <div class="frac-den">4</div>
+          </div>
+          <div class="frac-label">← Numerator: how many parts you HAVE<br>← Denominator: total EQUAL parts</div>
+        </div>
+      </div>
+
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#FF922B,#FFD43B)">2</div>
+          <div class="cc-title">Fractions on a Number Line</div>
+        </div>
+        <p style="font-size:.9rem;font-weight:700;color:#555;margin-bottom:12px;">
+          We can also show fractions on a number line — between 0 and 1!
+        </p>
+        ${makeNumberLine(4, 3)}
+        <div class="rule-card">
+          <div class="rule-icon">💡</div>
+          <div class="rule-text">The denominator tells you how many <em>equal jumps</em> to divide 0→1 into. 
+          The numerator tells you how many jumps to take!</div>
+        </div>
+      </div>
+
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#51CF66,#20C997)">3</div>
+          <div class="cc-title">Quick Examples</div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">Example 1</div>
+          <div class="ex-problem">A chocolate bar has 8 equal pieces. You eat 3. What fraction did you eat?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num">1</div>Total pieces (denominator) = 8</li>
+            <li><div class="step-num">2</div>Pieces eaten (numerator) = 3</li>
+            <li><div class="step-num">3</div>Answer: <strong style="color:#4FACFE">3/8</strong> of the chocolate bar 🍫</li>
+          </ul>
+        </div>
+        <div class="example-box" style="border-left-color:#9775FA">
+          <div class="ex-label" style="color:#9775FA">Example 2</div>
+          <div class="ex-problem">A class has 20 students. 15 brought lunch. What fraction brought lunch?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#9775FA">1</div>Total students = 20</li>
+            <li><div class="step-num" style="background:#9775FA">2</div>Brought lunch = 15</li>
+            <li><div class="step-num" style="background:#9775FA">3</div>Answer: <strong style="color:#9775FA">15/20</strong> of the class 🎒</li>
+          </ul>
+        </div>
+      </div>`,
+    questions: [
+      {
+        type:'visual',
+        text:'Which pizza shows 3/8?',
+        options:[
+          {slices:8,filled:3,label:'3/8',correct:true},
+          {slices:8,filled:5,label:'5/8',correct:false},
+          {slices:8,filled:2,label:'2/8',correct:false},
+          {slices:8,filled:6,label:'6/8',correct:false},
+        ],
+        exp:'3/8 means 3 out of 8 equal slices are shaded. Count the colored slices — exactly 3 out of 8!'
+      },
+      {
+        type:'mcq',
+        text:'In the fraction 5/9, what does the 9 represent?',
+        opts:['How many parts you have','The total number of equal parts','How big each part is','The whole number'],
+        ans:1,
+        exp:'The DENOMINATOR (bottom number) always tells you the total equal parts the whole is divided into. The NUMERATOR (top) tells you how many parts you have.'
+      },
+      {
+        type:'mcq',
+        text:'A ribbon is cut into 6 equal pieces. 4 pieces are blue. What fraction is blue?',
+        opts:['2/6','4/6','6/4','1/6'],
+        ans:1,
+        exp:'4 pieces are blue out of 6 total equal pieces → 4/6. Numerator = blue pieces (4), Denominator = total pieces (6).'
+      },
+      {
+        type:'mcq',
+        text:'Which fraction is closest to 1 whole?',
+        opts:['1/8','2/5','7/8','3/10'],
+        ans:2,
+        exp:'7/8 means only 1 piece is missing out of 8! The closer the numerator is to the denominator, the closer the fraction is to 1 whole.'
+      },
+    ]
+  },
+
+  equivalent: {
+    title: 'Equivalent Fractions',
+    emoji: '⚖️',
+    standard: '5.NF.A.1',
+    color: '#9775FA',
+    learn: `
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#9775FA,#F06595)">1</div>
+          <div class="cc-title">Same Value, Different Look!</div>
+          <div class="cc-std">5.NF.A.1</div>
+        </div>
+        <p style="font-size:.9rem;font-weight:700;color:#555;margin-bottom:16px;line-height:1.65;">
+          Equivalent fractions look different but represent the <strong style="color:#9775FA">exact same amount</strong>. 
+          Like wearing different outfits but being the same person! 👗👔
+        </p>
+        <div class="fraction-visual">
+          ${makePizzaSet([
+            {slices:2, filled:1, label:'1/2'},
+            {slices:4, filled:2, label:'2/4'},
+            {slices:8, filled:4, label:'4/8'},
+          ])}
+        </div>
+        <div class="rule-card">
+          <div class="rule-icon">⚖️</div>
+          <div class="rule-text">1/2 = 2/4 = 4/8 — All the same amount! The pizza eaten is identical.</div>
+        </div>
+      </div>
+
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#FF922B,#FFD43B)">2</div>
+          <div class="cc-title">How to Find Equivalent Fractions</div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-icon">✖️</div>
+          <div class="rule-text"><strong>Multiply Rule:</strong> Multiply BOTH numerator AND denominator by the SAME number.</div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">Multiply Method</div>
+          <div class="ex-problem">Find 3 fractions equivalent to 1/3</div>
+          <ul class="ex-steps">
+            <li><div class="step-num">1</div>1/3 × 2/2 = <strong style="color:#9775FA">2/6</strong></li>
+            <li><div class="step-num">2</div>1/3 × 3/3 = <strong style="color:#9775FA">3/9</strong></li>
+            <li><div class="step-num">3</div>1/3 × 4/4 = <strong style="color:#9775FA">4/12</strong></li>
+          </ul>
+        </div>
+        <div class="rule-card" style="background:linear-gradient(135deg,#F0FFF4,#DCFCE7);border-color:#51CF66">
+          <div class="rule-icon">➗</div>
+          <div class="rule-text"><strong style="color:#166534">Simplify Rule:</strong> Divide BOTH by the same number to simplify. 
+          6/8 ÷ 2/2 = 3/4 ← Simplest form!</div>
+        </div>
+      </div>`,
+    questions: [
+      {
+        type:'mcq',
+        text:'Which fraction is equivalent to 2/3?',
+        opts:['3/4','4/6','2/5','5/9'],
+        ans:1,
+        exp:'2/3 × 2/2 = 4/6. Multiply both top and bottom by 2 and you get 4/6, which equals the same amount as 2/3.'
+      },
+      {
+        type:'mcq',
+        text:'What number completes this? 3/4 = ?/12',
+        opts:['6','8','9','7'],
+        ans:2,
+        exp:'4 × 3 = 12, so multiply the numerator by 3 too: 3 × 3 = 9. Answer: 3/4 = 9/12!'
+      },
+      {
+        type:'visual',
+        text:'Which pizza shows an equivalent fraction to 1/2?',
+        options:[
+          {slices:6,filled:2,label:'2/6',correct:false},
+          {slices:6,filled:3,label:'3/6',correct:true},
+          {slices:6,filled:4,label:'4/6',correct:false},
+          {slices:8,filled:3,label:'3/8',correct:false},
+        ],
+        exp:'3/6 = 1/2 because 3÷3=1 and 6÷3=2. Half of 6 slices is 3 slices — same as half!'
+      },
+      {
+        type:'mcq',
+        text:'Simplify 8/12 to lowest terms.',
+        opts:['4/6','2/3','3/4','1/2'],
+        ans:1,
+        exp:'Both 8 and 12 can be divided by 4. 8÷4=2, 12÷4=3. So 8/12 simplifies to 2/3!'
+      },
+    ]
+  },
+
+  add: {
+    title: 'Adding Fractions',
+    emoji: '➕',
+    standard: '5.NF.A.1',
+    color: '#51CF66',
+    learn: `
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#51CF66,#20C997)">1</div>
+          <div class="cc-title">Same Denominator = Easy!</div>
+          <div class="cc-std">5.NF.A.1</div>
+        </div>
+        <div class="rule-card" style="background:linear-gradient(135deg,#F0FFF4,#DCFCE7);border-color:#51CF66">
+          <div class="rule-icon">✅</div>
+          <div class="rule-text"><strong style="color:#166534">Rule:</strong> Same denominator → just add the numerators! Keep the denominator the same.</div>
+        </div>
+        <div class="example-box" style="border-left-color:#51CF66">
+          <div class="ex-label" style="color:#51CF66">Same Denominator</div>
+          <div class="ex-problem">2/7 + 3/7 = ?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#51CF66">1</div>Same denominator (7) ✅ — No changes needed!</li>
+            <li><div class="step-num" style="background:#51CF66">2</div>Add numerators: 2 + 3 = <strong style="color:#51CF66">5</strong></li>
+            <li><div class="step-num" style="background:#51CF66">3</div>Keep denominator: <strong style="color:#51CF66">5/7</strong> 🎉</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#FF922B,#FFD43B)">2</div>
+          <div class="cc-title">Different Denominators → Find Common Ground!</div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-icon">🔑</div>
+          <div class="rule-text">When denominators are different, find the <strong>Least Common Denominator (LCD)</strong> first — the smallest number both denominators divide into evenly.</div>
+        </div>
+        <div class="example-box">
+          <div class="ex-label">Different Denominators</div>
+          <div class="ex-problem">1/3 + 1/4 = ?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num">1</div>LCD of 3 and 4 = <strong>12</strong> (smallest number 3 and 4 both go into)</li>
+            <li><div class="step-num">2</div>Convert: 1/3 = 4/12 &nbsp;&nbsp; 1/4 = 3/12</li>
+            <li><div class="step-num">3</div>Add: 4/12 + 3/12 = <strong style="color:#51CF66">7/12</strong> 🎉</li>
+          </ul>
+        </div>
+      </div>`,
+    questions: [
+      {
+        type:'mcq',
+        text:'2/9 + 4/9 = ?',
+        opts:['6/18','6/9','8/9','2/3'],
+        ans:1,
+        exp:'Same denominators! Just add the numerators: 2+4=6. Keep the 9. Answer: 6/9 (which also simplifies to 2/3).'
+      },
+      {
+        type:'mcq',
+        text:'1/4 + 1/2 = ?',
+        opts:['2/6','2/4','3/4','1/3'],
+        ans:2,
+        exp:'Convert 1/2 to fourths: 1/2 = 2/4. Now: 1/4 + 2/4 = 3/4!'
+      },
+      {
+        type:'mcq',
+        text:'You eat 1/6 of a cake Monday and 2/6 on Tuesday. How much total?',
+        opts:['3/12','3/6','2/6','1/3'],
+        ans:1,
+        exp:'Same denominators: 1/6 + 2/6 = 3/6. Same as 1/2 of the cake!'
+      },
+      {
+        type:'mcq',
+        text:'1/3 + 1/4 = ?',
+        opts:['2/7','2/12','7/12','1/6'],
+        ans:2,
+        exp:'LCD of 3 and 4 is 12. Convert: 1/3=4/12, 1/4=3/12. Add: 4/12+3/12=7/12!'
+      },
+    ]
+  },
+
+  subtract: {
+    title: 'Subtracting Fractions',
+    emoji: '➖',
+    standard: '5.NF.A.1',
+    color: '#FF6B6B',
+    learn: `
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#FF6B6B,#F06595)">1</div>
+          <div class="cc-title">Subtracting = Same Rules as Adding!</div>
+          <div class="cc-std">5.NF.A.1</div>
+        </div>
+        <div class="rule-card" style="background:linear-gradient(135deg,#FFF5F5,#FFE4E4);border-color:#FF6B6B">
+          <div class="rule-icon">➖</div>
+          <div class="rule-text"><strong style="color:#9B1C1C">Rule:</strong> Same denominator → subtract numerators. Different denominators → find LCD first, same as addition!</div>
+        </div>
+        <div class="example-box" style="border-left-color:#FF6B6B">
+          <div class="ex-label" style="color:#FF6B6B">Same Denominator</div>
+          <div class="ex-problem">5/8 − 2/8 = ?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#FF6B6B">1</div>Same denominator (8) ✅</li>
+            <li><div class="step-num" style="background:#FF6B6B">2</div>Subtract numerators: 5 − 2 = <strong style="color:#FF6B6B">3</strong></li>
+            <li><div class="step-num" style="background:#FF6B6B">3</div>Keep denominator: <strong style="color:#FF6B6B">3/8</strong> 🎉</li>
+          </ul>
+        </div>
+        <div class="example-box" style="border-left-color:#F06595">
+          <div class="ex-label" style="color:#F06595">Different Denominators</div>
+          <div class="ex-problem">3/4 − 1/3 = ?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#F06595">1</div>LCD of 4 and 3 = <strong>12</strong></li>
+            <li><div class="step-num" style="background:#F06595">2</div>Convert: 3/4 = 9/12 &nbsp;&nbsp; 1/3 = 4/12</li>
+            <li><div class="step-num" style="background:#F06595">3</div>Subtract: 9/12 − 4/12 = <strong style="color:#F06595">5/12</strong> 🎉</li>
+          </ul>
+        </div>
+      </div>`,
+    questions: [
+      {
+        type:'mcq',
+        text:'7/10 − 3/10 = ?',
+        opts:['4/20','4/0','4/10','10/10'],
+        ans:2,
+        exp:'Same denominators! Subtract numerators: 7−3=4. Keep 10. Answer: 4/10 (simplifies to 2/5).'
+      },
+      {
+        type:'mcq',
+        text:'3/4 − 1/2 = ?',
+        opts:['2/2','1/4','2/4','1/2'],
+        ans:1,
+        exp:'Convert 1/2 to fourths: 1/2=2/4. Then: 3/4 − 2/4 = 1/4!'
+      },
+      {
+        type:'mcq',
+        text:'A full bottle of juice is 4/4. You drink 1/4. How much is left?',
+        opts:['5/4','4/4','3/4','1/4'],
+        ans:2,
+        exp:'4/4 − 1/4 = 3/4. Three quarters of the bottle is still left!'
+      },
+      {
+        type:'mcq',
+        text:'5/6 − 1/4 = ?',
+        opts:['4/2','4/12','7/12','10/12'],
+        ans:2,
+        exp:'LCD of 6 and 4 = 12. Convert: 5/6=10/12, 1/4=3/12. Subtract: 10/12−3/12=7/12!'
+      },
+    ]
+  },
+
+  multiply: {
+    title: 'Multiplying Fractions',
+    emoji: '✖️',
+    standard: '5.NF.B.4',
+    color: '#7C3AED',
+    learn: `
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#7C3AED,#A78BFA)">1</div>
+          <div class="cc-title">Multiplying is EASIER Than Adding!</div>
+          <div class="cc-std">5.NF.B.4</div>
+        </div>
+        <p style="font-size:.9rem;font-weight:700;color:#555;margin-bottom:16px;line-height:1.65;">
+          No need to find a common denominator! Just multiply <strong style="color:#7C3AED">across the top</strong> and <strong style="color:#7C3AED">across the bottom</strong>. 🎉
+        </p>
+        <div class="rule-card" style="background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border-color:#7C3AED">
+          <div class="rule-icon">✖️</div>
+          <div class="rule-text"><strong style="color:#4C1D95">The Rule:</strong> Multiply the numerators together. Multiply the denominators together. Simplify if needed!</div>
+        </div>
+        <div class="example-box" style="border-left-color:#7C3AED">
+          <div class="ex-label" style="color:#7C3AED">Example 1 — Fraction × Fraction</div>
+          <div class="ex-problem">2/3 × 3/4 = ?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#7C3AED">1</div>Multiply numerators: 2 × 3 = <strong style="color:#7C3AED">6</strong></li>
+            <li><div class="step-num" style="background:#7C3AED">2</div>Multiply denominators: 3 × 4 = <strong style="color:#7C3AED">12</strong></li>
+            <li><div class="step-num" style="background:#7C3AED">3</div>Answer: 6/12 → Simplify: <strong style="color:#7C3AED">1/2</strong> 🎉</li>
+          </ul>
+        </div>
+        <div class="example-box" style="border-left-color:#A78BFA">
+          <div class="ex-label" style="color:#A78BFA">Example 2 — Whole Number × Fraction</div>
+          <div class="ex-problem">4 × 2/5 = ?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#A78BFA">1</div>Write 4 as a fraction: 4/1</li>
+            <li><div class="step-num" style="background:#A78BFA">2</div>Multiply: 4/1 × 2/5 = 8/5</li>
+            <li><div class="step-num" style="background:#A78BFA">3</div>Answer: <strong style="color:#A78BFA">8/5</strong> (or 1 and 3/5 as a mixed number)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#FF922B,#FFD43B)">2</div>
+          <div class="cc-title">Real World: "of" means multiply!</div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-icon">💡</div>
+          <div class="rule-text">When you see <strong>"fraction OF a number"</strong> — that means multiply! "1/2 of 8" = 1/2 × 8 = 4</div>
+        </div>
+        <div class="example-box" style="border-left-color:#FF922B">
+          <div class="ex-label" style="color:#FF922B">Word Problem</div>
+          <div class="ex-problem">You have 3/4 of a pizza. You eat 1/2 of what you have. How much pizza did you eat?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#FF922B">1</div>"1/2 of 3/4" means 1/2 × 3/4</li>
+            <li><div class="step-num" style="background:#FF922B">2</div>1 × 3 = 3 (numerators) · 2 × 4 = 8 (denominators)</li>
+            <li><div class="step-num" style="background:#FF922B">3</div>You ate <strong style="color:#FF922B">3/8</strong> of the whole pizza 🍕</li>
+          </ul>
+        </div>
+      </div>`,
+    questions: [
+      {
+        type:'mcq',
+        text:'1/2 × 3/5 = ?',
+        opts:['4/7','3/10','2/7','3/5'],
+        ans:1,
+        exp:'Multiply across: 1×3=3 (numerator), 2×5=10 (denominator). Answer: 3/10!'
+      },
+      {
+        type:'mcq',
+        text:'2/3 × 4/5 = ?',
+        opts:['6/8','8/15','6/15','8/8'],
+        ans:1,
+        exp:'2×4=8 (numerator), 3×5=15 (denominator). Answer: 8/15!'
+      },
+      {
+        type:'mcq',
+        text:'What is 1/3 of 12?',
+        opts:['3','4','6','36'],
+        ans:1,
+        exp:'"Of" means multiply! 1/3 × 12 = 1/3 × 12/1 = 12/3 = 4. One third of 12 is 4!'
+      },
+      {
+        type:'mcq',
+        text:'A recipe needs 3/4 cup of sugar. You want to make half the recipe. How much sugar do you need?',
+        opts:['1/4 cup','3/8 cup','1/2 cup','3/4 cup'],
+        ans:1,
+        exp:'Half of 3/4 = 1/2 × 3/4 = 3/8. You need 3/8 cup of sugar!'
+      },
+      {
+        type:'mcq',
+        text:'3/4 × 2/3 = ?',
+        opts:['5/7','6/12','1/2','5/12'],
+        ans:2,
+        exp:'3×2=6 (numerator), 4×3=12 (denominator). 6/12 simplifies to 1/2!'
+      },
+    ]
+  },
+
+  divide: {
+    title: 'Dividing Fractions',
+    emoji: '➗',
+    standard: '5.NF.B.7',
+    color: '#0EA5E9',
+    learn: `
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#0EA5E9,#38BDF8)">1</div>
+          <div class="cc-title">Keep · Change · Flip! (KCF)</div>
+          <div class="cc-std">5.NF.B.7</div>
+        </div>
+        <p style="font-size:.9rem;font-weight:700;color:#555;margin-bottom:16px;line-height:1.65;">
+          Dividing by a fraction? Use the <strong style="color:#0EA5E9">Keep · Change · Flip</strong> trick — it turns division into multiplication!
+        </p>
+        <div class="rule-card" style="background:linear-gradient(135deg,#F0F9FF,#E0F2FE);border-color:#0EA5E9">
+          <div class="rule-icon">🔑</div>
+          <div class="rule-text">
+            <strong style="color:#0C4A6E">Keep</strong> the first fraction the same →
+            <strong style="color:#0C4A6E">Change</strong> ÷ to × →
+            <strong style="color:#0C4A6E">Flip</strong> the second fraction (reciprocal)
+          </div>
+        </div>
+        <div class="example-box" style="border-left-color:#0EA5E9">
+          <div class="ex-label" style="color:#0EA5E9">Example 1</div>
+          <div class="ex-problem">3/4 ÷ 1/2 = ?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#0EA5E9">K</div><strong>Keep</strong> → 3/4</li>
+            <li><div class="step-num" style="background:#0EA5E9">C</div><strong>Change</strong> → ÷ becomes ×</li>
+            <li><div class="step-num" style="background:#0EA5E9">F</div><strong>Flip</strong> → 1/2 becomes 2/1</li>
+            <li><div class="step-num" style="background:#38BDF8">4</div>Now multiply: 3/4 × 2/1 = <strong style="color:#0EA5E9">6/4 = 1½</strong> 🎉</li>
+          </ul>
+        </div>
+        <div class="example-box" style="border-left-color:#38BDF8">
+          <div class="ex-label" style="color:#38BDF8">Example 2 — Whole ÷ Fraction</div>
+          <div class="ex-problem">4 ÷ 1/3 = ?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#38BDF8">1</div>Write 4 as 4/1</li>
+            <li><div class="step-num" style="background:#38BDF8">2</div>KCF: 4/1 × 3/1 = 12/1</li>
+            <li><div class="step-num" style="background:#38BDF8">3</div>Answer: <strong style="color:#0EA5E9">12</strong> — How many 1/3 pieces fit in 4? Twelve!</li>
+          </ul>
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#51CF66,#20C997)">2</div>
+          <div class="cc-title">Why does KCF work?</div>
+        </div>
+        <div class="rule-card" style="background:linear-gradient(135deg,#F0FFF4,#DCFCE7);border-color:#51CF66">
+          <div class="rule-icon">🍫</div>
+          <div class="rule-text">Think: "How many 1/2 pieces fit in 3/4?" Dividing by 1/2 is the same as asking how many halves — and multiplying by 2 (the flip) does exactly that!</div>
+        </div>
+      </div>`,
+    questions: [
+      {
+        type:'mcq',
+        text:'1/2 ÷ 1/4 = ?',
+        opts:['1/8','1/2','2','4'],
+        ans:2,
+        exp:'Keep 1/2 · Change ÷ to × · Flip 1/4 to 4/1. Now: 1/2 × 4/1 = 4/2 = 2. Two quarters fit in one half!'
+      },
+      {
+        type:'mcq',
+        text:'2/3 ÷ 1/3 = ?',
+        opts:['2/9','2','1/2','3/2'],
+        ans:1,
+        exp:'KCF: 2/3 × 3/1 = 6/3 = 2. Two thirds divided by one third = 2. Makes sense — two 1/3 pieces fit in 2/3!'
+      },
+      {
+        type:'mcq',
+        text:'You have 3 feet of ribbon. You cut pieces that are each 1/4 foot long. How many pieces do you get?',
+        opts:['3/4','4','12','3'],
+        ans:2,
+        exp:'3 ÷ 1/4 = 3/1 × 4/1 = 12. You get 12 pieces — there are 12 quarter-feet in 3 feet!'
+      },
+      {
+        type:'mcq',
+        text:'3/5 ÷ 3/10 = ?',
+        opts:['9/50','1/2','2','9/10'],
+        ans:2,
+        exp:'KCF: 3/5 × 10/3 = 30/15 = 2. Simplify 30/15 = 2!'
+      },
+      {
+        type:'mcq',
+        text:'5 ÷ 1/2 = ?',
+        opts:['5/2','2/5','10','2'],
+        ans:2,
+        exp:'5/1 × 2/1 = 10/1 = 10. There are 10 half-pieces in 5 wholes!'
+      },
+    ]
+  },
+
+  mixed: {
+    title: 'Mixed Numbers',
+    emoji: '🔢',
+    standard: '5.NF.A.2',
+    color: '#10B981',
+    learn: `
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#10B981,#34D399)">1</div>
+          <div class="cc-title">What is a Mixed Number?</div>
+          <div class="cc-std">5.NF.A.2</div>
+        </div>
+        <p style="font-size:.9rem;font-weight:700;color:#555;margin-bottom:16px;line-height:1.65;">
+          A <strong style="color:#10B981">mixed number</strong> has a whole number AND a fraction together — like 2½. An <strong style="color:#F97316">improper fraction</strong> has a bigger numerator than denominator — like 5/2. They mean the same thing!
+        </p>
+        <div class="fraction-visual">
+          ${typeof makePizzaSet === 'function' ? makePizzaSet([
+            {slices:2, filled:2, label:'1 whole'},
+            {slices:2, filled:1, label:'+ 1/2'},
+          ]) : ''}
+        </div>
+        <div class="rule-card" style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border-color:#10B981">
+          <div class="rule-icon">🔄</div>
+          <div class="rule-text">2½ = 5/2 &nbsp;|&nbsp; 3⅓ = 10/3 &nbsp;|&nbsp; 1¾ = 7/4 — Same value, different forms!</div>
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#FF922B,#FFD43B)">2</div>
+          <div class="cc-title">Converting: Mixed Number ↔ Improper Fraction</div>
+        </div>
+        <div class="example-box" style="border-left-color:#10B981">
+          <div class="ex-label" style="color:#10B981">Mixed → Improper Fraction</div>
+          <div class="ex-problem">Convert 2¾ to an improper fraction</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#10B981">1</div>Multiply whole number × denominator: 2 × 4 = <strong>8</strong></li>
+            <li><div class="step-num" style="background:#10B981">2</div>Add the numerator: 8 + 3 = <strong>11</strong></li>
+            <li><div class="step-num" style="background:#10B981">3</div>Keep denominator: <strong style="color:#10B981">11/4</strong> 🎉</li>
+          </ul>
+        </div>
+        <div class="example-box" style="border-left-color:#34D399">
+          <div class="ex-label" style="color:#34D399">Improper Fraction → Mixed</div>
+          <div class="ex-problem">Convert 13/5 to a mixed number</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#34D399">1</div>Divide: 13 ÷ 5 = <strong>2</strong> remainder <strong>3</strong></li>
+            <li><div class="step-num" style="background:#34D399">2</div>Whole number = 2, remainder = 3, denominator stays 5</li>
+            <li><div class="step-num" style="background:#34D399">3</div>Answer: <strong style="color:#10B981">2 and 3/5</strong> 🎉</li>
+          </ul>
+        </div>
+      </div>
+      <div class="concept-card">
+        <div class="cc-header">
+          <div class="cc-num" style="background:linear-gradient(135deg,#9775FA,#F06595)">3</div>
+          <div class="cc-title">Adding Mixed Numbers</div>
+        </div>
+        <div class="example-box" style="border-left-color:#9775FA">
+          <div class="ex-label" style="color:#9775FA">Example</div>
+          <div class="ex-problem">1½ + 2¼ = ?</div>
+          <ul class="ex-steps">
+            <li><div class="step-num" style="background:#9775FA">1</div>Add whole numbers: 1 + 2 = 3</li>
+            <li><div class="step-num" style="background:#9775FA">2</div>Add fractions (find LCD): 1/2 + 1/4 → LCD=4 → 2/4 + 1/4 = 3/4</li>
+            <li><div class="step-num" style="background:#9775FA">3</div>Combine: <strong style="color:#9775FA">3 and 3/4</strong> 🎉</li>
+          </ul>
+        </div>
+      </div>`,
+    questions: [
+      {
+        type:'mcq',
+        text:'Convert 2¾ to an improper fraction.',
+        opts:['8/4','11/4','9/4','10/4'],
+        ans:1,
+        exp:'Multiply: 2 × 4 = 8. Add numerator: 8 + 3 = 11. Keep denominator 4. Answer: 11/4!'
+      },
+      {
+        type:'mcq',
+        text:'Convert 17/5 to a mixed number.',
+        opts:['2 and 7/5','3 and 1/5','3 and 2/5','2 and 3/5'],
+        ans:2,
+        exp:'17 ÷ 5 = 3 remainder 2. So 17/5 = 3 and 2/5!'
+      },
+      {
+        type:'mcq',
+        text:'1½ + 2⅓ = ?',
+        opts:['3 and 5/6','3 and 2/5','4 and 1/6','3 and 1/2'],
+        ans:0,
+        exp:'Whole numbers: 1+2=3. Fractions: 1/2+1/3, LCD=6 → 3/6+2/6=5/6. Answer: 3 and 5/6!'
+      },
+      {
+        type:'mcq',
+        text:'Which is bigger: 2⅔ or 8/3?',
+        opts:['2⅔ is bigger','8/3 is bigger','They are equal','Cannot be compared'],
+        ans:2,
+        exp:'Convert 2⅔: 2×3=6, 6+2=8, so 2⅔ = 8/3. They are exactly equal — just written differently!'
+      },
+      {
+        type:'mcq',
+        text:'You have 3½ pizzas. You eat 1¼ pizzas. How much is left?',
+        opts:['2 and 1/4','2 and 1/2','2 and 3/4','1 and 3/4'],
+        ans:0,
+        exp:'Subtract whole numbers: 3-1=2. Subtract fractions: 1/2-1/4, LCD=4 → 2/4-1/4=1/4. Answer: 2 and 1/4 pizzas!'
+      },
+    ]
+  }
+};
+
+// ═══════════════════════════════
+// SVG HELPERS
+// ═══════════════════════════════
+function makePizzaSVG(slices, filled, size=80, colors=null) {
+  const cx=size/2, cy=size/2, r=size/2-2;
+  const fillColor = colors?.fill || '#FF922B';
+  const emptyColor = colors?.empty || '#FFE8CC';
+  let svg=`<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+  svg+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${emptyColor}" stroke="#ccc" stroke-width="1.5"/>`;
+  for(let i=0;i<slices;i++){
+    const a1=(i/slices)*Math.PI*2 - Math.PI/2;
+    const a2=((i+1)/slices)*Math.PI*2 - Math.PI/2;
+    const x1=cx+r*Math.cos(a1), y1=cy+r*Math.sin(a1);
+    const x2=cx+r*Math.cos(a2), y2=cy+r*Math.sin(a2);
+    if(i<filled){
+      svg+=`<path d="M${cx},${cy} L${x1},${y1} A${r},${r} 0 ${slices===1?1:0},1 ${x2},${y2} Z" fill="${fillColor}" stroke="white" stroke-width="1.5"/>`;
+    }
+    svg+=`<line x1="${cx}" y1="${cy}" x2="${x1}" y2="${y1}" stroke="white" stroke-width="1.5"/>`;
+  }
+  svg+=`</svg>`;
+  return svg;
+}
+
+function makePizzaSet(items) {
+  return `<div class="fraction-visual" style="gap:20px;justify-content:center;">` +
+    items.map(item => `
+      <div class="pizza-wrap">
+        <div class="pizza-label">${item.label}</div>
+        <div class="pizza">${makePizzaSVG(item.slices, item.filled)}</div>
+      </div>`).join('') + `</div>`;
+}
+
+function makeNumberLine(denom, num) {
+  const points = [];
+  for(let i=0;i<=denom;i++) points.push(i/denom);
+  const pct = num/denom;
+  return `<div class="number-line-wrap"><div class="number-line">
+    <div class="nl-track"></div>
+    <div class="nl-highlight" style="left:20px;width:calc(${pct*100}% * (100% - 40px)/100%)"></div>
+    ${points.map((p,i)=>`
+      <div class="nl-dot" style="left:calc(20px + ${p}*(100% - 40px))"></div>
+      <div class="nl-label" style="left:calc(20px + ${p}*(100% - 40px));top:68%">
+        ${i===0?'0':i===denom?'1':`${i}/${denom}`}
+      </div>`).join('')}
+  </div></div>`;
+}
+
+// ═══════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════
+function loadLesson(id, btn) {
+  currentLesson = id;
+  practiceState = { idx:0, score:0, answered:false };
+  document.querySelectorAll('.lesson-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderMain();
+}
+
+function renderMain() {
+  const L = LESSONS[currentLesson];
+  const main = document.getElementById('mainContent');
+  const progress = Math.round((practiceState.idx / L.questions.length) * 100);
+
+  main.innerHTML = `
+    <div class="lesson-header" style="background:linear-gradient(135deg,${L.color},${L.color}aa)">
+      <div class="lh-emoji float">${L.emoji}</div>
+      <div class="lh-text">
+        <div class="lh-tag">Grade 5 · ${L.standard}</div>
+        <div class="lh-title">${L.title}</div>
+        <div class="lh-sub">Common Core Math · Interactive Practice</div>
+      </div>
+      <div class="lh-progress">
+        <div class="progress-ring">
+          <svg width="70" height="70"><circle cx="35" cy="35" r="28" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="6"/>
+          <circle cx="35" cy="35" r="28" fill="none" stroke="white" stroke-width="6"
+            stroke-dasharray="${2*Math.PI*28}" stroke-dashoffset="${2*Math.PI*28*(1-progress/100)}" stroke-linecap="round"/></svg>
+          <div class="progress-ring-val">${progress}%</div>
+        </div>
+        <div style="color:rgba(255,255,255,.8);font-size:.72rem;font-weight:800;margin-top:4px;">Progress</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tabLearn" onclick="switchTab('learn')">📖 Learn</button>
+      <button class="tab-btn" id="tabPractice" onclick="switchTab('practice')">✏️ Practice</button>
+      <button class="tab-btn" id="tabGames" onclick="switchTab('games')">🎮 Games</button>
+    </div>
+
+    <div class="panel active" id="panelLearn">${L.learn}</div>
+    <div class="panel" id="panelPractice"><div class="practice-area" id="practiceContent"></div></div>
+    <div class="panel" id="panelGames" id="gamesContent">${renderGames()}</div>
+  `;
+  renderQuestion();
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`tab${tab.charAt(0).toUpperCase()+tab.slice(1)}`).classList.add('active');
+  document.getElementById(`panel${tab.charAt(0).toUpperCase()+tab.slice(1)}`).classList.add('active');
+  if(tab==='practice') renderQuestion();
+  if(tab==='games') renderGames();
+}
+
+// ═══════════════════════════════
+// PRACTICE
+// ═══════════════════════════════
+function renderQuestion() {
+  const L = LESSONS[currentLesson];
+  const pc = document.getElementById('practiceContent');
+  if(!pc) return;
+
+  if(practiceState.idx >= L.questions.length) {
+    renderScore();
+    return;
+  }
+  const q = L.questions[practiceState.idx];
+  practiceState.answered = false;
+
+  let optionsHTML = '';
+  if(q.type==='mcq') {
+    optionsHTML = `<div class="mcq-grid">${q.opts.map((o,i)=>`
+      <div class="mcq-opt" id="opt${i}" onclick="answerMCQ(${i},${q.ans},'${encodeURIComponent(q.exp)}')">
+        <div class="opt-key">${['A','B','C','D'][i]}</div>${o}
+      </div>`).join('')}</div>`;
+  } else if(q.type==='visual') {
+    optionsHTML = `<div class="visual-grid">${q.options.map((o,i)=>`
+      <div class="visual-opt" id="opt${i}" onclick="answerVisual(${i},${q.options.findIndex(x=>x.correct)},'${encodeURIComponent(q.exp)}')">
+        ${makePizzaSVG(o.slices,o.filled,64)}
+        <div class="visual-opt-label">${o.label}</div>
+      </div>`).join('')}</div>`;
+  }
+
+  pc.innerHTML = `
+    <div class="q-card" style="animation:slideUp .3s ease">
+      <div class="q-header">
+        <div class="q-num">Question ${practiceState.idx+1} of ${L.questions.length}</div>
+        <div class="q-pts">⭐ +${q.type==='visual'?15:10} XP</div>
+      </div>
+      <div class="q-text">${q.text}</div>
+      ${optionsHTML}
+      <div id="feedback"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+    </div>`;
+}
+
+function answerMCQ(sel, ans, expEnc) {
+  if(practiceState.answered) return;
+  practiceState.answered = true;
+  const exp = decodeURIComponent(expEnc);
+  document.querySelectorAll('.mcq-opt').forEach(el=>el.classList.add('disabled'));
+  document.getElementById(`opt${ans}`).classList.add('correct');
+  if(sel!==ans) document.getElementById(`opt${sel}`).classList.add('wrong');
+  else { addXP(10); addStar(); spawnConfetti(); }
+  showFeedback(sel===ans, exp);
+  if(sel===ans) practiceState.score++;
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function answerVisual(sel, ans, expEnc) {
+  if(practiceState.answered) return;
+  practiceState.answered = true;
+  const exp = decodeURIComponent(expEnc);
+  document.querySelectorAll('.visual-opt').forEach(el=>el.classList.add('disabled'));
+  document.getElementById(`opt${ans}`).classList.add('correct');
+  if(sel!==ans) document.getElementById(`opt${sel}`).classList.add('wrong');
+  else { addXP(15); addStar(); spawnConfetti(); }
+  showFeedback(sel===ans, exp);
+  if(sel===ans) practiceState.score++;
+  document.getElementById('nextBtn').classList.add('show');
+}
+
+function showFeedback(correct, exp) {
+  const fb = document.getElementById('feedback');
+  fb.innerHTML = `
+    <div class="feedback-box ${correct?'correct-fb':'wrong-fb'}">
+      <div class="fb-icon">${correct?'🎉':'💪'}</div>
+      <div>
+        <div class="fb-title ${correct?'c':'w'}">${correct?'Excellent! +XP':'Not quite — try again next time!'}</div>
+        <div class="fb-text">${exp}</div>
+      </div>
+    </div>`;
+}
+
+function nextQuestion() {
+  practiceState.idx++;
+  renderQuestion();
+  // update header progress ring
+  const L = LESSONS[currentLesson];
+  const progress = Math.round((practiceState.idx / L.questions.length) * 100);
+  const ring = document.querySelector('.progress-ring circle:last-child');
+  const val = document.querySelector('.progress-ring-val');
+  if(ring){ ring.style.strokeDashoffset = 2*Math.PI*28*(1-progress/100); }
+  if(val) val.textContent = progress+'%';
+}
+
+function renderScore() {
+  const L = LESSONS[currentLesson];
+  const pc = document.getElementById('practiceContent');
+  const pct = Math.round(practiceState.score/L.questions.length*100);
+  const emoji = pct>=90?'🏆':pct>=70?'⭐':'💪';
+  const msg = pct>=90?'Perfect Score!':pct>=70?'Great Work!':'Keep Practicing!';
+  spawnConfetti();
+  pc.innerHTML = `
+    <div class="score-screen">
+      <div class="score-emoji">${emoji}</div>
+      <div class="score-title">${msg}</div>
+      <div class="score-val">${practiceState.score}/${L.questions.length}</div>
+      <div class="score-stars">${'⭐'.repeat(Math.ceil(practiceState.score/L.questions.length*3))}</div>
+      <p style="color:#888;font-size:.9rem;font-weight:700;margin-bottom:20px;">You scored ${pct}% on ${L.title}</p>
+      <button class="retry-btn" onclick="practiceState={idx:0,score:0,answered:false};renderQuestion()">Try Again ↺</button>
+    </div>`;
+}
+
+// ═══════════════════════════════
+// GAMES
+// ═══════════════════════════════
+function renderGames() {
+  const L = LESSONS[currentLesson];
+  return `
+    <div class="game-area">
+      <div class="game-card" onclick="startMatchingGame()">
+        <div class="game-card-emoji">🎯</div>
+        <div class="game-card-title">Fraction Matcher</div>
+        <div class="game-card-desc">Match fractions to their pizza pictures!</div>
+        <div class="game-badge">+20 XP per match</div>
+      </div>
+      <div class="game-card" onclick="startBuilderGame()">
+        <div class="game-card-emoji">🍕</div>
+        <div class="game-card-title">Pizza Builder</div>
+        <div class="game-card-desc">Click the right slices to build the fraction!</div>
+        <div class="game-badge">+25 XP per round</div>
+      </div>
+    </div>
+    <div id="gameContainer" style="margin-top:16px;"></div>`;
+}
+
+function startMatchingGame() {
+  const gc = document.getElementById('gameContainer');
+  const pairs = [
+    {frac:'1/2', slices:2, filled:1},
+    {frac:'3/4', slices:4, filled:3},
+    {frac:'2/3', slices:3, filled:2},
+    {frac:'1/4', slices:4, filled:1},
+  ];
+  const shuffledPizzas = [...pairs].sort(()=>Math.random()-.5);
+  let selected = null, matched = 0;
+
+  gc.innerHTML = `
+    <div class="matching-game">
+      <div class="builder-title">🎯 Match the Fraction to the Pizza!</div>
+      <div class="match-grid">
+        <div class="match-col" id="fracCol">
+          ${pairs.map((p,i)=>`<div class="match-item" id="frac${i}" data-idx="${i}" onclick="selectMatch('frac',${i})">${p.frac}</div>`).join('')}
+        </div>
+        <div class="match-col" id="pizzaCol">
+          ${shuffledPizzas.map((p,i)=>`
+            <div class="match-item" id="pizza${i}" data-orig="${pairs.findIndex(x=>x.frac===p.frac)}" onclick="selectMatch('pizza',${i})">
+              ${makePizzaSVG(p.slices,p.filled,50)}
+            </div>`).join('')}
+        </div>
+      </div>
+      <div id="matchFeedback" style="margin-top:12px;text-align:center;font-family:'Fredoka One',cursive;font-size:1.1rem;color:#888;"></div>
+    </div>`;
+
+  let fracSel=null, pizzaSel=null;
+  window.selectMatch = (type, idx) => {
+    if(type==='frac') {
+      document.querySelectorAll('#fracCol .match-item:not(.matched)').forEach(el=>el.classList.remove('selected'));
+      document.getElementById(`frac${idx}`).classList.add('selected');
+      fracSel=idx;
+    } else {
+      document.querySelectorAll('#pizzaCol .match-item:not(.matched)').forEach(el=>el.classList.remove('selected'));
+      document.getElementById(`pizza${idx}`).classList.add('selected');
+      pizzaSel=idx;
+    }
+    if(fracSel!==null && pizzaSel!==null) {
+      const pizzaOrig = parseInt(document.getElementById(`pizza${pizzaSel}`).dataset.orig);
+      if(fracSel===pizzaOrig) {
+        document.getElementById(`frac${fracSel}`).classList.add('matched');
+        document.getElementById(`pizza${pizzaSel}`).classList.add('matched');
+        addXP(20); spawnConfetti();
+        matched++;
+        document.getElementById('matchFeedback').innerHTML = `<span style="color:#51CF66">✅ Match! +20 XP</span>`;
+        if(matched===pairs.length) {
+          document.getElementById('matchFeedback').innerHTML = `<span style="color:#FF922B">🏆 All matched! Amazing job!</span>`;
+        }
+      } else {
+        document.getElementById(`frac${fracSel}`).classList.add('wrong-match');
+        document.getElementById(`pizza${pizzaSel}`).classList.add('wrong-match');
+        document.getElementById('matchFeedback').innerHTML = `<span style="color:#FF6B6B">❌ Not quite! Try again.</span>`;
+        setTimeout(()=>{
+          document.getElementById(`frac${fracSel}`).classList.remove('wrong-match','selected');
+          document.getElementById(`pizza${pizzaSel}`).classList.remove('wrong-match','selected');
+          document.getElementById('matchFeedback').innerHTML='';
+        }, 800);
+      }
+      fracSel=null; pizzaSel=null;
+    }
+  };
+}
+
+function startBuilderGame() {
+  const gc = document.getElementById('gameContainer');
+  const targets = [{slices:4,filled:3,label:'3/4'},{slices:8,filled:5,label:'5/8'},{slices:6,filled:2,label:'2/6'},{slices:3,filled:2,label:'2/3'}];
+  let tIdx=0, selected=0;
+  const target = targets[tIdx];
+
+  function renderBuilder() {
+    const t = targets[tIdx];
+    selected=0;
+    gc.innerHTML = `
+      <div class="builder-game">
+        <div class="builder-title">🍕 Build this fraction: <span style="color:#FF922B">${t.label}</span></div>
+        <div class="builder-target">
+          <div class="builder-target-label">Target Fraction</div>
+          <div class="frac" style="font-family:'Fredoka One',cursive">
+            <div style="font-size:2rem;color:#FF922B">${t.filled}</div>
+            <div style="width:40px;height:3px;background:#1a1a2e;margin:4px auto"></div>
+            <div style="font-size:2rem;color:#9775FA">${t.slices}</div>
+          </div>
+          <p style="font-size:.8rem;font-weight:700;color:#888;margin-top:8px;">Click ${t.filled} pizza slices to shade them!</p>
+        </div>
+        <div class="builder-pizza-wrap" id="builderPizzas"></div>
+        <div id="builderMsg" style="text-align:center;font-family:'Fredoka One',cursive;font-size:1rem;color:#888;margin-bottom:12px;">
+          Selected: 0 / ${t.filled} slices
+        </div>
+        <button class="builder-submit" onclick="checkBuilder(${t.filled})">Check My Answer! ✓</button>
+      </div>`;
+
+    const wrap = document.getElementById('builderPizzas');
+    let slicesSelected = new Array(t.slices).fill(false);
+
+    for(let i=0;i<t.slices;i++) {
+      const div = document.createElement('div');
+      div.style.cssText = 'cursor:pointer;transition:transform .2s;';
+      div.innerHTML = makePizzaSVG(t.slices, 0, 70, {fill:'#FF922B',empty:'#FFE8CC'});
+      div.onclick = () => {
+        slicesSelected[i] = !slicesSelected[i];
+        selected = slicesSelected.filter(Boolean).length;
+        // Redraw with correct fills
+        div.innerHTML = makePizzaSVG(t.slices, 0, 70, {fill: slicesSelected[i]?'#FF922B':'#FFE8CC', empty:'#FFE8CC'});
+        div.style.filter = slicesSelected[i] ? 'drop-shadow(0 0 8px rgba(255,146,43,.7))' : '';
+        document.getElementById('builderMsg').innerHTML = `Selected: ${selected} / ${t.filled} slices`;
+      };
+      wrap.appendChild(div);
+    }
+
+    window.checkBuilder = (needed) => {
+      if(selected===needed) {
+        document.getElementById('builderMsg').innerHTML = `<span style="color:#51CF66">🎉 Perfect! That's ${t.label}! +25 XP</span>`;
+        addXP(25); spawnConfetti();
+        tIdx=(tIdx+1)%targets.length;
+        setTimeout(renderBuilder, 1500);
+      } else {
+        document.getElementById('builderMsg').innerHTML = `<span style="color:#FF6B6B">Not quite! You need exactly ${needed} slices. Try again!</span>`;
+      }
+    };
+  }
+  renderBuilder();
+}
+
+// ═══════════════════════════════
+// XP / STARS / CONFETTI
+// ═══════════════════════════════
+function addXP(amount) {
+  xp += amount;
+  const pct = Math.min(100, (xp%200)/2);
+  document.getElementById('xpFill').style.width = pct+'%';
+  document.getElementById('xpTxt').textContent = xp+' XP';
+}
+
+function addStar() {
+  stars++;
+  document.getElementById('starCount').textContent = '⭐ '+stars;
+  document.getElementById('sidebarStars').textContent = '⭐ '+stars;
+}
+
+function spawnConfetti() {
+  const colors=['#4FACFE','#FFD43B','#51CF66','#FF6B6B','#9775FA','#FF922B'];
+  for(let i=0;i<20;i++) {
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.style.cssText=`
+      left:${Math.random()*100}vw;
+      top:${Math.random()*30+20}vh;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${Math.random()*10+6}px;height:${Math.random()*10+6}px;
+      border-radius:${Math.random()>0.5?'50%':'3px'};
+      animation-delay:${Math.random()*0.5}s;
+      animation-duration:${Math.random()*0.8+1}s;
+    `;
+    document.body.appendChild(el);
+    el.addEventListener('animationend',()=>el.remove());
+  }
+}
+
+// ═══════════════════════════════
+// INIT
+// ═══════════════════════════════
+loadLesson('what', document.querySelector('.lesson-btn'));
+</script>
+</body>
+</html>

@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELABoost · Writing Coach · Grade 5</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0A2240; --red: #CC0000; --gold: #E8A000; --peach: #FF6B47;
+    --green: #1A7A4A; --purple: #6D28D9; --bg: #F5F2EE;
+    --card: #FFFFFF; --text: #1A1A2E; --muted: #6B7280;
+    --border: #E5E0D8; --radius: 18px;
+    --shadow: 0 4px 24px rgba(10,34,64,0.10);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── NAV ── */
+  nav { background: var(--navy); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 20px rgba(10,34,64,0.3); }
+  .logo { font-family: 'Lora', serif; font-size: 1.4rem; color: white; display: flex; align-items: center; gap: 10px; }
+  .logo span { background: var(--red); padding: 3px 9px; border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: 0.68rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+  .nav-grade { display: flex; gap: 6px; }
+  .ng-btn { padding: 6px 14px; border-radius: 18px; border: 2px solid rgba(255,255,255,0.2); font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.8rem; cursor: pointer; background: transparent; color: rgba(255,255,255,0.6); transition: all 0.2s; }
+  .ng-btn:hover { border-color: rgba(255,255,255,0.5); color: white; }
+  .ng-btn.active { background: var(--red); border-color: var(--red); color: white; }
+  .nav-right { display: flex; align-items: center; gap: 8px; }
+  .xp-pill { background: var(--gold); color: var(--navy); padding: 5px 12px; border-radius: 18px; font-weight: 800; font-size: 0.8rem; }
+
+  /* ── LAYOUT ── */
+  .app { display: grid; grid-template-columns: 280px 1fr; min-height: calc(100vh - 64px); }
+
+  /* ── SIDEBAR ── */
+  .sidebar { background: var(--navy); padding: 28px 20px; display: flex; flex-direction: column; gap: 6px; border-right: 1px solid rgba(255,255,255,0.08); }
+  .sidebar-title { color: rgba(255,255,255,0.45); font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; padding: 0 8px; margin-bottom: 4px; margin-top: 12px; }
+  .sidebar-title:first-child { margin-top: 0; }
+  .lesson-btn { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 12px; border: none; background: transparent; color: rgba(255,255,255,0.6); font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; text-align: left; width: 100%; }
+  .lesson-btn:hover { background: rgba(255,255,255,0.08); color: white; }
+  .lesson-btn.active { background: rgba(255,255,255,0.12); color: white; }
+  .lesson-btn.done { color: rgba(255,255,255,0.5); }
+  .lesson-btn .lb-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+  .lesson-btn.active .lb-icon { background: var(--gold); }
+  .lesson-btn:not(.active) .lb-icon { background: rgba(255,255,255,0.08); }
+  .lesson-btn.done .lb-icon { background: rgba(26,122,74,0.4); }
+  .lb-check { margin-left: auto; font-size: 0.8rem; opacity: 0.6; }
+
+  /* ── MAIN ── */
+  .main { padding: 36px; overflow-y: auto; max-width: 860px; }
+
+  /* ── LESSON HEADER ── */
+  .lesson-header { margin-bottom: 28px; }
+  .lh-breadcrumb { color: var(--red); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .lh-title { font-family: 'Lora', serif; font-size: 2rem; color: var(--navy); line-height: 1.2; margin-bottom: 8px; }
+  .lh-gse { display: inline-block; background: #FEF3E2; color: #92400E; border: 1px solid #FDE68A; padding: 4px 12px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+  .lh-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.6; margin-top: 10px; }
+
+  /* ── PROGRESS STEPS ── */
+  .steps-bar { display: flex; align-items: center; gap: 0; margin-bottom: 32px; }
+  .step-item { display: flex; align-items: center; flex: 1; }
+  .step-circle { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.8rem; flex-shrink: 0; transition: all 0.3s; border: 2px solid var(--border); background: white; color: var(--muted); }
+  .step-circle.active { background: var(--navy); border-color: var(--navy); color: white; }
+  .step-circle.done { background: var(--green); border-color: var(--green); color: white; }
+  .step-line { flex: 1; height: 2px; background: var(--border); transition: background 0.3s; }
+  .step-line.done { background: var(--green); }
+  .step-label { font-size: 0.7rem; font-weight: 700; color: var(--muted); margin-top: 6px; text-align: center; white-space: nowrap; }
+  .step-wrapper { display: flex; flex-direction: column; align-items: center; flex: 1; }
+
+  /* ── LESSON CARD ── */
+  .lesson-card { background: white; border-radius: var(--radius); border: 2px solid var(--border); overflow: hidden; margin-bottom: 20px; box-shadow: var(--shadow); }
+  .lc-header { padding: 18px 24px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .lc-step-badge { background: var(--navy); color: white; padding: 4px 12px; border-radius: 18px; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+  .lc-title { font-family: 'Lora', serif; font-size: 1.1rem; color: var(--navy); }
+  .lc-body { padding: 24px; }
+
+  /* ── LEARN BOX ── */
+  .learn-box { background: #F0F4FF; border-left: 4px solid var(--navy); border-radius: 0 12px 12px 0; padding: 18px 22px; margin-bottom: 20px; }
+  .learn-box h4 { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--navy); margin-bottom: 8px; }
+  .learn-box p { font-size: 0.92rem; line-height: 1.7; color: var(--text); }
+  .learn-box .example { background: white; border-radius: 10px; padding: 12px 16px; margin-top: 12px; font-family: 'Lora', serif; font-size: 0.95rem; font-style: italic; color: var(--navy); border: 1px solid var(--border); }
+  .learn-box .bad-example { background: #FEF2F2; border-radius: 10px; padding: 12px 16px; margin-top: 8px; font-family: 'Lora', serif; font-size: 0.95rem; font-style: italic; color: #991B1B; border: 1px solid #FECACA; }
+  .ex-label { font-family: 'DM Sans', sans-serif; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+
+  /* ── SENTENCE BUILDER ── */
+  .drag-zone { margin-bottom: 20px; }
+  .drag-label { font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .word-bank { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; background: #F9F7F4; border-radius: 12px; border: 2px dashed var(--border); min-height: 60px; }
+  .word-chip { padding: 7px 14px; background: white; border: 2px solid var(--border); border-radius: 20px; font-weight: 700; font-size: 0.88rem; cursor: grab; transition: all 0.2s; user-select: none; }
+  .word-chip:hover { border-color: var(--navy); color: var(--navy); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(10,34,64,0.12); }
+  .word-chip.dragging { opacity: 0.4; }
+  .word-chip.placed { opacity: 0.35; cursor: not-allowed; }
+  .drop-zone { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; background: white; border-radius: 12px; border: 2px solid var(--border); min-height: 60px; transition: all 0.2s; }
+  .drop-zone.over { border-color: var(--navy); background: #EFF3FA; }
+  .placed-chip { padding: 7px 14px; background: var(--navy); color: white; border-radius: 20px; font-weight: 700; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+  .placed-chip:hover { background: var(--red); }
+  .placed-chip .remove { font-size: 0.75rem; opacity: 0.7; }
+  .drop-placeholder { color: var(--muted); font-size: 0.88rem; font-style: italic; padding: 4px 0; }
+
+  .check-sentence-btn { padding: 10px 22px; background: var(--navy); color: white; border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; margin-top: 12px; }
+  .check-sentence-btn:hover { background: #0D2E5A; transform: translateY(-1px); }
+
+  .sentence-result { margin-top: 12px; padding: 14px 18px; border-radius: 12px; font-size: 0.9rem; font-weight: 600; display: none; }
+  .sentence-result.show { display: block; }
+  .sentence-result.ok { background: #F0FDF4; border: 2px solid #86EFAC; color: #14532D; }
+  .sentence-result.no { background: #FEF2F2; border: 2px solid #FECACA; color: #7F1D1D; }
+
+  /* ── WRITING AREA ── */
+  .writing-prompt { background: #FFFBF0; border: 2px solid #FDE68A; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; }
+  .writing-prompt .wp-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gold); margin-bottom: 6px; }
+  .writing-prompt p { font-family: 'Lora', serif; font-size: 1rem; color: var(--navy); line-height: 1.6; }
+
+  .hint-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .hint-chip { padding: 5px 12px; background: #EFF3FA; border: 1px solid #BFDBFE; border-radius: 18px; font-size: 0.78rem; font-weight: 600; color: var(--navy); cursor: pointer; transition: all 0.2s; }
+  .hint-chip:hover { background: var(--navy); color: white; }
+
+  .writing-input { width: 100%; padding: 16px 18px; border: 2px solid var(--border); border-radius: 14px; font-family: 'Lora', serif; font-size: 1rem; line-height: 1.7; resize: vertical; min-height: 120px; transition: border-color 0.2s; color: var(--text); background: white; }
+  .writing-input:focus { outline: none; border-color: var(--navy); }
+  .writing-input::placeholder { color: var(--muted); font-style: italic; }
+  .word-count { font-size: 0.75rem; color: var(--muted); font-weight: 600; margin-top: 6px; text-align: right; }
+
+  /* ── AI FEEDBACK BOX ── */
+  .ai-feedback { background: var(--navy); border-radius: var(--radius); padding: 24px; margin-top: 16px; display: none; animation: fadeIn 0.4s ease; }
+  .ai-feedback.show { display: block; }
+  .ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .ai-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+  .ai-title { color: white; font-weight: 800; font-size: 0.92rem; }
+  .ai-subtitle { color: rgba(255,255,255,0.5); font-size: 0.75rem; }
+  .ai-score-row { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .ai-score-item { background: rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px; flex: 1; min-width: 100px; }
+  .ai-score-item .sc-val { font-family: 'Lora', serif; font-size: 1.5rem; font-weight: 700; }
+  .ai-score-item .sc-lbl { font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .ai-text { color: rgba(255,255,255,0.85); font-size: 0.9rem; line-height: 1.75; }
+  .ai-text strong { color: var(--gold); }
+  .ai-loading { display: flex; align-items: center; gap: 12px; color: rgba(255,255,255,0.7); font-size: 0.9rem; }
+  .ai-dots { display: flex; gap: 4px; }
+  .ai-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); animation: bounce 1.2s infinite; }
+  .ai-dot:nth-child(2) { animation-delay: 0.2s; }
+  .ai-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:scale(0.6);opacity:0.5} 40%{transform:scale(1);opacity:1} }
+
+  .highlighted-text { line-height: 2; font-family: 'Lora', serif; font-size: 0.95rem; color: rgba(255,255,255,0.85); margin-top: 14px; padding: 14px 16px; background: rgba(255,255,255,0.06); border-radius: 10px; }
+  .hl-good { background: rgba(26,122,74,0.35); border-radius: 4px; padding: 1px 3px; }
+  .hl-improve { background: rgba(232,160,0,0.3); border-radius: 4px; padding: 1px 3px; }
+  .hl-fix { background: rgba(204,0,0,0.3); border-radius: 4px; padding: 1px 3px; text-decoration: underline; text-decoration-color: rgba(204,0,0,0.7); }
+
+  /* ── BUTTONS ── */
+  .action-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .btn-primary { padding: 13px 26px; background: var(--navy); color: white; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 0.93rem; cursor: pointer; transition: all 0.2s; }
+  .btn-primary:hover { background: #0D2E5A; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(10,34,64,0.25); }
+  .btn-secondary { padding: 13px 22px; background: white; color: var(--navy); border: 2px solid var(--border); border-radius: 12px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; }
+  .btn-secondary:hover { border-color: var(--navy); }
+  .btn-ai { padding: 13px 22px; background: linear-gradient(135deg, #1A7A4A, #059669); color: white; border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-weight: 800; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 8px; }
+  .btn-ai:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,122,74,0.35); }
+  .btn-ai:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ── GRAMMAR QUIZ ── */
+  .grammar-item { background: white; border: 2px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-bottom: 14px; }
+  .gi-sentence { font-family: 'Lora', serif; font-size: 1.05rem; line-height: 1.7; margin-bottom: 14px; color: var(--navy); }
+  .gi-options { display: flex; flex-wrap: wrap; gap: 8px; }
+  .gi-opt { padding: 8px 16px; background: #F9F7F4; border: 2px solid var(--border); border-radius: 20px; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; }
+  .gi-opt:hover:not(:disabled) { border-color: var(--navy); background: #EFF3FA; color: var(--navy); }
+  .gi-opt.correct { border-color: var(--green); background: #F0FDF4; color: #14532D; }
+  .gi-opt.wrong { border-color: var(--red); background: #FEF2F2; color: #7F1D1D; }
+  .gi-opt:disabled { cursor: not-allowed; }
+  .gi-explain { margin-top: 12px; padding: 12px 16px; background: #F0F4FF; border-radius: 10px; font-size: 0.85rem; line-height: 1.6; color: var(--text); display: none; }
+  .gi-explain.show { display: block; }
+
+  /* ── COMPLETION ── */
+  .completion-card { background: var(--navy); border-radius: var(--radius); padding: 40px; text-align: center; color: white; }
+  .completion-card h2 { font-family: 'Lora', serif; font-size: 2rem; margin-bottom: 10px; }
+  .completion-card p { color: rgba(255,255,255,0.7); margin-bottom: 24px; }
+  .xp-gained { font-family: 'Lora', serif; font-size: 3rem; color: var(--gold); }
+
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  @media(max-width:768px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 18px; }
+    .ai-score-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">✍️ Writing Coach <span>GSE</span></div>
+  <div class="nav-grade">
+    <button class="ng-btn active" onclick="setGrade(5)">Gr.5</button>
+    <button class="ng-btn" onclick="setGrade(6)">Gr.6</button>
+    <button class="ng-btn" onclick="setGrade(7)">Gr.7</button>
+    <button class="ng-btn" onclick="setGrade(8)">Gr.8</button>
+    <button class="ng-btn" onclick="setGrade(9)">Gr.9</button>
+  </div>
+  <div class="nav-right">
+    <div class="xp-pill">⭐ <span id="xpCount">0</span> XP</div>
+  </div>
+</nav>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-title">Sentence Building</div>
+    <button class="lesson-btn active" onclick="loadLesson('sentence1')">
+      <div class="lb-icon">🔧</div> Subject & Predicate
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('sentence2')">
+      <div class="lb-icon">🔗</div> Compound Sentences
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('sentence3')">
+      <div class="lb-icon">🌿</div> Complex Sentences
+    </button>
+
+    <div class="sidebar-title">Paragraph Structure</div>
+    <button class="lesson-btn" onclick="loadLesson('para1')">
+      <div class="lb-icon">🎯</div> Topic Sentences
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('para2')">
+      <div class="lb-icon">📋</div> Supporting Details
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('para3')">
+      <div class="lb-icon">🔚</div> Concluding Sentences
+    </button>
+
+    <div class="sidebar-title">Grammar & Mechanics</div>
+    <button class="lesson-btn" onclick="loadLesson('gram1')">
+      <div class="lb-icon">🔤</div> Punctuation
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('gram2')">
+      <div class="lb-icon">⏰</div> Verb Tense
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('gram3')">
+      <div class="lb-icon">🔄</div> Transitions
+    </button>
+
+    <div class="sidebar-title">Reading Literature</div>
+    <button class="lesson-btn" onclick="loadLesson('rl5')">
+      <div class="lb-icon">📐</div> Story Structure
+    </button>
+
+    <div class="sidebar-title">Reading Informational</div>
+    <button class="lesson-btn" onclick="loadLesson('ri4')">
+      <div class="lb-icon">🔍</div> Word Meaning
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('ri6')">
+      <div class="lb-icon">👁️</div> Author's Point of View
+    </button>
+    <button class="lesson-btn" onclick="loadLesson('ri7')">
+      <div class="lb-icon">📊</div> Text Features
+    </button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main" id="mainContent"></div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// LESSON DATA
+// ══════════════════════════════════════════
+const LESSONS = {
+
+  sentence1: {
+    title: "Subject & Predicate",
+    breadcrumb: "Sentence Building · Step 1 of 3",
+    gse: "ELAGSE5L.1 — Demonstrate command of English grammar",
+    desc: "Every complete sentence needs two parts: a subject (who or what the sentence is about) and a predicate (what the subject does or is). Mastering this is the first step to powerful writing!",
+    steps: ["Learn", "Build", "Write", "AI Review"],
+    type: "sentence_builder",
+    learn: {
+      rule: "The <strong>subject</strong> tells who or what the sentence is about. The <strong>predicate</strong> tells what the subject does, is, or has. Without both parts, a sentence is a fragment — an incomplete thought.",
+      good: "✅ The red-tailed hawk / soars above the Georgia pines.",
+      bad: "❌ Soars above the Georgia pines. (No subject — who is doing this?)"
+    },
+    drag: {
+      prompt: "Arrange these words to build a complete sentence:",
+      words: ["The", "river", "otter", "slides", "into", "the", "cold", "stream"],
+      correct: ["The", "river", "otter", "slides", "into", "the", "cold", "stream"],
+      explanation: "Subject: 'The river otter' · Predicate: 'slides into the cold stream' — a complete thought!"
+    },
+    write: {
+      prompt: "Write 2 complete sentences about an animal you find interesting. Make sure each sentence has a clear subject and predicate.",
+      placeholder: "Example: The monarch butterfly migrates thousands of miles each fall. It follows the same path as its ancestors did before it...",
+      hints: ["The dolphin...", "A bald eagle...", "My dog...", "Wild horses..."],
+      minWords: 15
+    }
+  },
+
+  sentence2: {
+    title: "Compound Sentences",
+    breadcrumb: "Sentence Building · Step 2 of 3",
+    gse: "ELAGSE5L.1 — Use coordinating conjunctions correctly",
+    desc: "Compound sentences join two complete ideas using FANBOYS conjunctions (For, And, Nor, But, Or, Yet, So). They make your writing flow more smoothly and show how ideas connect.",
+    steps: ["Learn", "Build", "Write", "AI Review"],
+    type: "sentence_builder",
+    learn: {
+      rule: "Use a <strong>coordinating conjunction</strong> (FANBOYS) with a <strong>comma</strong> to join two independent clauses. Each part must be able to stand alone as its own sentence. Put the comma BEFORE the conjunction.",
+      good: "✅ The peach crop was small this year, but the farmers worked hard.",
+      bad: "❌ The peach crop was small this year but the farmers worked hard. (Missing comma before 'but')"
+    },
+    drag: {
+      prompt: "Rearrange to form a correct compound sentence:",
+      words: ["Joshua", "finished", "his", "homework", ",", "so", "he", "played", "outside"],
+      correct: ["Joshua", "finished", "his", "homework", ",", "so", "he", "played", "outside"],
+      explanation: "Two independent clauses joined by ', so' — cause and effect shown with a coordinating conjunction and comma."
+    },
+    write: {
+      prompt: "Write 2 compound sentences using different FANBOYS conjunctions. One should use 'but' and one should use 'so' or 'and.'",
+      placeholder: "Example: I wanted to stay inside, but my friends convinced me to play. The rain stopped early, so we went to the park after all...",
+      hints: ["I love reading, but...", "The test was hard, and...", "She wanted pizza, yet...", "We studied, so..."],
+      minWords: 20
+    }
+  },
+
+  sentence3: {
+    title: "Complex Sentences",
+    breadcrumb: "Sentence Building · Step 3 of 3",
+    gse: "ELAGSE5L.1 — Use subordinating conjunctions to build complex sentences",
+    desc: "Complex sentences use subordinating conjunctions (because, although, when, if, since, while, after, before) to show how one idea depends on another. They add depth and sophistication to your writing.",
+    steps: ["Learn", "Build", "Write", "AI Review"],
+    type: "sentence_builder",
+    learn: {
+      rule: "A <strong>complex sentence</strong> = independent clause + dependent clause. <strong>Key rule:</strong> If the dependent clause comes FIRST, add a comma after it. If it comes second, no comma is needed.",
+      good: "✅ Because it rained all morning, we stayed inside. ✅ We stayed inside because it rained all morning.",
+      bad: "❌ Because it rained all morning we stayed inside. (Missing comma after the opening dependent clause)"
+    },
+    drag: {
+      prompt: "Build a complex sentence in the correct order:",
+      words: ["Although", "the", "test", "was", "difficult", ",", "Maya", "felt", "prepared"],
+      correct: ["Although", "the", "test", "was", "difficult", ",", "Maya", "felt", "prepared"],
+      explanation: "Dependent clause first ('Although the test was difficult') + comma + independent clause ('Maya felt prepared')."
+    },
+    write: {
+      prompt: "Write 3 complex sentences using three different subordinating conjunctions: 'although,' 'because,' and 'when.' Use a comma correctly in each.",
+      placeholder: "Example: Although the hike was long, I loved every step. I packed extra water because the trail was steep. When we reached the top, the view took my breath away...",
+      hints: ["Although I was tired,...", "Because the weather...,", "When the bell rings,...", "Since we practiced,..."],
+      minWords: 25
+    }
+  },
+
+  para1: {
+    title: "Topic Sentences",
+    breadcrumb: "Paragraph Structure · Step 1 of 3",
+    gse: "ELAGSE5W.2 — Write informative texts with a clear topic",
+    desc: "A topic sentence is the backbone of your paragraph — it tells the reader exactly what ONE idea the paragraph will explain. Strong topic sentences are specific and focused, not too broad or too vague.",
+    steps: ["Learn", "Identify", "Write", "AI Review"],
+    type: "writing",
+    learn: {
+      rule: "A strong topic sentence: (1) states ONE clear, focused idea, (2) is specific — not too broad ('Animals are interesting') or too narrow ('My dog likes bones'), (3) never starts with 'In this paragraph I will tell you about...' Just state the idea directly.",
+      good: "✅ Bottlenose dolphins use a complex system of clicks and whistles to communicate with their pod.",
+      bad: "❌ This paragraph is about dolphins. (Too vague — doesn't say what about dolphins)"
+    },
+    write: {
+      prompt: "Write a strong topic sentence for a paragraph about ONE of these topics: why recess is important, how recycling helps the environment, or what makes a good friend.",
+      placeholder: "Write your topic sentence here. Remember: one specific idea, stated directly, no 'I am going to...'",
+      hints: ["Recess gives students...", "Recycling reduces waste by...", "A good friend always...", "Daily exercise helps students..."],
+      minWords: 10
+    }
+  },
+
+  para2: {
+    title: "Supporting Details",
+    breadcrumb: "Paragraph Structure · Step 2 of 3",
+    gse: "ELAGSE5W.2b — Develop topics with facts, definitions, and details",
+    desc: "After your topic sentence, you need 2-3 supporting details that prove or explain your main idea. Good details are specific, relevant, and use facts, examples, or explanations — not just repeating the same idea.",
+    steps: ["Learn", "Identify", "Write", "AI Review"],
+    type: "writing",
+    learn: {
+      rule: "Each supporting detail should directly connect to the topic sentence. Use the <strong>PIE structure</strong>: Point (your detail) → Information (a fact or example) → Explanation (why it matters). Avoid vague details that don't add new information.",
+      good: "✅ Topic: Recess is important. → Detail: Studies show that after recess, students pay attention 20% longer. → Explanation: Physical activity increases blood flow to the brain, which improves focus.",
+      bad: "❌ Recess is good. Also recess helps kids. Recess is really important. (Repeating the same vague idea three times)"
+    },
+    write: {
+      prompt: "Use the topic sentence you wrote about recess, recycling, or friendship. Write a full paragraph: topic sentence + 2 supporting details using the PIE structure.",
+      placeholder: "Start with your topic sentence, then add two specific supporting details with explanations...",
+      hints: ["For example,...", "Research shows that...", "This is important because...", "One key reason is..."],
+      minWords: 45
+    }
+  },
+
+  para3: {
+    title: "Concluding Sentences",
+    breadcrumb: "Paragraph Structure · Step 3 of 3",
+    gse: "ELAGSE5W.2f — Provide a concluding statement",
+    desc: "A concluding sentence closes your paragraph by restating the main idea in NEW words — never just copying the topic sentence. It signals to the reader: this idea is complete.",
+    steps: ["Learn", "Identify", "Write", "AI Review"],
+    type: "writing",
+    learn: {
+      rule: "A strong concluding sentence: (1) restates the topic in different words, (2) does NOT introduce new ideas, (3) uses signal phrases like: 'Clearly,...' 'For these reasons,...' 'In short,...' 'It is clear that...'",
+      good: "✅ Topic: Recess improves focus. → Conclusion: Clearly, giving students time to move and play is one of the most powerful ways to improve their learning.",
+      bad: "❌ So that is why recess is good. (Too short — doesn't reflect what the paragraph explained)"
+    },
+    write: {
+      prompt: "Complete your paragraph! Add a strong concluding sentence to the paragraph you've been building. Then write out the full paragraph (topic sentence + 2 details + conclusion).",
+      placeholder: "Write your complete paragraph here — all four parts together...",
+      hints: ["Clearly,...", "For these reasons,...", "In short,...", "It is clear that..."],
+      minWords: 55
+    }
+  },
+
+  gram1: {
+    title: "Punctuation",
+    breadcrumb: "Grammar & Mechanics · Step 1 of 3",
+    gse: "ELAGSE5L.2 — Demonstrate command of punctuation",
+    desc: "Correct punctuation guides your reader through your ideas. Missing or incorrect punctuation can completely change — or confuse — the meaning of a sentence. Master these rules and your writing will shine!",
+    steps: ["Learn", "Fix It", "Write", "AI Review"],
+    type: "grammar",
+    learn: {
+      rule: "Key 5th grade rules: (1) Comma after an introductory clause, (2) Comma before FANBOYS in compound sentences, (3) Apostrophe for possessives (the dog's collar) — NOT for plurals, (4) Commas to set off introductory words like 'However,' and 'First,'",
+      good: "✅ After the long hike, we rested by the creek. ✅ The student's essay earned an A.",
+      bad: "❌ After the long hike we rested by the creek. ❌ The students essay earned an A."
+    },
+    grammar: [
+      {
+        q: "Which sentence uses an apostrophe correctly?",
+        opts: [
+          "The three friend's laughed at the joke.",
+          "The teacher returned the student's test.",
+          "The students' were happy about the news.",
+          "My two dog's are named Spot and Rover."
+        ],
+        ans: 1,
+        exp: "'The student's test' correctly uses an apostrophe to show possession — the test belongs to one student. Apostrophes are NEVER used to make a word plural (so 'friends' and 'dogs' with apostrophes are wrong)."
+      },
+      {
+        q: "Which sentence is punctuated correctly?",
+        opts: [
+          "However the storm passed quickly.",
+          "However, the storm passed quickly.",
+          "However the storm, passed quickly.",
+          "However the storm passed, quickly."
+        ],
+        ans: 1,
+        exp: "A comma is required after introductory words and phrases like 'However,' 'First,' 'In addition,' and 'For example.' These transition words always need a comma before the main clause."
+      },
+      {
+        q: "Which sentence uses commas correctly in a compound sentence?",
+        opts: [
+          "The dog barked, and the cat ran away.",
+          "The dog, barked and the cat ran away.",
+          "The dog barked and, the cat ran away.",
+          "The, dog barked and the cat ran away."
+        ],
+        ans: 0,
+        exp: "In a compound sentence, the comma goes BEFORE the coordinating conjunction (and, but, so, or, yet). 'The dog barked, and the cat ran away' correctly places the comma before 'and.'"
+      }
+    ],
+    write: {
+      prompt: "Write a paragraph of 4-5 sentences about your favorite time of day. Include: (1) an introductory clause with a comma, (2) one compound sentence, and (3) one possessive noun with an apostrophe.",
+      placeholder: "Example: After school ends, I love the quiet of the afternoon. The sun's light turns golden, and everything looks warm. My dog's favorite spot is the back porch, so we sit together...",
+      hints: ["After school,...", "The evening's...", "I love mornings, and...", "When the sun sets,..."],
+      minWords: 40
+    }
+  },
+
+  gram2: {
+    title: "Verb Tense",
+    breadcrumb: "Grammar & Mechanics · Step 2 of 3",
+    gse: "ELAGSE5L.1c — Use verb tenses to convey times and sequences",
+    desc: "Verb tense tells your reader WHEN something happens. Mixing tenses in the same piece of writing is one of the most common 5th grade errors — and one of the easiest to fix once you notice it!",
+    steps: ["Learn", "Fix It", "Write", "AI Review"],
+    type: "grammar",
+    learn: {
+      rule: "Pick a tense and STAY in it. Narratives (stories) use <strong>past tense</strong>. When you analyze a story or book, use <strong>present tense</strong>. Never jump between past and present within the same paragraph.",
+      good: "✅ (Story): She ran to the door and opened it. A cold wind rushed inside. ✅ (Analysis): The character runs to the door because she hears the noise.",
+      bad: "❌ She ran to the door and opens it. A cold wind rushes inside. (Mixed past and present tenses!)"
+    },
+    grammar: [
+      {
+        q: "Find the verb tense error: 'Last Tuesday, our class visits the science museum and learned about space.'",
+        opts: [
+          "'Last Tuesday' should be removed",
+          "'visits' should be 'visited'",
+          "'learned' should be 'learns'",
+          "There is no error"
+        ],
+        ans: 1,
+        exp: "'Last Tuesday' signals past tense. 'Visits' is present tense — it breaks the consistency. It should be 'visited' to match 'learned' and the time signal 'Last Tuesday.'"
+      },
+      {
+        q: "Which sentence correctly analyzes a book using the literary present tense?",
+        opts: [
+          "In Charlotte's Web, Wilbur was a lonely pig who needed a friend.",
+          "In Charlotte's Web, Wilbur is a lonely pig who needs a friend.",
+          "In Charlotte's Web, Wilbur will be a lonely pig who needed a friend.",
+          "In Charlotte's Web, Wilbur has been a lonely pig who needed a friend."
+        ],
+        ans: 1,
+        exp: "When writing about what happens in a book (literary analysis), always use present tense: 'is,' 'needs,' 'feels.' Even though the book was written in the past, we describe the story as if it is always happening."
+      },
+      {
+        q: "Choose the sentence with CONSISTENT verb tense:",
+        opts: [
+          "The team practices every day and won the championship.",
+          "The team practiced every day and wins the championship.",
+          "The team practiced every day and won the championship.",
+          "The team will practice every day and won the championship."
+        ],
+        ans: 2,
+        exp: "'Practiced' and 'won' are both simple past tense — they match each other and describe two things that happened in the past. All other options mix tenses incorrectly."
+      }
+    ],
+    write: {
+      prompt: "Write a short paragraph (4-5 sentences) in PAST TENSE describing what happened during a memorable day at school or a field trip. Use only past tense verbs throughout.",
+      placeholder: "Example: Last spring, our class visited a nature preserve outside the city. We hiked along a trail and spotted three different types of birds...",
+      hints: ["Last week, we...", "Our class traveled...", "I noticed that...", "When we arrived,..."],
+      minWords: 35
+    }
+  },
+
+  gram3: {
+    title: "Transitions",
+    breadcrumb: "Grammar & Mechanics · Step 3 of 3",
+    gse: "ELAGSE5W.2c — Use words and phrases to link ideas",
+    desc: "Transitions are the bridges that connect your ideas. Without them, writing feels choppy and hard to follow. The right transition word tells the reader exactly HOW two ideas are related.",
+    steps: ["Learn", "Fix It", "Write", "AI Review"],
+    type: "grammar",
+    learn: {
+      rule: "<strong>Types of transitions:</strong> ➕ Adding: furthermore, in addition, also, moreover · ↔ Contrasting: however, on the other hand, although, even though · ⚡ Cause/Effect: therefore, as a result, because, consequently · ⏱ Time/Order: first, next, then, finally, meanwhile · ✅ Concluding: in conclusion, clearly, for these reasons, overall",
+      good: "✅ Wolves are important to ecosystems. <em>For example</em>, they control deer populations. <em>As a result</em>, forests stay healthier.",
+      bad: "❌ Wolves are important to ecosystems. They control deer populations. Forests stay healthier. (No connections — choppy and flat!)"
+    },
+    grammar: [
+      {
+        q: "Choose the BEST transition: 'Zoos help protect endangered species. _____, many animals in zoos suffer from stress.'",
+        opts: ["Furthermore", "Therefore", "However", "In addition"],
+        ans: 2,
+        exp: "'However' signals contrast — the first sentence is positive about zoos, but the second gives a negative point. The relationship between the two ideas is contradictory, so a contrast transition is needed."
+      },
+      {
+        q: "Choose the BEST transition: 'The students studied every night for a week. _____, they felt confident on test day.'",
+        opts: ["However", "In contrast", "As a result", "For example"],
+        ans: 2,
+        exp: "'As a result' signals cause and effect. The studying CAUSED confidence on test day. This is a direct cause-effect relationship, so a causal transition is the best choice."
+      },
+      {
+        q: "Which sentence uses a transition INCORRECTLY?",
+        opts: [
+          "First, I gathered my materials. Then, I began the experiment.",
+          "I love science. Furthermore, I enjoy reading about it.",
+          "She practiced piano for hours. Therefore, she forgot how to play.",
+          "In conclusion, recycling benefits our planet in many ways."
+        ],
+        ans: 2,
+        exp: "'Therefore' signals a logical result. But practicing piano causing someone to FORGET how to play makes no logical sense — more practice leads to improvement. 'However' or 'Yet' would fit if the result was surprising, but this sentence is just logically backwards."
+      }
+    ],
+    write: {
+      prompt: "Write a paragraph of 4-5 sentences about whether students should be allowed to use devices in class. Use AT LEAST 3 different transition types (you can label them in parentheses if you want).",
+      placeholder: "Example: Students should be allowed to use tablets in class for research. However, they must follow rules to stay focused. As a result, learning could become more engaging. In conclusion, devices can help when used responsibly...",
+      hints: ["However,...", "Furthermore,...", "As a result,...", "In conclusion,..."],
+      minWords: 40
+    }
+  },
+
+  rl5: {
+    title: "Story Structure (RL.5)",
+    breadcrumb: "Reading Literature · RL.5",
+    gse: "ELAGSE5RL.5 — Explain how chapters, scenes, or stanzas fit into the overall structure",
+    desc: "Good authors don't just tell a story randomly — they build it carefully. Understanding how a story is structured helps you understand WHY things happen and HOW the author builds toward the ending.",
+    steps: ["Learn", "Fix It", "Write", "AI Review"],
+    type: "grammar",
+    learn: {
+      rule: "<strong>Story structure (plot diagram):</strong> 📍 Exposition (introduces characters, setting, problem) → 📈 Rising Action (events building tension) → ⚡ Climax (the turning point — highest tension) → 📉 Falling Action (after the climax, things settle) → 🔚 Resolution (how everything ends). Each part plays a specific role — and the author's chapter/scene choices control pacing!",
+      good: "✅ 'In Chapter 3, the author reveals that Maya's best friend has been lying to her. This is part of the rising action because it increases the conflict — Maya must decide whether to forgive her or not, pushing us toward the climax.'",
+      bad: "❌ 'Chapter 3 is when Maya finds out her friend lied.' (This describes WHAT happens but doesn't explain WHERE it fits in the structure or WHY it matters.)"
+    },
+    grammar: [
+      {
+        q: "A character discovers a locked door and hears strange noises behind it. Where does this MOST LIKELY fit in the story structure?",
+        opts: ["Exposition", "Rising Action", "Resolution", "Falling Action"],
+        ans: 1,
+        exp: "This builds suspense and creates questions — exactly what rising action does! Rising action consists of events that increase tension and push toward the climax. The mystery of the door makes us want to keep reading."
+      },
+      {
+        q: "The main character finally confronts the villain and defeats them. This is the story's _____.",
+        opts: ["Exposition", "Rising Action", "Climax", "Resolution"],
+        ans: 2,
+        exp: "The climax is the highest point of tension — the turning point where the main conflict is directly faced. Confronting and defeating the villain is the biggest moment of the story, so it's the climax."
+      },
+      {
+        q: "An author uses short, fast chapters during an exciting chase scene. Why?",
+        opts: [
+          "To slow down the story and add details",
+          "To speed up the pacing and increase tension",
+          "To introduce new characters",
+          "To end the story quickly"
+        ],
+        ans: 1,
+        exp: "Short chapters = fast reading pace = feeling of urgency and excitement. Authors control how fast or slow readers feel the action by adjusting chapter and scene length. Short chapters during action make your heart race!"
+      }
+    ],
+    write: {
+      prompt: "Think of a book or story you know. Write a short paragraph identifying ONE specific scene or chapter and explain exactly where it fits in the story structure (exposition, rising action, climax, falling action, or resolution). Explain WHY it fits there.",
+      placeholder: "In [book title], the scene where _____ is part of the [structure part] because...",
+      hints: ["This scene is the climax because...", "This chapter is rising action because...", "The author uses this scene to build tension by...", "This is the resolution because..."],
+      minWords: 40
+    }
+  },
+
+  ri4: {
+    title: "Word Meaning in Context (RI.4)",
+    breadcrumb: "Reading Informational · RI.4",
+    gse: "ELAGSE5RI.4 — Determine the meaning of words and phrases in a text",
+    desc: "When you read informational text, you'll meet unfamiliar words. You don't need a dictionary — the surrounding sentences give you clues! This skill is tested heavily on the Georgia Milestone.",
+    steps: ["Learn", "Fix It", "Write", "AI Review"],
+    type: "grammar",
+    learn: {
+      rule: "<strong>Context clue strategies:</strong> 🔍 Definition clue: author defines it nearby ('Photosynthesis, the process by which plants make food...') · 🔄 Restatement: restated in other words ('The arid, or extremely dry, desert...') · ↔ Contrast clue: opposite meaning given ('Unlike the timid deer, the wolf was bold and fearless') · 💡 Inference clue: use surrounding sentences to figure it out. Always ask: What does this word need to mean for the sentence to make sense?",
+      good: "✅ 'The scientist was meticulous in her work, checking every measurement three times and never rushing.' → Meticulous means EXTREMELY CAREFUL — the clues (checking 3x, never rushing) tell us.",
+      bad: "❌ 'Meticulous means detailed.' (Too vague — doesn't show understanding of the word in context or explain HOW you figured it out.)"
+    },
+    grammar: [
+      {
+        q: "Read: 'The hiker was exhausted after the arduous climb — her legs ached, she could barely breathe, and she collapsed at the summit.' What does 'arduous' mean?",
+        opts: ["Easy and enjoyable", "Very difficult and tiring", "Short and simple", "Beautiful and scenic"],
+        ans: 1,
+        exp: "The context clues (exhausted, legs ached, barely breathe, collapsed) all point to extreme difficulty. 'Arduous' means requiring great effort or very difficult. The description of her body after the climb is the key clue!"
+      },
+      {
+        q: "Read: 'Unlike his gregarious sister who loved parties and talking with everyone, Marcus was quiet and preferred to be alone.' What does 'gregarious' mean?",
+        opts: ["Shy and quiet", "Smart and clever", "Outgoing and sociable", "Angry and rude"],
+        ans: 2,
+        exp: "This is a CONTRAST clue! 'Unlike' signals that Marcus is the opposite of his sister. Since Marcus is quiet and prefers to be alone, his sister (gregarious) must be the opposite — outgoing and social!"
+      },
+      {
+        q: "Read: 'The immune system, the body's natural defense mechanism against disease, works constantly to keep us healthy.' What clue type helps define 'immune system'?",
+        opts: ["Contrast clue", "Definition clue", "Inference clue", "Example clue"],
+        ans: 1,
+        exp: "The author directly defines 'immune system' right after the comma — 'the body's natural defense mechanism against disease.' This is a DEFINITION clue, where the meaning is stated right in the text."
+      }
+    ],
+    write: {
+      prompt: "Choose ONE of these words: 'perseverance,' 'abundant,' or 'deteriorate.' Write 3-4 sentences that use the word AND include context clues so a reader could figure out the meaning WITHOUT looking it up. Don't define the word directly!",
+      placeholder: "Example using 'reluctant': Even though everyone else jumped in immediately, Joshua stood at the edge of the pool. He crossed his arms and stared at the water for five long minutes before finally stepping in...",
+      hints: ["Show the meaning through what happens...", "Use a contrast (unlike...)", "Show examples of the word in action...", "Describe what you see or feel..."],
+      minWords: 35
+    }
+  },
+
+  ri6: {
+    title: "Author's Point of View (RI.6)",
+    breadcrumb: "Reading Informational · RI.6",
+    gse: "ELAGSE5RI.6 — Analyze multiple accounts of the same event or topic",
+    desc: "The same topic can be written about from very different points of view. Identifying the author's perspective and comparing it to other accounts is a key critical thinking skill on the Georgia Milestone.",
+    steps: ["Learn", "Fix It", "Write", "AI Review"],
+    type: "grammar",
+    learn: {
+      rule: "<strong>Author's point of view in informational text:</strong> Every author makes choices about WHAT to include, what to leave out, and what language to use — and these choices reveal their perspective. Ask: (1) What is the author's main message or argument? (2) What words show their opinion (amazing, dangerous, unfortunately)? (3) What facts did they choose to include — and what did they leave out? Two articles about the same topic can tell very different stories!",
+      good: "✅ 'Source A says zoos are 'cruel prisons.' Source B says zoos are 'essential conservation centers.' Both are about zoos, but Source A focuses on animal suffering while Source B focuses on species protection. The authors chose different facts to support opposite viewpoints.'",
+      bad: "❌ 'Source A and Source B are both about zoos.' (This only says what they're about — it doesn't analyze the different perspectives or explain HOW they differ.)"
+    },
+    grammar: [
+      {
+        q: "Article A says: 'Wolves are dangerous predators that threaten livestock.' Article B says: 'Wolves are vital to healthy ecosystems and rarely attack humans.' What is the KEY difference?",
+        opts: [
+          "Article A is about wildlife; Article B is about farming",
+          "Article A focuses on threats to humans/farms; Article B focuses on environmental benefits",
+          "Article A has more facts than Article B",
+          "Article B was written by scientists; Article A was not"
+        ],
+        ans: 1,
+        exp: "Both articles are about wolves, but they have different PERSPECTIVES based on what they choose to focus on. Article A frames wolves as a threat. Article B frames them as beneficial. This is about what each author chose to emphasize — which reveals their point of view."
+      },
+      {
+        q: "An article uses words like 'unfortunately,' 'harmful,' and 'must be stopped' when describing a new factory. What does this tell you about the author's point of view?",
+        opts: [
+          "The author is neutral and just reporting facts",
+          "The author is in favor of the factory",
+          "The author is opposed to the factory",
+          "The author works at the factory"
+        ],
+        ans: 2,
+        exp: "Word choice reveals point of view! 'Unfortunately,' 'harmful,' and 'must be stopped' are all negative, emotional words that show the author disapproves of the factory. In informational writing, strong emotional language often signals the author's perspective."
+      },
+      {
+        q: "Two articles about school uniforms reach opposite conclusions using the SAME statistics. How is this possible?",
+        opts: [
+          "One article made up its statistics",
+          "Different authors can interpret the same data to support different viewpoints",
+          "One article is wrong and one is right",
+          "Statistics always prove one side is correct"
+        ],
+        ans: 1,
+        exp: "The same data can be interpreted different ways depending on what question you're asking and what conclusion you want to support. For example: '60% of students like uniforms' — one author says 'Most students approve!' Another says 'Almost half oppose them!' Same fact, different spin."
+      }
+    ],
+    write: {
+      prompt: "Imagine two short articles about screen time for kids. Article A is written by a tech company. Article B is written by a doctor concerned about children's health. Write 3-4 sentences explaining how their points of view would DIFFER and WHY. What would each author choose to include or leave out?",
+      placeholder: "Article A, written by a tech company, would likely focus on... while Article B, written by a doctor, would emphasize... This is because...",
+      hints: ["The tech company would focus on benefits like...", "The doctor would be concerned about...", "Each author would choose facts that support...", "Their word choices would differ because..."],
+      minWords: 45
+    }
+  },
+
+  ri7: {
+    title: "Using Text Features (RI.7)",
+    breadcrumb: "Reading Informational · RI.7",
+    gse: "ELAGSE5RI.7 — Draw on information from multiple print or digital sources",
+    desc: "Informational texts use special features — charts, diagrams, headings, captions, sidebars — to present information that words alone can't show. Knowing how to read these features is essential for the Georgia Milestone.",
+    steps: ["Learn", "Fix It", "Write", "AI Review"],
+    type: "grammar",
+    learn: {
+      rule: "<strong>Common text features and their jobs:</strong> 📋 Headings/Subheadings: organize the text into topics · 📊 Charts/Graphs: show data visually — easier to compare numbers · 🗺️ Diagrams/Maps: show how things look, where they are, or how they work · 📸 Captions: explain what a photo or diagram shows · 📝 Sidebars: extra information related to the main topic · 🔍 Bold/Italic words: signal key vocabulary. Key question: 'What does this feature show that the words don't?'",
+      good: "✅ 'The bar graph on page 4 shows that rainforest destruction increased 40% from 2010 to 2020. This visual makes the rate of change much clearer than just reading those numbers in a paragraph.'",
+      bad: "❌ 'The graph shows information about rainforests.' (This doesn't explain WHAT information or WHY the graph is more effective than words.)"
+    },
+    grammar: [
+      {
+        q: "A science article about the solar system includes a diagram showing the distance between planets. What does the diagram show that words CANNOT easily show?",
+        opts: [
+          "The names of the planets",
+          "The history of space exploration",
+          "The relative distances and sizes of planets compared to each other",
+          "The temperature of each planet"
+        ],
+        ans: 2,
+        exp: "A diagram lets you SEE the distances visually — something almost impossible to truly understand just by reading numbers. '93 million miles from the Sun' is hard to picture; seeing Earth as a tiny dot far from the Sun makes it real. Visuals show COMPARISON and PROPORTION better than words."
+      },
+      {
+        q: "A student is researching dolphins and finds two sources: one article with facts and one with a labeled diagram of a dolphin's anatomy. Which is BEST for understanding how dolphins use echolocation?",
+        opts: [
+          "The article alone — it has more information",
+          "The diagram alone — pictures are always better",
+          "Both together — the article explains it; the diagram shows WHERE in the body it happens",
+          "Neither — you need a video for this topic"
+        ],
+        ans: 2,
+        exp: "This is a key RI.7 skill — using MULTIPLE sources together! The article gives you the explanation (what echolocation is, how it works), while the diagram shows WHERE the sound organs are located. Together they give a complete understanding that neither provides alone."
+      },
+      {
+        q: "An article has bold vocabulary words throughout. What is the MAIN purpose of bolding these words?",
+        opts: [
+          "To make the article look more colorful",
+          "To signal key terms that are important and may be defined nearby",
+          "To show which parts the author likes best",
+          "To mark sentences that will be on a test"
+        ],
+        ans: 1,
+        exp: "Bold words in informational text signal KEY VOCABULARY — terms the author considers central to understanding the topic. They often appear in a glossary, are defined in the sentence, or are the most important terms in the whole article. When you see bold, slow down and make sure you understand that word!"
+      }
+    ],
+    write: {
+      prompt: "Think about an informational book or article you've read that had text features (diagrams, charts, maps, photos with captions, or headings). Write 3-4 sentences describing ONE specific text feature and explain what information it showed that the words in the article did NOT or COULD NOT show as clearly.",
+      placeholder: "In [book/article], the [text feature] showed... This was more effective than the words alone because... Without this feature, readers would not understand...",
+      hints: ["The diagram showed how...", "The graph made it easy to compare...", "The map helped readers understand where...", "The caption explained something the photo couldn't show by itself..."],
+      minWords: 40
+    }
+  }
+};
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let currentLesson = 'sentence1';
+let currentGrade = 5;
+let currentStep = 0;
+let xp = 0;
+let draggedWord = null;
+let placedWords = [];
+
+const GRADE_PREFIXES = {5:'ELAGSE5',6:'ELAGSE6',7:'ELAGSE7',8:'ELAGSE8',9:'ELAGSE9-10'};
+
+// ══════════════════════════════════════════
+// GRADE
+// ══════════════════════════════════════════
+function setGrade(g) {
+  currentGrade = g;
+  document.querySelectorAll('.ng-btn').forEach((b,i) => b.classList.toggle('active', i === g-5));
+  loadLesson(currentLesson);
+}
+
+// ══════════════════════════════════════════
+// LESSON LOADER
+// ══════════════════════════════════════════
+function loadLesson(id) {
+  currentLesson = id;
+  currentStep = 0;
+  placedWords = [];
+
+  document.querySelectorAll('.lesson-btn').forEach(b => b.classList.remove('active'));
+  const btns = document.querySelectorAll('.lesson-btn');
+  const lessonKeys = Object.keys(LESSONS);
+  const idx = lessonKeys.indexOf(id);
+  if(btns[idx]) btns[idx].classList.add('active');
+
+  renderStep();
+}
+
+// ══════════════════════════════════════════
+// STEP RENDERER
+// ══════════════════════════════════════════
+function renderStep() {
+  const L = LESSONS[currentLesson];
+  const main = document.getElementById('mainContent');
+
+  // Build steps bar HTML
+  const stepsHtml = L.steps.map((s,i) => {
+    const cls = i < currentStep ? 'done' : i === currentStep ? 'active' : '';
+    const icon = i < currentStep ? '✓' : i+1;
+    return `<div class="step-wrapper">
+      <div style="display:flex;align-items:center;width:100%;">
+        <div class="step-circle ${cls}">${icon}</div>
+        ${i < L.steps.length-1 ? `<div class="step-line ${i < currentStep ? 'done' : ''}"></div>` : ''}
+      </div>
+      <div class="step-label" style="color:${i===currentStep?'var(--navy)':''};font-weight:${i===currentStep?'800':'600'}">${s}</div>
+    </div>`;
+  }).join('');
+
+  // Determine content based on step
+  let content = '';
+
+  if(currentStep === 0) {
+    // LEARN STEP
+    content = `
+      <div class="lesson-card">
+        <div class="lc-header">
+          <div class="lc-step-badge">📖 Learn</div>
+          <div class="lc-title">The Rule</div>
+        </div>
+        <div class="lc-body">
+          <div class="learn-box">
+            <h4>💡 Key Concept</h4>
+            <p>${L.learn.rule}</p>
+            <div class="ex-label" style="color:var(--green);margin-top:14px;">Strong example</div>
+            <div class="example">${L.learn.good}</div>
+            <div class="ex-label" style="color:var(--red);margin-top:10px;">Weak example — avoid this</div>
+            <div class="bad-example">${L.learn.bad}</div>
+          </div>
+          <div class="action-row">
+            <button class="btn-primary" onclick="advanceStep()">I understand — let's practice! →</button>
+          </div>
+        </div>
+      </div>`;
+
+  } else if(currentStep === 1) {
+    // PRACTICE STEP (drag/grammar/identify)
+    if(L.type === 'sentence_builder' && L.drag) {
+      content = buildDragStep(L);
+    } else if(L.type === 'grammar' && L.grammar) {
+      content = buildGrammarStep(L);
+    } else {
+      // paragraph lessons — show identify exercise
+      content = buildIdentifyStep(L);
+    }
+
+  } else if(currentStep === 2) {
+    // WRITE STEP
+    content = buildWriteStep(L);
+
+  } else if(currentStep === 3) {
+    // COMPLETION
+    content = buildCompletionStep(L);
+  }
+
+  main.innerHTML = `
+    <div class="lesson-header">
+      <div class="lh-breadcrumb">${L.breadcrumb}</div>
+      <h1 class="lh-title">${L.title}</h1>
+      <div class="lh-gse">${L.gse}</div>
+      <p class="lh-desc">${L.desc}</p>
+    </div>
+    <div class="steps-bar">${stepsHtml}</div>
+    ${content}`;
+
+  // Re-attach drag events if needed
+  if(L.type === 'sentence_builder' && L.drag && currentStep === 1) {
+    setupDrag();
+  }
+}
+
+// ══════════════════════════════════════════
+// DRAG & DROP STEP
+// ══════════════════════════════════════════
+function buildDragStep(L) {
+  const chips = L.drag.words.map((w,i) =>
+    `<div class="word-chip" draggable="true" id="chip-${i}" data-word="${w}" data-idx="${i}">${w}</div>`
+  ).join('');
+
+  return `
+    <div class="lesson-card">
+      <div class="lc-header">
+        <div class="lc-step-badge">🔧 Build</div>
+        <div class="lc-title">Sentence Builder</div>
+      </div>
+      <div class="lc-body">
+        <div class="drag-zone">
+          <div class="drag-label">Word Bank — drag words into the sentence</div>
+          <div class="word-bank" id="wordBank">${chips}</div>
+        </div>
+        <div class="drag-zone">
+          <div class="drag-label">Build your sentence here</div>
+          <div class="drop-zone" id="dropZone">
+            <span class="drop-placeholder" id="dropPlaceholder">Drop words here to build your sentence...</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;">
+          <button class="check-sentence-btn" onclick="checkSentence()">✓ Check My Sentence</button>
+          <button class="btn-secondary" onclick="clearSentence()" style="padding:10px 18px;font-size:0.85rem;">Reset ↺</button>
+        </div>
+        <div class="sentence-result" id="sentenceResult"></div>
+      </div>
+    </div>`;
+}
+
+function setupDrag() {
+  const L = LESSONS[currentLesson];
+  placedWords = [];
+
+  document.querySelectorAll('.word-chip').forEach(chip => {
+    chip.addEventListener('dragstart', e => {
+      draggedWord = { word: chip.dataset.word, idx: chip.dataset.idx };
+      chip.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
+  });
+
+  const dropZone = document.getElementById('dropZone');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('over');
+    if(!draggedWord) return;
+
+    const chip = document.getElementById(`chip-${draggedWord.idx}`);
+    if(chip && !chip.classList.contains('placed')) {
+      chip.classList.add('placed');
+      placedWords.push({ word: draggedWord.word, idx: draggedWord.idx });
+      renderDropped();
+    }
+    draggedWord = null;
+  });
+}
+
+function renderDropped() {
+  const dz = document.getElementById('dropZone');
+  const ph = document.getElementById('dropPlaceholder');
+  if(ph) ph.style.display = placedWords.length ? 'none' : 'block';
+
+  // Remove existing placed chips
+  dz.querySelectorAll('.placed-chip').forEach(c => c.remove());
+  placedWords.forEach((item, i) => {
+    const el = document.createElement('div');
+    el.className = 'placed-chip';
+    el.innerHTML = `${item.word} <span class="remove">✕</span>`;
+    el.onclick = () => removePlaced(i);
+    dz.appendChild(el);
+  });
+}
+
+function removePlaced(idx) {
+  const item = placedWords[idx];
+  placedWords.splice(idx, 1);
+  const chip = document.getElementById(`chip-${item.idx}`);
+  if(chip) chip.classList.remove('placed');
+  renderDropped();
+}
+
+function clearSentence() {
+  placedWords = [];
+  document.querySelectorAll('.word-chip').forEach(c => c.classList.remove('placed'));
+  renderDropped();
+  const r = document.getElementById('sentenceResult');
+  if(r) r.className = 'sentence-result';
+}
+
+function checkSentence() {
+  const L = LESSONS[currentLesson];
+  const result = document.getElementById('sentenceResult');
+  const built = placedWords.map(p => p.word).join(' ');
+  const correct = L.drag.correct.join(' ');
+
+  if(built.toLowerCase() === correct.toLowerCase()) {
+    result.className = 'sentence-result show ok';
+    result.innerHTML = `✅ <strong>Perfect!</strong> ${L.drag.explanation}`;
+    addXP(20);
+    setTimeout(() => advanceStep(), 1800);
+  } else if(built.length === 0) {
+    result.className = 'sentence-result show no';
+    result.innerHTML = `⚠️ Please drag some words into the sentence first!`;
+  } else {
+    result.className = 'sentence-result show no';
+    result.innerHTML = `💡 <strong>Not quite!</strong> Check your word order. Hint: Start with the subject.`;
+  }
+}
+
+// ══════════════════════════════════════════
+// GRAMMAR STEP
+// ══════════════════════════════════════════
+function buildGrammarStep(L) {
+  const items = L.grammar.map((q,i) => `
+    <div class="grammar-item" id="gi-${i}">
+      <div class="gi-sentence">${q.q}</div>
+      <div class="gi-options">
+        ${q.opts.map((o,j) => `<button class="gi-opt" onclick="checkGrammar(${i},${j})" id="go-${i}-${j}">${o}</button>`).join('')}
+      </div>
+      <div class="gi-explain" id="ge-${i}">${q.exp}</div>
+    </div>`).join('');
+
+  return `
+    <div class="lesson-card">
+      <div class="lc-header">
+        <div class="lc-step-badge">🔧 Fix It</div>
+        <div class="lc-title">Grammar Practice</div>
+      </div>
+      <div class="lc-body">
+        <p style="color:var(--muted);font-size:0.88rem;margin-bottom:18px;">Answer all 3 questions to continue to the writing step.</p>
+        ${items}
+        <div id="grammarNext" style="display:none;margin-top:4px;">
+          <div class="action-row"><button class="btn-primary" onclick="advanceStep()">Great! Now let's write →</button></div>
+        </div>
+      </div>
+    </div>`;
+}
+
+let grammarScores = {};
+function checkGrammar(qIdx, optIdx) {
+  const L = LESSONS[currentLesson];
+  const q = L.grammar[qIdx];
+  const opts = document.querySelectorAll(`[id^="go-${qIdx}-"]`);
+  opts.forEach(o => o.disabled = true);
+  opts[q.ans].classList.add('correct');
+  if(optIdx !== q.ans) opts[optIdx].classList.add('wrong');
+  document.getElementById(`ge-${qIdx}`).classList.add('show');
+
+  grammarScores[qIdx] = optIdx === q.ans;
+  if(optIdx === q.ans) addXP(10);
+
+  if(Object.keys(grammarScores).length >= L.grammar.length) {
+    document.getElementById('grammarNext').style.display = 'block';
+  }
+}
+
+// ══════════════════════════════════════════
+// IDENTIFY STEP (paragraph lessons)
+// ══════════════════════════════════════════
+function buildIdentifyStep(L) {
+  return `
+    <div class="lesson-card">
+      <div class="lc-header">
+        <div class="lc-step-badge">🔍 Identify</div>
+        <div class="lc-title">Spot the Difference</div>
+      </div>
+      <div class="lc-body">
+        <p style="color:var(--muted);font-size:0.88rem;margin-bottom:18px;">Read the examples below. Which one follows the rule you just learned?</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="learn-box" style="cursor:pointer;transition:all 0.2s;" onclick="identifyChoice('A',true)" id="choiceA">
+            <h4>Option A</h4>
+            <p style="font-family:'Lora',serif;">${L.learn.good.replace('✅ ','')}</p>
+          </div>
+          <div class="learn-box" style="cursor:pointer;background:#FFF0EE;border-left-color:var(--red);transition:all 0.2s;" onclick="identifyChoice('B',false)" id="choiceB">
+            <h4>Option B</h4>
+            <p style="font-family:'Lora',serif;">${L.learn.bad.replace('❌ ','')}</p>
+          </div>
+        </div>
+        <div id="identifyResult" style="margin-top:16px;display:none;"></div>
+      </div>
+    </div>`;
+}
+
+function identifyChoice(choice, correct) {
+  const result = document.getElementById('identifyResult');
+  result.style.display = 'block';
+  if(correct) {
+    result.innerHTML = `<div style="background:#F0FDF4;border:2px solid #86EFAC;border-radius:12px;padding:16px;color:#14532D;font-weight:700;">🎉 Correct! Option A follows the rule. <button class="btn-primary" style="margin-left:12px;padding:8px 18px;font-size:0.83rem;" onclick="advanceStep()">Continue →</button></div>`;
+    addXP(15);
+  } else {
+    result.innerHTML = `<div style="background:#FEF2F2;border:2px solid #FECACA;border-radius:12px;padding:16px;color:#7F1D1D;font-weight:700;">💡 Not quite — Option A is correct. <button class="btn-primary" style="margin-left:12px;padding:8px 18px;font-size:0.83rem;" onclick="advanceStep()">Continue →</button></div>`;
+  }
+}
+
+// ══════════════════════════════════════════
+// WRITE STEP
+// ══════════════════════════════════════════
+function buildWriteStep(L) {
+  const hints = L.write.hints.map(h =>
+    `<div class="hint-chip" onclick="insertHint('${h}')">${h}</div>`
+  ).join('');
+
+  return `
+    <div class="lesson-card">
+      <div class="lc-header">
+        <div class="lc-step-badge">✍️ Write</div>
+        <div class="lc-title">Your Turn</div>
+      </div>
+      <div class="lc-body">
+        <div class="writing-prompt">
+          <div class="wp-label">📋 Your Writing Prompt</div>
+          <p>${L.write.prompt}</p>
+        </div>
+        <div class="drag-label">💡 Starter phrases — click to insert</div>
+        <div class="hint-chips">${hints}</div>
+        <textarea class="writing-input" id="writingInput" placeholder="${L.write.placeholder}" oninput="updateWordCount()" rows="6"></textarea>
+        <div class="word-count" id="wordCount">0 words · Goal: ${L.write.minWords}+ words</div>
+        <div class="action-row">
+          <button class="btn-ai" id="aiFeedbackBtn" onclick="getAIFeedback()">
+            🤖 Get AI Feedback
+          </button>
+          <button class="btn-secondary" onclick="clearWriting()">Clear ↺</button>
+        </div>
+        <div class="ai-feedback" id="aiFeedbackBox"></div>
+        <div class="action-row" id="nextAfterWrite" style="display:none;">
+          <button class="btn-primary" onclick="advanceStep()">Complete Lesson ✓</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function insertHint(text) {
+  const ta = document.getElementById('writingInput');
+  if(!ta) return;
+  const pos = ta.selectionStart;
+  const current = ta.value;
+  ta.value = current.slice(0, pos) + text + ' ' + current.slice(pos);
+  ta.focus();
+  updateWordCount();
+}
+
+function updateWordCount() {
+  const ta = document.getElementById('writingInput');
+  const wc = document.getElementById('wordCount');
+  const L = LESSONS[currentLesson];
+  if(!ta || !wc) return;
+  const words = ta.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+  const goal = L.write.minWords;
+  const pct = Math.min(100, Math.round(words/goal*100));
+  wc.textContent = `${words} words · Goal: ${goal}+ words`;
+  wc.style.color = words >= goal ? 'var(--green)' : 'var(--muted)';
+}
+
+function clearWriting() {
+  const ta = document.getElementById('writingInput');
+  if(ta) ta.value = '';
+  updateWordCount();
+  const fb = document.getElementById('aiFeedbackBox');
+  if(fb) fb.className = 'ai-feedback';
+}
+
+// ══════════════════════════════════════════
+// AI FEEDBACK via Anthropic API
+// ══════════════════════════════════════════
+async function getAIFeedback() {
+  const ta = document.getElementById('writingInput');
+  const fbBox = document.getElementById('aiFeedbackBox');
+  const btn = document.getElementById('aiFeedbackBtn');
+  const L = LESSONS[currentLesson];
+
+  if(!ta || !ta.value.trim()) {
+    alert('Please write something first!');
+    return;
+  }
+  const words = ta.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+  if(words < 5) {
+    alert('Please write at least a few sentences before requesting feedback.');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Analyzing...';
+  fbBox.className = 'ai-feedback show';
+  fbBox.innerHTML = `
+    <div class="ai-header">
+      <div class="ai-icon">🤖</div>
+      <div><div class="ai-title">AI Writing Coach</div><div class="ai-subtitle">Analyzing your writing...</div></div>
+    </div>
+    <div class="ai-loading">
+      <div class="ai-dots"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>
+      Reading your writing carefully...
+    </div>`;
+
+  const gradeLabel = {5:'5th',6:'6th',7:'7th',8:'8th',9:'9th'}[currentGrade];
+  const prompt = `You are a supportive, encouraging Georgia ELA writing coach for ${gradeLabel} grade students. 
+The student is practicing: "${L.title}"
+GSE Standard: ${L.gse}
+The lesson rule: ${L.learn.rule.replace(/<[^>]+>/g,'')}
+
+Student's writing:
+"${ta.value}"
+
+Provide feedback in this EXACT JSON format (respond with ONLY the JSON, no markdown):
+{
+  "score_structure": 85,
+  "score_grammar": 78,
+  "score_vocabulary": 80,
+  "overall": "One warm, encouraging sentence summarizing their work (max 20 words)",
+  "strength": "One specific thing they did WELL, with a direct quote from their text",
+  "improve": "One specific, actionable suggestion for improvement with an example rewrite",
+  "gse_tip": "One brief tip connecting to the ${L.gse.replace(/<[^>]+>/g,'')} standard"
+}`;
+
+  try {
+    const GEMINI_KEY = 'AIzaSyDQ35gOH9rwCz3P5ZZ8wLCD8GjQq8S9glQ';
+    const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { maxOutputTokens: 600, temperature: 0.7 }
+      })
+    });
+
+    const data = await resp.json();
+    const raw = data.candidates[0].content.parts[0].text.trim();
+    let fb;
+    try {
+      fb = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    } catch(e) {
+      fb = {
+        score_structure: 75, score_grammar: 70, score_vocabulary: 72,
+        overall: "Good effort! Your writing shows real understanding of the concept.",
+        strength: "You used the key concept from this lesson in your writing.",
+        improve: "Try to add more specific details to support your main idea.",
+        gse_tip: "Keep practicing — each sentence you write builds your skills."
+      };
+    }
+
+    const scoreColor = s => s >= 80 ? 'var(--green)' : s >= 65 ? 'var(--gold)' : 'var(--red)';
+
+    fbBox.innerHTML = `
+      <div class="ai-header">
+        <div class="ai-icon">🤖</div>
+        <div><div class="ai-title">AI Writing Coach Feedback</div><div class="ai-subtitle">${L.title} · ${gradeLabel} Grade GSE</div></div>
+      </div>
+      <div class="ai-score-row">
+        <div class="ai-score-item"><div class="sc-val" style="color:${scoreColor(fb.score_structure)};">${fb.score_structure}</div><div class="sc-lbl">Structure</div></div>
+        <div class="ai-score-item"><div class="sc-val" style="color:${scoreColor(fb.score_grammar)};">${fb.score_grammar}</div><div class="sc-lbl">Grammar</div></div>
+        <div class="ai-score-item"><div class="sc-val" style="color:${scoreColor(fb.score_vocabulary)};">${fb.score_vocabulary}</div><div class="sc-lbl">Vocabulary</div></div>
+        <div class="ai-score-item"><div class="sc-val" style="color:var(--gold);">${Math.round((fb.score_structure+fb.score_grammar+fb.score_vocabulary)/3)}</div><div class="sc-lbl">Overall</div></div>
+      </div>
+      <div class="ai-text">
+        <p style="margin-bottom:12px;">✨ ${fb.overall}</p>
+        <p style="margin-bottom:8px;"><strong>💚 What you did well:</strong><br>${fb.strength}</p>
+        <p style="margin-bottom:8px;"><strong>📈 One thing to improve:</strong><br>${fb.improve}</p>
+        <p><strong>📋 GSE Connection:</strong><br>${fb.gse_tip}</p>
+      </div>`;
+
+    addXP(30);
+    const nextDiv = document.getElementById('nextAfterWrite');
+    if(nextDiv) nextDiv.style.display = 'flex';
+
+  } catch(err) {
+    fbBox.innerHTML = `<div class="ai-text" style="color:rgba(255,255,255,0.7);">⚠️ Feedback unavailable right now. Your writing looks great — keep going! <button class="btn-secondary" style="margin-top:10px;" onclick="advanceStep()">Continue →</button></div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '🤖 Get AI Feedback Again';
+}
+
+// ══════════════════════════════════════════
+// COMPLETION STEP
+// ══════════════════════════════════════════
+function buildCompletionStep(L) {
+  const lessons = Object.keys(LESSONS);
+  const idx = lessons.indexOf(currentLesson);
+  const nextId = idx < lessons.length - 1 ? lessons[idx+1] : null;
+  const nextLesson = nextId ? LESSONS[nextId] : null;
+
+  // Mark sidebar button as done
+  const btns = document.querySelectorAll('.lesson-btn');
+  if(btns[idx]) {
+    btns[idx].classList.remove('active');
+    btns[idx].classList.add('done');
+    btns[idx].querySelector('.lb-icon').textContent = '✓';
+    if(!btns[idx].querySelector('.lb-check')) {
+      const check = document.createElement('span');
+      check.className = 'lb-check'; check.textContent = '✓';
+      btns[idx].appendChild(check);
+    }
+  }
+
+  return `
+    <div class="completion-card">
+      <div style="font-size:3.5rem;margin-bottom:16px;">🏆</div>
+      <h2>Lesson Complete!</h2>
+      <p>You mastered <strong style="color:var(--gold);">${L.title}</strong></p>
+      <div class="xp-gained">+50 XP</div>
+      <p style="color:rgba(255,255,255,0.5);font-size:0.8rem;margin-top:4px;">added to your total</p>
+      ${nextLesson ? `
+        <div style="margin-top:28px;background:rgba(255,255,255,0.08);border-radius:14px;padding:20px;">
+          <div style="color:rgba(255,255,255,0.5);font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Up Next</div>
+          <div style="color:white;font-family:'Lora',serif;font-size:1.1rem;margin-bottom:14px;">${nextLesson.title}</div>
+          <button class="btn-secondary" style="background:transparent;border-color:rgba(255,255,255,0.3);color:white;" onclick="loadLesson('${nextId}')">Start Next Lesson →</button>
+        </div>` : `<p style="color:rgba(255,255,255,0.6);margin-top:20px;">You've completed all writing lessons! 🎉</p>`}
+      <div style="margin-top:16px;">
+        <button class="btn-secondary" style="background:transparent;border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);" onclick="loadLesson('${currentLesson}')">Redo This Lesson ↺</button>
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════
+function advanceStep() {
+  const L = LESSONS[currentLesson];
+  grammarScores = {};
+  if(currentStep < L.steps.length - 1) {
+    currentStep++;
+    renderStep();
+  }
+}
+
+function addXP(amount) {
+  xp += amount;
+  const el = document.getElementById('xpCount');
+  if(el) el.textContent = xp;
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+loadLesson('sentence1');
+</script>
+</body>
+</html>

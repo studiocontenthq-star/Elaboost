@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ELABoost</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:#F0F4FF;min-height:100vh;overflow:hidden;}
+.main-nav{background:#0F172A;height:54px;padding:0 16px;display:flex;align-items:center;position:fixed;top:0;left:0;right:0;z-index:9000;box-shadow:0 2px 20px rgba(0,0,0,.4);}
+.nav-logo{font-family:'Fredoka One',cursive;color:white;font-size:1.15rem;margin-right:10px;flex-shrink:0;}
+.nav-logo span{color:#F59E0B;}
+.nav-links{display:flex;align-items:center;gap:2px;flex:1;overflow-x:auto;}
+.nav-btn{display:flex;align-items:center;gap:4px;padding:7px 11px;border-radius:10px;border:none;background:transparent;color:rgba(255,255,255,.5);font-family:'Nunito',sans-serif;font-weight:800;font-size:.75rem;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.nav-btn:hover{background:rgba(255,255,255,.1);color:white;}
+.nav-btn.active{background:rgba(255,255,255,.2);color:white;}
+.xp-wrap{margin-left:auto;flex-shrink:0;background:rgba(255,255,255,.1);border-radius:10px;padding:5px 10px;display:flex;align-items:center;gap:6px;}
+.xp-bar{width:56px;height:6px;background:rgba(255,255,255,.2);border-radius:3px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,#F59E0B,#F97316);border-radius:3px;transition:width .5s;}
+.xp-txt{font-family:'Fredoka One',cursive;font-size:.72rem;color:#F59E0B;}
+
+/* Home page */
+#home-page{display:none;position:fixed;top:54px;left:0;right:0;bottom:0;overflow-y:auto;background:#F0F4FF;}
+#home-page.active{display:block;}
+.dash{max-width:960px;margin:0 auto;padding:20px 16px;}
+.welcome-card{background:linear-gradient(135deg,#0F172A,#1a3a6b);border-radius:22px;padding:22px 26px;margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.wc-avatar{width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,#3B82F6,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;}
+.wc-name{font-family:'Fredoka One',cursive;color:white;font-size:1.3rem;}
+.wc-sub{color:rgba(255,255,255,.5);font-size:.78rem;font-weight:700;}
+.wc-stats{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;}
+.wc-stat{background:rgba(255,255,255,.1);border-radius:12px;padding:8px 14px;text-align:center;}
+.wc-val{font-family:'Fredoka One',cursive;font-size:1.1rem;color:white;}
+.wc-lbl{font-size:.6rem;font-weight:800;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px;}
+.section-title{font-family:'Fredoka One',cursive;font-size:1rem;color:#0F172A;margin:16px 0 10px;}
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+.qcard{background:white;border-radius:18px;padding:16px;box-shadow:0 4px 16px rgba(0,0,0,.07);cursor:pointer;transition:all .22s;border:2.5px solid transparent;text-align:center;}
+.qcard:hover{transform:translateY(-3px);border-color:var(--hc,#3B82F6);}
+.qc-ico{font-size:1.9rem;margin-bottom:5px;}
+.qc-ttl{font-family:'Fredoka One',cursive;font-size:.9rem;color:#0F172A;}
+.qc-lbl{display:inline-block;margin-top:5px;padding:2px 8px;border-radius:7px;font-size:.65rem;font-weight:900;}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:12px;font-family:'Fredoka One',cursive;font-size:.88rem;color:white;z-index:99999;box-shadow:0 4px 16px rgba(0,0,0,.25);white-space:nowrap;animation:tIn .3s ease;pointer-events:none;}
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(8px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+
+/* Iframes */
+.module-frame{display:none;position:fixed;top:54px;left:0;right:0;bottom:0;width:100%;height:calc(100vh - 54px);border:none;}
+.module-frame.active{display:block;}
+@media(max-width:580px){.quick-grid{grid-template-columns:1fr 1fr;}.nav-btn span{display:none;}}
+</style>
+</head>
+<body>
+<nav class="main-nav">
+  <div class="nav-logo">ELA<span>Boost</span></div>
+  <div class="nav-links">
+    <button class="nav-btn active" id="nb-home"    onclick="goPage('home')">🏠 <span>Home</span></button>
+    <button class="nav-btn"        id="nb-assess"  onclick="goPage('assess')">📋 <span>Test</span></button>
+    <button class="nav-btn"        id="nb-prep"    onclick="goPage('prep')" style="background:rgba(239,68,68,.25);color:#fca5a5;">🎯 <span>Exam Prep</span></button>
+    <span style="color:rgba(255,255,255,.2);font-size:.7rem;padding:0 4px;font-weight:900;">G5</span>
+    <button class="nav-btn"        id="nb-ela"     onclick="goPage('ela')">📖 <span>ELA</span></button>
+    <button class="nav-btn"        id="nb-writing" onclick="goPage('writing')" style="background:rgba(139,92,246,.2);color:#c4b5fd;">✍️ <span>Writing</span></button>
+    <button class="nav-btn"        id="nb-math"    onclick="goPage('math')">🧮 <span>Math</span></button>
+    <span style="color:rgba(255,255,255,.2);font-size:.7rem;padding:0 4px;font-weight:900;">G6</span>
+    <button class="nav-btn"        id="nb-elag6"   onclick="goPage('elag6')" style="background:rgba(139,92,246,.15);color:#a78bfa;">📚 <span>ELA G6</span></button>
+    <button class="nav-btn"        id="nb-writg6"  onclick="goPage('writg6')" style="background:rgba(139,92,246,.15);color:#a78bfa;">✍️ <span>Write G6</span></button>
+    <button class="nav-btn"        id="nb-mathg6"  onclick="goPage('mathg6')" style="background:rgba(249,115,22,.15);color:#fb923c;">🧮 <span>Math G6</span></button>
+    <button class="nav-btn"        id="nb-games"   onclick="goPage('games')">🎮 <span>Games</span></button>
+    <button class="nav-btn"        id="nb-sched"   onclick="goPage('sched')">📅 <span>Exams</span></button>
+  </div>
+  <div class="xp-wrap">
+    <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+    <span class="xp-txt" id="xpTxt">0 XP</span>
+    <span class="xp-txt">⭐<span id="starTxt">0</span></span>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="home-page" class="active">
+<div class="dash">
+  <div class="welcome-card">
+    <div class="wc-avatar">👦</div>
+    <div><div class="wc-name">Welcome back, Joshua! 👋</div><div class="wc-sub">Grade 5 → 6 · Georgia Standards</div></div>
+    <div class="wc-stats">
+      <div class="wc-stat"><div class="wc-val" id="dashXP">0</div><div class="wc-lbl">XP</div></div>
+      <div class="wc-stat"><div class="wc-val" id="dashStars">0</div><div class="wc-lbl">Stars</div></div>
+      <div class="wc-stat"><div class="wc-val">🔥1</div><div class="wc-lbl">Streak</div></div>
+    </div>
+  </div>
+  <div class="section-title">🎯 Grade 5 — Exam Prep</div>
+  <div class="quick-grid">
+    <div class="qcard" style="--hc:#EF4444;border:2.5px solid #EF4444;background:linear-gradient(135deg,#fff,#fff5f5)" onclick="goPage('prep')"><div class="qc-ico">🎯</div><div class="qc-ttl">Exam Prep</div><div class="qc-lbl" style="background:#FEF2F2;color:#EF4444">Apr 21 🔥</div></div>
+    <div class="qcard" style="--hc:#3B82F6" onclick="goPage('assess')"><div class="qc-ico">📋</div><div class="qc-ttl">Placement Test</div><div class="qc-lbl" style="background:#EFF6FF;color:#3B82F6">Start →</div></div>
+    <div class="qcard" style="--hc:#8B5CF6" onclick="goPage('ela')"><div class="qc-ico">📖</div><div class="qc-ttl">ELA Reading</div><div class="qc-lbl" style="background:#F5F3FF;color:#8B5CF6">13 Lessons</div></div>
+    <div class="qcard" style="--hc:#7C3AED" onclick="goPage('writing')"><div class="qc-ico">✍️</div><div class="qc-ttl">Writing Coach</div><div class="qc-lbl" style="background:#EDE9FE;color:#7C3AED">W.1 W.2 W.3</div></div>
+    <div class="qcard" style="--hc:#F97316" onclick="goPage('math')"><div class="qc-ico">🧮</div><div class="qc-ttl">Math Fractions</div><div class="qc-lbl" style="background:#FFF7ED;color:#F97316">7 Lessons</div></div>
+  </div>
+  <div class="section-title">🚀 Grade 6 — Next Level</div>
+  <div class="quick-grid">
+    <div class="qcard" style="--hc:#8B5CF6;border:2px solid #8B5CF6" onclick="goPage('elag6')"><div class="qc-ico">📚</div><div class="qc-ttl">ELA G6 Reading</div><div class="qc-lbl" style="background:#F5F3FF;color:#8B5CF6">8 Lessons</div></div>
+    <div class="qcard" style="--hc:#7C3AED;border:2px solid #7C3AED" onclick="goPage('writg6')"><div class="qc-ico">⚔️</div><div class="qc-ttl">Writing G6</div><div class="qc-lbl" style="background:#EDE9FE;color:#7C3AED">Argument+</div></div>
+    <div class="qcard" style="--hc:#F97316;border:2px solid #F97316" onclick="goPage('mathg6')"><div class="qc-ico">📐</div><div class="qc-ttl">Math G6</div><div class="qc-lbl" style="background:#FFF7ED;color:#F97316">9 Lessons</div></div>
+    <div class="qcard" style="--hc:#10B981" onclick="goPage('games')"><div class="qc-ico">🎮</div><div class="qc-ttl">Review Games</div><div class="qc-lbl" style="background:#ECFDF5;color:#10B981">6 Games</div></div>
+    <div class="qcard" style="--hc:#F59E0B" onclick="goPage('sched')"><div class="qc-ico">📅</div><div class="qc-ttl">Exam Schedule</div><div class="qc-lbl" style="background:#FFFBEB;color:#F59E0B">Add Exams</div></div>
+  </div>
+</div>
+</div>
+
+<!-- MODULE IFRAMES -->
+<iframe id="frame-assess"  class="module-frame" src="about:blank"></iframe>
+<iframe id="frame-ela"     class="module-frame" src="about:blank"></iframe>
+<iframe id="frame-writing" class="module-frame" src="about:blank"></iframe>
+<iframe id="frame-math"    class="module-frame" src="about:blank"></iframe>
+<iframe id="frame-elag6"   class="module-frame" src="about:blank"></iframe>
+<iframe id="frame-writg6"  class="module-frame" src="about:blank"></iframe>
+<iframe id="frame-mathg6"  class="module-frame" src="about:blank"></iframe>
+<iframe id="frame-games"   class="module-frame" src="about:blank"></iframe>
+<iframe id="frame-sched"   class="module-frame" src="about:blank"></iframe>
+<iframe id="frame-prep"    class="module-frame" src="about:blank"></iframe>
+
+<script>
+const _SB = supabase.createClient('https://xqujtupqhefizflcdmrl.supabase.co','sb_publishable_yxg8-Bm4dZR3KPO1lqVzYw_FITUKPGD');
+let gXP=0, gStars=0, _dbId=null;
+const loaded = {};
+
+function goPage(id) {
+  // Hide all
+  document.getElementById('home-page').classList.remove('active');
+  document.querySelectorAll('.module-frame').forEach(f=>f.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  // Show nav button
+  const nb = document.getElementById('nb-'+id);
+  if(nb) nb.classList.add('active');
+  if(id === 'home') {
+    document.getElementById('home-page').classList.add('active');
+  } else {
+    const frame = document.getElementById('frame-'+id);
+    frame.classList.add('active');
+    if(!loaded[id]) {
+      const pageMap = {
+        prep:    'ela-grade5-prep.html',
+        writing: 'ela-writing.html',
+        elag6:   'ela-g6.html',
+        writg6:  'ela-writing-g6.html',
+        mathg6:  'math-g6.html'
+      };
+      frame.src = pageMap[id] || (id+'.html');
+      loaded[id] = true;
+    }
+  }
+}
+
+function showToast(msg, col) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.style.background = col || '#10B981';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2200);
+}
+
+function updateNav() {
+  const p = Math.min(100,(gXP%500)/5);
+  document.getElementById('xpFill').style.width = p+'%';
+  document.getElementById('xpTxt').textContent = gXP+' XP';
+  document.getElementById('starTxt').textContent = gStars;
+  document.getElementById('dashXP').textContent = gXP;
+  document.getElementById('dashStars').textContent = gStars;
+}
+
+async function saveProgress() {
+  try { localStorage.setItem('eb', JSON.stringify({xp:gXP, stars:gStars})); } catch(e) {}
+  try {
+    const p = {student_name:'Joshua', xp:gXP, stars:gStars, updated_at:new Date().toISOString()};
+    if(_dbId) await _SB.from('student_progress').update(p).eq('id',_dbId);
+    else {
+      const {data} = await _SB.from('student_progress').insert(p).select().single();
+      if(data) _dbId = data.id;
+    }
+  } catch(e) {}
+}
+
+async function loadProgress() {
+  try {
+    const d = JSON.parse(localStorage.getItem('eb')||'{}');
+    gXP = d.xp||0; gStars = d.stars||0; updateNav();
+  } catch(e) {}
+  try {
+    const {data} = await _SB.from('student_progress').select('*').eq('student_name','Alex').single();
+    if(data) {
+      _dbId = data.id;
+      if(data.xp > gXP) { gXP=data.xp; gStars=data.stars||0; }
+      updateNav();
+      showToast('✅ Progress loaded!');
+    }
+  } catch(e) {}
+}
+
+// Listen for XP/Star events from iframes
+window.addEventListener('message', function(e) {
+  if(e.data && e.data.type === 'addXP') {
+    gXP += e.data.amount;
+    updateNav();
+    showToast('⭐ +'+e.data.amount+' XP!');
+    saveProgress();
+  } else if(e.data && e.data.type === 'navigate') {
+    goPage(e.data.page);
+  } else if(e.data && e.data.type === 'addStar') {
+    gStars++;
+    updateNav();
+    saveProgress();
+  }
+});
+
+setInterval(saveProgress, 60000);
+window.addEventListener('beforeunload', saveProgress);
+window.addEventListener('DOMContentLoaded', loadProgress);
+</script>
+</body>
+</html>

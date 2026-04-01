@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELABoost — Student Placement Assessment</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0F172A; --sky:#3B82F6; --green:#10B981; --red:#EF4444;
+  --gold:#F59E0B; --purple:#8B5CF6; --pink:#EC4899; --teal:#14B8A6;
+  --orange:#F97316; --light:#F8FAFC; --muted:#64748B;
+  --card-shadow:0 4px 24px rgba(0,0,0,0.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--light);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;flex-direction:column;}
+
+/* ══════════════════════════════
+   WELCOME SCREEN
+══════════════════════════════ */
+#welcomeScreen{
+  background:linear-gradient(145deg,#0F172A 0%,#1E293B 40%,#0F3460 100%);
+  align-items:center;justify-content:center;
+  padding:40px 24px;text-align:center;
+  position:relative;overflow:hidden;
+}
+#welcomeScreen::before{
+  content:'';position:absolute;
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(59,130,246,.15) 0%,transparent 70%);
+  top:-100px;left:50%;transform:translateX(-50%);pointer-events:none;
+}
+.star-field{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.star{position:absolute;border-radius:50%;background:white;animation:twinkle var(--d) ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(1);}50%{opacity:.9;transform:scale(1.3);}}
+
+.welcome-logo{
+  font-family:'Fredoka One',cursive;font-size:2.2rem;color:white;
+  margin-bottom:8px;letter-spacing:1px;
+}
+.welcome-logo span{color:var(--gold);}
+.welcome-badge{
+  display:inline-block;background:rgba(59,130,246,.25);
+  border:1px solid rgba(59,130,246,.5);color:#93C5FD;
+  font-size:.75rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+  padding:4px 14px;border-radius:20px;margin-bottom:32px;
+}
+.welcome-title{
+  font-family:'DM Serif Display',serif;font-size:clamp(2rem,5vw,3.2rem);
+  color:white;line-height:1.15;margin-bottom:16px;max-width:560px;
+}
+.welcome-title em{color:var(--gold);font-style:italic;}
+.welcome-sub{color:#94A3B8;font-size:1rem;font-weight:600;max-width:440px;margin:0 auto 36px;}
+
+.form-card{
+  background:rgba(255,255,255,.06);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.12);border-radius:24px;
+  padding:28px;max-width:420px;width:100%;margin:0 auto 28px;
+  text-align:left;
+}
+.form-label{color:#CBD5E1;font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:block;}
+.form-input{
+  width:100%;padding:12px 16px;border-radius:12px;
+  border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);
+  color:white;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;
+  outline:none;transition:all .2s;margin-bottom:14px;
+}
+.form-input:focus{border-color:var(--sky);background:rgba(59,130,246,.1);}
+.form-input::placeholder{color:rgba(255,255,255,.3);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-select{
+  width:100%;padding:12px 16px;border-radius:12px;
+  border:2px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);
+  color:white;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;
+  outline:none;transition:all .2s;cursor:pointer;
+  -webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2394A3B8' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;
+}
+.form-select option{background:#1E293B;color:white;}
+
+.start-btn{
+  width:100%;padding:16px;border-radius:16px;border:none;
+  background:linear-gradient(135deg,var(--sky),var(--purple));
+  color:white;font-family:'Fredoka One',cursive;font-size:1.3rem;
+  cursor:pointer;transition:all .25s;
+  box-shadow:0 8px 32px rgba(59,130,246,.4);
+  position:relative;overflow:hidden;
+}
+.start-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.2),transparent);
+  opacity:0;transition:opacity .2s;
+}
+.start-btn:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(59,130,246,.5);}
+.start-btn:hover::after{opacity:1;}
+
+.welcome-info{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+.info-pill{
+  display:flex;align-items:center;gap:6px;
+  color:#94A3B8;font-size:.78rem;font-weight:700;
+}
+.info-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);}
+
+/* ══════════════════════════════
+   ASSESSMENT SCREEN
+══════════════════════════════ */
+#assessScreen{background:var(--light);}
+
+.assess-header{
+  background:white;border-bottom:2px solid #E2E8F0;
+  padding:16px 24px;display:flex;align-items:center;gap:16px;
+  position:sticky;top:0;z-index:100;
+}
+.assess-logo{font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--navy);}
+.assess-logo span{color:var(--sky);}
+.assess-progress-wrap{flex:1;max-width:400px;margin:0 auto;}
+.assess-progress-label{font-size:.72rem;font-weight:800;color:var(--muted);margin-bottom:4px;text-align:center;}
+.assess-progress-bar{height:8px;background:#E2E8F0;border-radius:4px;overflow:hidden;}
+.assess-progress-fill{height:100%;background:linear-gradient(90deg,var(--sky),var(--purple));border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+.assess-timer{
+  display:flex;align-items:center;gap:6px;
+  background:#F1F5F9;border-radius:10px;padding:6px 12px;
+  font-family:'Fredoka One',cursive;font-size:1rem;color:var(--navy);
+}
+.timer-icon{font-size:.9rem;}
+
+.assess-body{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:32px 16px;}
+
+.q-container{max-width:660px;width:100%;animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.subject-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 14px;border-radius:20px;font-size:.72rem;font-weight:900;
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;
+}
+.subject-tag.ela{background:#EFF6FF;color:var(--sky);}
+.subject-tag.math{background:#FFF7ED;color:var(--orange);}
+
+.q-card{
+  background:white;border-radius:24px;padding:28px 30px;
+  box-shadow:var(--card-shadow);border:2px solid #E2E8F0;
+  margin-bottom:16px;
+}
+.q-number{font-size:.78rem;font-weight:900;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+.q-text{
+  font-family:'DM Serif Display',serif;font-size:1.35rem;color:var(--navy);
+  line-height:1.5;margin-bottom:24px;
+}
+.q-passage{
+  background:#F8FAFC;border-left:4px solid var(--sky);border-radius:0 12px 12px 0;
+  padding:14px 16px;margin-bottom:20px;
+  font-size:.9rem;font-weight:600;color:#334155;line-height:1.7;
+  font-style:italic;
+}
+
+.options-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.opt-btn{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;border-radius:14px;border:2.5px solid #E2E8F0;
+  background:white;cursor:pointer;transition:all .2s;text-align:left;
+  font-family:'Nunito',sans-serif;font-weight:700;font-size:.92rem;color:var(--navy);
+}
+.opt-btn:hover:not(.disabled){border-color:var(--sky);background:#EFF6FF;transform:translateX(4px);}
+.opt-btn.selected{border-color:var(--sky);background:#EFF6FF;}
+.opt-btn.correct{border-color:var(--green);background:#ECFDF5;color:#065F46;}
+.opt-btn.wrong{border-color:var(--red);background:#FEF2F2;color:#991B1B;}
+.opt-btn.disabled{cursor:not-allowed;}
+.opt-key{
+  width:32px;height:32px;border-radius:10px;background:#F1F5F9;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--muted);
+  flex-shrink:0;transition:all .2s;
+}
+.opt-btn.selected .opt-key{background:var(--sky);color:white;}
+.opt-btn.correct .opt-key{background:var(--green);color:white;}
+.opt-btn.wrong .opt-key{background:var(--red);color:white;}
+
+.assess-feedback{
+  border-radius:14px;padding:14px 16px;margin-bottom:14px;
+  display:flex;gap:10px;align-items:flex-start;
+  animation:fadeUp .3s ease;
+}
+.assess-feedback.correct{background:#ECFDF5;border:2px solid #6EE7B7;}
+.assess-feedback.wrong{background:#FEF2F2;border:2px solid #FCA5A5;}
+.fb-emoji{font-size:1.2rem;flex-shrink:0;}
+.fb-body{flex:1;}
+.fb-title{font-weight:900;font-size:.9rem;margin-bottom:3px;}
+.fb-title.c{color:#065F46;}
+.fb-title.w{color:#991B1B;}
+.fb-exp{font-size:.82rem;font-weight:600;color:#475569;line-height:1.6;}
+
+.next-q-btn{
+  width:100%;padding:14px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--navy),#1E3A5F);color:white;
+  font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;
+  transition:all .2s;box-shadow:0 4px 16px rgba(15,23,42,.25);
+  display:none;
+}
+.next-q-btn.show{display:block;}
+.next-q-btn:hover{transform:translateY(-2px);}
+
+/* ══════════════════════════════
+   LOADING SCREEN
+══════════════════════════════ */
+#loadingScreen{
+  background:linear-gradient(145deg,#0F172A,#1E293B);
+  align-items:center;justify-content:center;text-align:center;padding:40px;
+}
+.loading-logo{font-family:'Fredoka One',cursive;font-size:1.5rem;color:white;margin-bottom:40px;}
+.loading-logo span{color:var(--gold);}
+.loading-spinner{
+  width:80px;height:80px;border-radius:50%;
+  border:6px solid rgba(255,255,255,.1);
+  border-top-color:var(--sky);
+  animation:spin 1s linear infinite;margin:0 auto 24px;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{color:#94A3B8;font-size:1rem;font-weight:700;margin-bottom:8px;}
+.loading-sub{color:#475569;font-size:.85rem;font-weight:600;}
+.loading-dots{display:inline-flex;gap:6px;margin-top:20px;}
+.loading-dot{width:8px;height:8px;border-radius:50%;background:var(--sky);animation:dotPulse 1.2s ease-in-out infinite;}
+.loading-dot:nth-child(2){animation-delay:.2s;}
+.loading-dot:nth-child(3){animation-delay:.4s;}
+@keyframes dotPulse{0%,80%,100%{transform:scale(.6);opacity:.4;}40%{transform:scale(1);opacity:1;}}
+.loading-steps{margin-top:32px;display:flex;flex-direction:column;gap:10px;max-width:300px;width:100%;}
+.loading-step{
+  display:flex;align-items:center;gap:10px;
+  color:#64748B;font-size:.82rem;font-weight:700;
+  transition:color .3s;
+}
+.loading-step.done{color:#10B981;}
+.loading-step.active{color:white;}
+.step-dot{width:10px;height:10px;border-radius:50%;background:#334155;flex-shrink:0;transition:background .3s;}
+.loading-step.done .step-dot{background:var(--green);}
+.loading-step.active .step-dot{background:var(--sky);animation:dotPulse .8s infinite;}
+
+/* ══════════════════════════════
+   REPORT SCREEN
+══════════════════════════════ */
+#reportScreen{background:#F1F5F9;}
+
+.report-header{
+  background:linear-gradient(135deg,var(--navy),#1E3A5F);
+  padding:32px 24px 24px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.report-header::before{
+  content:'';position:absolute;
+  width:300px;height:300px;border-radius:50%;
+  background:rgba(59,130,246,.1);
+  top:-100px;right:-80px;pointer-events:none;
+}
+.report-brand{font-family:'Fredoka One',cursive;font-size:1rem;color:rgba(255,255,255,.5);margin-bottom:8px;}
+.report-brand span{color:var(--gold);}
+.report-title{font-family:'DM Serif Display',serif;font-size:1.9rem;color:white;margin-bottom:4px;}
+.report-sub{color:#94A3B8;font-size:.85rem;font-weight:700;}
+.report-student-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:20px;padding:6px 16px;margin-top:12px;
+  color:white;font-weight:800;font-size:.9rem;
+}
+
+.report-body{max-width:760px;margin:0 auto;padding:24px 16px;}
+
+/* OVERALL SCORE */
+.overall-card{
+  background:white;border-radius:24px;padding:24px;
+  box-shadow:var(--card-shadow);margin-bottom:20px;
+  display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+}
+.score-circle-wrap{flex-shrink:0;position:relative;width:110px;height:110px;}
+.score-circle-wrap svg{transform:rotate(-90deg);}
+.score-circle-val{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;
+}
+.scv-num{font-size:1.8rem;color:var(--navy);line-height:1;}
+.scv-lbl{font-size:.65rem;font-weight:800;color:var(--muted);text-transform:uppercase;}
+.overall-info{flex:1;}
+.overall-grade-tag{
+  display:inline-block;padding:4px 12px;border-radius:10px;
+  font-size:.72rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
+  margin-bottom:8px;
+}
+.grade-A{background:#ECFDF5;color:#065F46;}
+.grade-B{background:#EFF6FF;color:#1D4ED8;}
+.grade-C{background:#FFF7ED;color:#92400E;}
+.grade-D{background:#FEF2F2;color:#991B1B;}
+.overall-title{font-family:'DM Serif Display',serif;font-size:1.3rem;color:var(--navy);margin-bottom:4px;}
+.overall-desc{font-size:.85rem;font-weight:600;color:var(--muted);line-height:1.6;}
+
+/* SUBJECT BREAKDOWN */
+.section-title{
+  font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--navy);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+.subject-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+.subject-card{
+  background:white;border-radius:20px;padding:20px;
+  box-shadow:var(--card-shadow);border-top:4px solid var(--c);
+}
+.sc-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.sc-emoji{font-size:1.4rem;}
+.sc-name{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--navy);}
+.sc-pct{margin-left:auto;font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--c);}
+.sc-bar{height:8px;background:#F1F5F9;border-radius:4px;overflow:hidden;margin-bottom:12px;}
+.sc-fill{height:100%;border-radius:4px;background:var(--c);transition:width 1s ease;}
+.sc-skills{display:flex;flex-direction:column;gap:6px;}
+.skill-row{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;}
+.skill-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.skill-name{color:#475569;flex:1;}
+.skill-status{font-size:.7rem;font-weight:800;padding:2px 8px;border-radius:6px;}
+.skill-strong{background:#ECFDF5;color:#065F46;}
+.skill-review{background:#FFF7ED;color:#92400E;}
+.skill-focus{background:#FEF2F2;color:#991B1B;}
+
+/* RECOMMENDATIONS */
+.rec-cards{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+.rec-card{
+  background:white;border-radius:18px;padding:18px 20px;
+  box-shadow:var(--card-shadow);
+  display:flex;align-items:flex-start;gap:14px;
+  border-left:4px solid var(--c);
+}
+.rec-priority{
+  width:32px;height:32px;border-radius:10px;background:var(--c);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;color:white;font-size:.9rem;flex-shrink:0;
+}
+.rec-body{flex:1;}
+.rec-tag{font-size:.68rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:var(--c);margin-bottom:4px;}
+.rec-title{font-weight:900;font-size:.9rem;color:var(--navy);margin-bottom:3px;}
+.rec-desc{font-size:.8rem;font-weight:600;color:var(--muted);line-height:1.55;}
+
+/* LEARNING PATH */
+.path-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.path-card{
+  background:white;border-radius:16px;padding:16px 18px;
+  box-shadow:0 2px 12px rgba(0,0,0,.05);
+  display:flex;align-items:center;gap:14px;
+}
+.path-num{
+  width:36px;height:36px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;color:white;font-size:1rem;flex-shrink:0;
+}
+.path-info{flex:1;}
+.path-title{font-weight:900;font-size:.88rem;color:var(--navy);}
+.path-sub{font-size:.76rem;font-weight:600;color:var(--muted);}
+.path-badge{
+  font-size:.68rem;font-weight:800;padding:3px 10px;border-radius:8px;
+  white-space:nowrap;
+}
+.badge-start{background:#EFF6FF;color:var(--sky);}
+.badge-review{background:#FFF7ED;color:var(--orange);}
+.badge-skip{background:#ECFDF5;color:var(--green);}
+
+/* PARENT NOTE */
+.parent-note{
+  background:linear-gradient(135deg,#FEF9C3,#FEF3C7);
+  border:2px solid #FDE68A;border-radius:20px;padding:20px;
+  margin-bottom:20px;
+}
+.pn-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.pn-title{font-family:'Fredoka One',cursive;font-size:1rem;color:#92400E;}
+.pn-text{font-size:.85rem;font-weight:600;color:#78350F;line-height:1.7;}
+
+/* ACTION BUTTONS */
+.action-row{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-primary{
+  flex:1;padding:14px 20px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--sky),var(--purple));color:white;
+  font-family:'Fredoka One',cursive;font-size:1.05rem;cursor:pointer;
+  transition:all .2s;box-shadow:0 4px 16px rgba(59,130,246,.35);
+  text-align:center;min-width:160px;
+}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-secondary{
+  flex:1;padding:14px 20px;border-radius:14px;border:2px solid #E2E8F0;
+  background:white;color:var(--navy);font-family:'Fredoka One',cursive;
+  font-size:1.05rem;cursor:pointer;transition:all .2s;text-align:center;min-width:160px;
+}
+.btn-secondary:hover{border-color:var(--sky);color:var(--sky);}
+
+/* DATE */
+.report-date{text-align:center;color:#94A3B8;font-size:.75rem;font-weight:700;padding:16px 0 32px;}
+
+@media print{
+  .action-row,.assess-header{display:none!important;}
+  #reportScreen{background:white;}
+  .report-header{print-color-adjust:exact;-webkit-print-color-adjust:exact;}
+}
+@media(max-width:600px){
+  .subject-cards{grid-template-columns:1fr;}
+  .form-row{grid-template-columns:1fr;}
+  .action-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     WELCOME SCREEN
+══════════════════════════════ -->
+<div class="screen active" id="welcomeScreen">
+  <div class="star-field" id="starField"></div>
+
+  <div class="welcome-logo">ELA<span>Boost</span></div>
+  <div class="welcome-badge">📋 Student Placement Assessment</div>
+
+  <h1 class="welcome-title">
+    Find out exactly <em>where to start</em> learning
+  </h1>
+  <p class="welcome-sub">
+    A quick 10-minute assessment covering ELA &amp; Math. We'll build your child's personalized learning path.
+  </p>
+
+  <div class="form-card">
+    <label class="form-label">Student's First Name</label>
+    <input class="form-input" id="studentName" type="text" placeholder="e.g. Alex" autocomplete="off">
+
+    <div class="form-row">
+      <div>
+        <label class="form-label">Grade Level</label>
+        <select class="form-select" id="gradeLevel">
+          <option value="">Select grade</option>
+          <option value="5">Grade 5</option>
+          <option value="6">Grade 6</option>
+          <option value="7">Grade 7</option>
+          <option value="8">Grade 8</option>
+          <option value="9">Grade 9</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Parent's Name</label>
+        <input class="form-input" id="parentName" type="text" placeholder="e.g. Mrs. Johnson" style="margin-bottom:0">
+      </div>
+    </div>
+  </div>
+
+  <button class="start-btn" onclick="startAssessment()" style="max-width:420px;width:90%;">
+    🚀 Start Free Assessment
+  </button>
+
+  <div class="welcome-info" style="margin-top:20px;">
+    <div class="info-pill"><div class="info-dot"></div>10 Questions</div>
+    <div class="info-pill"><div class="info-dot"></div>~10 Minutes</div>
+    <div class="info-pill"><div class="info-dot"></div>ELA + Math</div>
+    <div class="info-pill"><div class="info-dot"></div>Parent Report Included</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     ASSESSMENT SCREEN
+══════════════════════════════ -->
+<div class="screen" id="assessScreen">
+  <div class="assess-header">
+    <div class="assess-logo">ELA<span>Boost</span></div>
+    <div class="assess-progress-wrap">
+      <div class="assess-progress-label" id="progressLabel">Question 1 of 10</div>
+      <div class="assess-progress-bar">
+        <div class="assess-progress-fill" id="progressFill" style="width:10%"></div>
+      </div>
+    </div>
+    <div class="assess-timer">
+      <span class="timer-icon">⏱️</span>
+      <span id="timerDisplay">10:00</span>
+    </div>
+  </div>
+
+  <div class="assess-body">
+    <div class="q-container" id="questionContainer"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     LOADING SCREEN
+══════════════════════════════ -->
+<div class="screen" id="loadingScreen">
+  <div class="loading-logo">ELA<span>Boost</span></div>
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Analyzing <span id="loadingName">your child</span>'s results...</div>
+  <div class="loading-sub">Building a personalized learning path</div>
+  <div class="loading-dots">
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+    <div class="loading-dot"></div>
+  </div>
+  <div class="loading-steps" id="loadingSteps">
+    <div class="loading-step active" id="ls1"><div class="step-dot"></div>Scoring assessment responses</div>
+    <div class="loading-step" id="ls2"><div class="step-dot"></div>Identifying knowledge gaps</div>
+    <div class="loading-step" id="ls3"><div class="step-dot"></div>Mapping to curriculum standards</div>
+    <div class="loading-step" id="ls4"><div class="step-dot"></div>Generating personalized report</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     REPORT SCREEN
+══════════════════════════════ -->
+<div class="screen" id="reportScreen">
+  <div class="report-header">
+    <div class="report-brand">ELA<span>Boost</span></div>
+    <div class="report-title">📊 Placement Report</div>
+    <div class="report-sub">Completed <span id="reportDate"></span></div>
+    <div class="report-student-badge">
+      👤 <span id="reportStudentName"></span> &nbsp;·&nbsp; Grade <span id="reportGrade"></span>
+    </div>
+  </div>
+
+  <div class="report-body" id="reportBody"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// QUESTION BANK
+// ═══════════════════════════════════════
+const QUESTIONS = [
+  // ── ELA ──
+  {
+    subject:'ela', topic:'Theme', skill:'Literary Analysis',
+    standard:'RL.5.2', difficulty:'medium',
+    text:'Read the passage and identify the theme.',
+    passage:'"Despite failing his science project three times, Marcus kept experimenting. On his fourth attempt, he won the school fair. His teacher said, \'Persistence is the greatest experiment of all.\'"',
+    opts:['Science is the most important subject','Never give up — persistence leads to success','Winning school fairs requires luck','Teachers always know best'],
+    ans:1,
+    exp:'The story shows Marcus succeeding through repeated effort. The theme is about the value of persistence, not giving up.'
+  },
+  {
+    subject:'ela', topic:'Point of View', skill:'Narrative Craft',
+    standard:'RL.5.6', difficulty:'easy',
+    text:'Which point of view is used in this sentence?',
+    passage:'"I walked into the old house, my heart pounding. I had no idea what I would find inside."',
+    opts:['Third person omniscient','Second person','First person','Third person limited'],
+    ans:2,
+    exp:'"I" is the narrator — they are a character in the story. This makes it first person point of view.'
+  },
+  {
+    subject:'ela', topic:'Text Evidence', skill:'Reading Comprehension',
+    standard:'RL.5.1', difficulty:'medium',
+    text:'A student claims: "The character was afraid." Which quote BEST supports this?',
+    opts:['"She walked quickly down the hallway."','"Her hands trembled and she pressed flat against the wall, barely breathing."','"The hallway was long and dimly lit."','"She had been in this building many times before."'],
+    ans:1,
+    exp:'"Trembled" and "barely breathing" are specific physical details that directly show fear. This is the strongest textual evidence.'
+  },
+  {
+    subject:'ela', topic:'Figurative Language', skill:'Literary Devices',
+    standard:'L.5.5', difficulty:'easy',
+    text:'Identify the figurative language: "The thunder roared like an angry lion."',
+    opts:['Metaphor','Hyperbole','Simile','Personification'],
+    ans:2,
+    exp:'This uses "like" to compare thunder to a lion. Any comparison using "like" or "as" is a SIMILE.'
+  },
+  {
+    subject:'ela', topic:'Central Idea', skill:'Informational Text',
+    standard:'RI.5.2', difficulty:'hard',
+    text:'An article includes: data on Georgia bee decline, expert quotes about pollinator importance, and statistics on crop losses. What is MOST LIKELY the central idea?',
+    opts:['Georgia grows many different crops','Bees are interesting insects to study','The decline of Georgia\'s bee population threatens food production','Farmers face many challenges every year'],
+    ans:2,
+    exp:'All three details (bee decline, pollinator importance, crop losses) connect to how bee decline threatens agriculture. That\'s the central idea all details support.'
+  },
+
+  // ── MATH ──
+  {
+    subject:'math', topic:'Fractions', skill:'Fraction Concepts',
+    standard:'5.NF.A', difficulty:'easy',
+    text:'A pizza is cut into 8 equal slices. Maya eats 3 slices. What fraction of the pizza did she eat?',
+    opts:['3/5','5/8','3/8','8/3'],
+    ans:2,
+    exp:'Maya ate 3 slices out of 8 total slices. Numerator = slices eaten (3), Denominator = total slices (8). Answer: 3/8'
+  },
+  {
+    subject:'math', topic:'Equivalent Fractions', skill:'Fraction Relationships',
+    standard:'5.NF.A.1', difficulty:'medium',
+    text:'Which fraction is equivalent to 2/3?',
+    opts:['3/4','4/9','6/9','2/9'],
+    ans:2,
+    exp:'2/3 × 3/3 = 6/9. Multiply both numerator and denominator by the same number (3) to get an equivalent fraction.'
+  },
+  {
+    subject:'math', topic:'Adding Fractions', skill:'Fraction Operations',
+    standard:'5.NF.A.1', difficulty:'medium',
+    text:'1/4 + 1/2 = ?',
+    opts:['2/6','2/8','3/4','1/3'],
+    ans:2,
+    exp:'Convert 1/2 to fourths: 1/2 = 2/4. Then: 1/4 + 2/4 = 3/4. Always find a common denominator first!'
+  },
+  {
+    subject:'math', topic:'Subtracting Fractions', skill:'Fraction Operations',
+    standard:'5.NF.A.1', difficulty:'medium',
+    text:'A water bottle is 5/6 full. You drink 1/3 of the bottle. How much is left?',
+    opts:['4/3','4/6','1/2','3/6'],
+    ans:2,
+    exp:'Convert 1/3 to sixths: 1/3 = 2/6. Then: 5/6 − 2/6 = 3/6 = 1/2. Find the LCD (6) first.'
+  },
+  {
+    subject:'math', topic:'Number Sense', skill:'Fraction Comparison',
+    standard:'5.NF.A', difficulty:'hard',
+    text:'Which fraction is GREATEST?',
+    opts:['3/4','5/8','2/3','7/12'],
+    ans:0,
+    exp:'Convert to the same denominator (24): 3/4=18/24, 5/8=15/24, 2/3=16/24, 7/12=14/24. Largest is 18/24 = 3/4!'
+  }
+];
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let state = {
+  student:'', parent:'', grade:'',
+  qIdx:0, answers:[], startTime:null,
+  timerInterval:null, secondsLeft:600
+};
+
+// ═══════════════════════════════════════
+// STARS BACKGROUND
+// ═══════════════════════════════════════
+
+// ═══════════════════════════════════════
+// SUPABASE — Auto Save & Load
+// ═══════════════════════════════════════
+let _SB = null;
+let _assessDbId = null;
+try {
+  if(typeof supabase !== 'undefined') {
+    _SB = supabase.createClient(
+      'https://xqujtupqhefizflcdmrl.supabase.co',
+      'sb_publishable_yxg8-Bm4dZR3KPO1lqVzYw_FITUKPGD'
+    );
+  }
+} catch(e) { _SB = null; }
+
+async function saveAssessmentResult(reportData) {
+  if(!reportData || !reportData.student) return;
+  const payload = {
+    student_name: reportData.student,
+    grade: reportData.grade,
+    ela_score: reportData.elaScore,
+    math_score: reportData.mathScore,
+    overall_score: reportData.overallScore,
+    ela_skills: JSON.stringify(reportData.elaSkills),
+    math_skills: JSON.stringify(reportData.mathSkills),
+    recommendations: JSON.stringify(reportData.recs),
+    answers: JSON.stringify(reportData.answers),
+    assessed_at: new Date().toISOString()
+  };
+  // Save to localStorage immediately
+  try { localStorage.setItem('eb_assess_'+reportData.student, JSON.stringify(payload)); } catch(e) {}
+  // Save to Supabase
+  try {
+    if(_SB) {
+      if(_assessDbId) {
+        await _SB.from('assessment_results').update(payload).eq('id', _assessDbId);
+      } else {
+        const { data } = await _SB.from('assessment_results').insert(payload).select().single();
+        if(data) _assessDbId = data.id;
+      }
+    }
+  } catch(e) { console.log('Supabase save:', e); }
+}
+
+async function loadPreviousAssessment(studentName) {
+  // Try localStorage first (faster, always works)
+  try {
+    const local = localStorage.getItem('eb_assess_' + studentName);
+    if(local) {
+      const parsed = JSON.parse(local);
+      if(parsed && parsed.assessed_at) return parsed;
+    }
+  } catch(e) {}
+  // Try Supabase (may fail if table doesnt exist yet)
+  try {
+    if(!_SB) throw new Error('no supabase');
+    const { data, error } = await _SB
+      .from('assessment_results')
+      .select('*')
+      .eq('student_name', studentName)
+      .order('assessed_at', { ascending: false })
+      .limit(1)
+      .single();
+    if(!error && data) return data;
+  } catch(e) {}
+  return null;
+}
+
+function showSavedReport(data) {
+  const elaSkills = typeof data.ela_skills === 'string' ? JSON.parse(data.ela_skills) : data.ela_skills;
+  const mathSkills = typeof data.math_skills === 'string' ? JSON.parse(data.math_skills) : data.math_skills;
+  const recs = typeof data.recommendations === 'string' ? JSON.parse(data.recommendations) : data.recommendations;
+  const date = new Date(data.assessed_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+
+  const getColor = s => s>=90?'#10B981':s>=75?'#3B82F6':s>=60?'#F59E0B':'#EF4444';
+  const getGrade = s => s>=90?'A':s>=75?'B':s>=60?'C':'D';
+  const getGradeLabel = s => s>=90?'Excellent':s>=75?'Proficient':s>=60?'Developing':'Needs Support';
+  const statusLabel = s => s==='strong'?'Strong':s==='review'?'Review':'Focus Area';
+  const statusClass = s => `skill-${s==='strong'?'strong':s==='review'?'review':'focus'}`;
+  const skillDotColor = s => s==='strong'?'#10B981':s==='review'?'#F59E0B':'#EF4444';
+  const circle = (pct,color,size=110) => {
+    const r=44,c=size/2,circ=2*Math.PI*r;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#F1F5F9" stroke-width="9"/>
+      <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color}" stroke-width="9"
+        stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pct/100)}" stroke-linecap="round"
+        style="transition:stroke-dashoffset 1.2s ease"/>
+    </svg>`;
+  };
+
+  const recHTML = recs.map((r,i) => `
+    <div class="rec-card" style="border-left:4px solid ${r.c}">
+      <div style="display:flex;align-items:flex-start;gap:14px;">
+        <div style="width:32px;height:32px;border-radius:10px;background:${r.c};color:white;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.9rem;flex-shrink:0;">${i+1}</div>
+        <div><div class="rec-label" style="color:${r.c}">${r.label}</div><div class="rec-title">${r.title}</div><div class="rec-desc">${r.desc}</div></div>
+      </div>
+    </div>`).join('');
+
+  showScreen('reportScreen');
+  document.getElementById('reportDate').textContent = date;
+  document.getElementById('reportScreen').innerHTML = `
+    <div class="report-wrap">
+      <div class="report-header">
+        <div class="rh-badge">✅ Saved Results</div>
+        <div class="rh-title">Assessment Report</div>
+        <div class="rh-sub">Results from ${date}</div>
+      </div>
+      <div class="report-body">
+        <div class="scores-grid">
+          <div class="score-card">
+            ${circle(data.ela_score, getColor(data.ela_score))}
+            <div class="sc-pct" style="color:${getColor(data.ela_score)}">${data.ela_score}%</div>
+            <div class="sc-grade" style="background:${getColor(data.ela_score)}">${getGrade(data.ela_score)}</div>
+            <div class="sc-label">ELA</div>
+            <div class="sc-sublabel">${getGradeLabel(data.ela_score)}</div>
+          </div>
+          <div class="score-card overall-card">
+            ${circle(data.overall_score, getColor(data.overall_score), 130)}
+            <div class="sc-pct" style="color:${getColor(data.overall_score)};font-size:1.8rem">${data.overall_score}%</div>
+            <div class="sc-grade" style="background:${getColor(data.overall_score)}">${getGrade(data.overall_score)}</div>
+            <div class="sc-label">Overall</div>
+            <div class="sc-sublabel">${getGradeLabel(data.overall_score)}</div>
+          </div>
+          <div class="score-card">
+            ${circle(data.math_score, getColor(data.math_score))}
+            <div class="sc-pct" style="color:${getColor(data.math_score)}">${data.math_score}%</div>
+            <div class="sc-grade" style="background:${getColor(data.math_score)}">${getGrade(data.math_score)}</div>
+            <div class="sc-label">Math</div>
+            <div class="sc-sublabel">${getGradeLabel(data.math_score)}</div>
+          </div>
+        </div>
+        <div class="skills-section">
+          <div class="skills-col">
+            <div class="skills-title">📖 ELA Skills</div>
+            ${elaSkills.map(s=>`<div class="skill-row ${statusClass(s.status)}"><span style="color:${skillDotColor(s.status)};margin-right:6px;">●</span>${s.name}<span class="skill-badge">${statusLabel(s.status)}</span></div>`).join('')}
+          </div>
+          <div class="skills-col">
+            <div class="skills-title">🧮 Math Skills</div>
+            ${mathSkills.map(s=>`<div class="skill-row ${statusClass(s.status)}"><span style="color:${skillDotColor(s.status)};margin-right:6px;">●</span>${s.name}<span class="skill-badge">${statusLabel(s.status)}</span></div>`).join('')}
+          </div>
+        </div>
+        <div class="rec-section">
+          <div class="rec-section-title">🎯 Recommendations</div>
+          ${recHTML}
+        </div>
+        <div class="parent-note">
+          <div class="pn-title">💌 Note for Parent</div>
+          <p>${data.student_name} completed the ELABoost Placement Assessment. Results are automatically saved.</p>
+          <p style="margin-top:8px"><strong>Recommended daily practice:</strong> 15–20 minutes · <strong>Next re-assessment:</strong> 2 weeks from test date</p>
+        </div>
+        <div class="action-row" style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn-primary" onclick="startLearning()">🚀 Start Learning Now</button>
+          <button class="btn-secondary" onclick="restartAssessment()">↺ New Assessment</button>
+        </div>
+        <div class="report-date">ELABoost Assessment · Grade ${data.grade} · ${new Date().getFullYear()} · Common Core & Georgia GSE Aligned</div>
+      </div>
+    </div>`;
+}
+
+function restartAssessment() {
+  _assessDbId = null;
+  showScreen('welcomeScreen');
+}
+
+function makeStars() {
+  const sf = document.getElementById('starField');
+  for(let i=0;i<60;i++) {
+    const s = document.createElement('div');
+    s.className='star';
+    const size = Math.random()*3+1;
+    s.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${Math.random()*3+2}s;animation-delay:${Math.random()*3}s;`;
+    sf.appendChild(s);
+  }
+}
+makeStars();
+
+// ═══════════════════════════════════════
+// SCREEN SWITCH
+// ═══════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════
+// START ASSESSMENT
+// ═══════════════════════════════════════
+function startAssessment() {
+  const name = document.getElementById('studentName').value.trim();
+  const grade = document.getElementById('gradeLevel').value;
+  const parent = document.getElementById('parentName').value.trim();
+
+  if(!name) { alert('Please enter the student\'s name!'); return; }
+  if(!grade) { alert('Please select a grade level!'); return; }
+
+  state.student = name;
+  state.parent = parent || 'Parent/Guardian';
+  state.grade = grade;
+  state.qIdx = 0;
+  state.answers = [];
+  state.secondsLeft = 600;
+
+  // Check for saved results first
+  loadPreviousAssessment(name).then(saved => {
+    if(saved) {
+      const d = new Date(saved.assessed_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+      const resume = confirm('✅ Found saved results for ' + name + ' from ' + d + '.\n\nPress OK to view saved results, or Cancel to start a new assessment.');
+      if(resume) { showSavedReport(saved); return; }
+    }
+    beginTest();
+  }).catch(() => {
+    // If Supabase fails for any reason, just start the test
+    beginTest();
+  });
+}
+
+function beginTest() {
+
+  showScreen('assessScreen');
+  startTimer();
+  renderQuestion();
+}
+
+// ═══════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════
+function startTimer() {
+  clearInterval(state.timerInterval);
+  state.timerInterval = setInterval(() => {
+    state.secondsLeft--;
+    const m = Math.floor(state.secondsLeft/60);
+    const s = state.secondsLeft%60;
+    document.getElementById('timerDisplay').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    if(state.secondsLeft <= 60) document.getElementById('timerDisplay').style.color='#EF4444';
+    if(state.secondsLeft <= 0) { clearInterval(state.timerInterval); finishAssessment(); }
+  },1000);
+}
+
+// ═══════════════════════════════════════
+// RENDER QUESTION
+// ═══════════════════════════════════════
+function renderQuestion() {
+  const q = QUESTIONS[state.qIdx];
+  const pct = ((state.qIdx+1)/QUESTIONS.length*100).toFixed(0);
+  document.getElementById('progressLabel').textContent = `Question ${state.qIdx+1} of ${QUESTIONS.length}`;
+  document.getElementById('progressFill').style.width = pct+'%';
+
+  const isELA = q.subject==='ela';
+  const tagClass = isELA?'ela':'math';
+  const tagLabel = isELA?'📖 ELA — '+q.topic:'🧮 Math — '+q.topic;
+
+  const container = document.getElementById('questionContainer');
+  container.style.opacity='0';
+  container.style.transform='translateY(16px)';
+
+  setTimeout(()=>{
+    container.innerHTML = `
+      <div class="subject-tag ${tagClass}">${tagLabel}</div>
+      <div class="q-card">
+        <div class="q-number">Question ${state.qIdx+1} · ${q.standard} · ${q.difficulty.toUpperCase()}</div>
+        <div class="q-text">${q.text}</div>
+        ${q.passage ? `<div class="q-passage">${q.passage}</div>` : ''}
+        <div class="options-grid">
+          ${q.opts.map((o,i)=>`
+            <button class="opt-btn" id="opt${i}" onclick="selectAnswer(${i})">
+              <div class="opt-key">${['A','B','C','D'][i]}</div>
+              ${o}
+            </button>`).join('')}
+        </div>
+        <div id="assessFeedback"></div>
+        <button class="next-q-btn" id="nextQBtn" onclick="nextQuestion()">
+          ${state.qIdx===QUESTIONS.length-1?'See My Results →':'Next Question →'}
+        </button>
+      </div>`;
+    container.style.transition='all .35s ease';
+    container.style.opacity='1';
+    container.style.transform='translateY(0)';
+  },150);
+}
+
+let selectedOpt = null;
+function selectAnswer(idx) {
+  if(selectedOpt!==null) return;
+  selectedOpt = idx;
+  const q = QUESTIONS[state.qIdx];
+  const correct = idx===q.ans;
+
+  // Record answer
+  state.answers.push({
+    qIdx:state.qIdx, subject:q.subject, topic:q.topic,
+    skill:q.skill, standard:q.standard, difficulty:q.difficulty,
+    correct, selectedIdx:idx, correctIdx:q.ans
+  });
+
+  // Style buttons
+  document.querySelectorAll('.opt-btn').forEach(b=>b.classList.add('disabled'));
+  document.getElementById(`opt${q.ans}`).classList.add('correct');
+  if(!correct) document.getElementById(`opt${idx}`).classList.add('wrong');
+
+  // Feedback
+  document.getElementById('assessFeedback').innerHTML = `
+    <div class="assess-feedback ${correct?'correct':'wrong'}">
+      <div class="fb-emoji">${correct?'✅':'❌'}</div>
+      <div class="fb-body">
+        <div class="fb-title ${correct?'c':'w'}">${correct?'Correct!':'Incorrect'}</div>
+        <div class="fb-exp">${q.exp}</div>
+      </div>
+    </div>`;
+
+  document.getElementById('nextQBtn').classList.add('show');
+}
+
+function nextQuestion() {
+  selectedOpt = null;
+  state.qIdx++;
+  if(state.qIdx >= QUESTIONS.length) {
+    clearInterval(state.timerInterval);
+    finishAssessment();
+  } else {
+    renderQuestion();
+  }
+}
+
+// ═══════════════════════════════════════
+// FINISH → LOADING → REPORT
+// ═══════════════════════════════════════
+function finishAssessment() {
+  showScreen('loadingScreen');
+  document.getElementById('loadingName').textContent = state.student + "'s";
+
+  const steps = ['ls1','ls2','ls3','ls4'];
+  let si=0;
+  const stepInterval = setInterval(()=>{
+    if(si>0) document.getElementById(steps[si-1]).classList.replace('active','done');
+    if(si < steps.length) document.getElementById(steps[si]).classList.add('active');
+    si++;
+    if(si>steps.length){ clearInterval(stepInterval); setTimeout(showReport,600); }
+  },700);
+}
+
+// ═══════════════════════════════════════
+// GENERATE REPORT
+// ═══════════════════════════════════════
+function showReport() {
+  // Compute scores
+  const elaAnswers = state.answers.filter(a=>a.subject==='ela');
+  const mathAnswers = state.answers.filter(a=>a.subject==='math');
+  const elaScore = Math.round(elaAnswers.filter(a=>a.correct).length/elaAnswers.length*100);
+  const mathScore = Math.round(mathAnswers.filter(a=>a.correct).length/mathAnswers.length*100);
+  const overallScore = Math.round(state.answers.filter(a=>a.correct).length/state.answers.length*100);
+
+  // Grade level
+  const getGrade = s => s>=90?'A':s>=75?'B':s>=60?'C':'D';
+  const getGradeLabel = s => s>=90?'Excellent':s>=75?'Proficient':s>=60?'Developing':'Needs Support';
+  const getColor = s => s>=90?'#10B981':s>=75?'#3B82F6':s>=60?'#F59E0B':'#EF4444';
+
+  // ELA skill breakdown
+  const elaSkills = [
+    {name:'Literary Analysis (Theme)', status: elaAnswers[0]?.correct?'strong':'focus'},
+    {name:'Point of View',             status: elaAnswers[1]?.correct?'strong':'review'},
+    {name:'Text Evidence',             status: elaAnswers[2]?.correct?'strong':'focus'},
+    {name:'Figurative Language',       status: elaAnswers[3]?.correct?'strong':'review'},
+    {name:'Central Idea (Non-fiction)',status: elaAnswers[4]?.correct?'strong':'focus'},
+  ];
+  const mathSkills = [
+    {name:'Fraction Concepts',         status: mathAnswers[0]?.correct?'strong':'focus'},
+    {name:'Equivalent Fractions',      status: mathAnswers[1]?.correct?'strong':'review'},
+    {name:'Adding Fractions',          status: mathAnswers[2]?.correct?'strong':'focus'},
+    {name:'Subtracting Fractions',     status: mathAnswers[3]?.correct?'strong':'review'},
+    {name:'Fraction Comparison',       status: mathAnswers[4]?.correct?'strong':'focus'},
+  ];
+
+  // Recommendations
+  const weakELA = elaSkills.filter(s=>s.status!=='strong');
+  const weakMath = mathSkills.filter(s=>s.status!=='strong');
+  const recs = [];
+  if(weakELA.length>0) recs.push({
+    c:getColor(elaScore), label:'ELA Priority',
+    title:`Start with: ${weakELA[0].name}`,
+    desc:`${state.student} missed questions on ${weakELA[0].name}. Begin with the interactive lesson and mastery practice before moving on.`
+  });
+  if(weakMath.length>0) recs.push({
+    c:getColor(mathScore), label:'Math Priority',
+    title:`Start with: ${weakMath[0].name}`,
+    desc:`${state.student} needs practice with ${weakMath[0].name}. The visual pizza activities are especially helpful for this concept.`
+  });
+  if(weakELA.length===0 && weakMath.length===0) recs.push({
+    c:'#10B981', label:'Advanced Path',
+    title:'Ready for challenge material!',
+    desc:`${state.student} scored excellently in all areas. Recommend starting with advanced lessons and unlocking higher difficulty practice sets.`
+  });
+
+  // Learning path
+  const path = [];
+  if(elaScore < mathScore) {
+    path.push({c:getColor(elaScore), num:1, title:'ELA Weak Areas First', sub:weakELA.map(s=>s.name).join(', ')||'Review all lessons', badge:'badge-start'});
+    path.push({c:getColor(mathScore), num:2, title:'Math Practice', sub:weakMath.length>0?weakMath.map(s=>s.name).join(', '):'Maintain strong performance', badge:mathScore>=80?'badge-skip':'badge-review'});
+  } else {
+    path.push({c:getColor(mathScore), num:1, title:'Math Weak Areas First', sub:weakMath.map(s=>s.name).join(', ')||'Review all lessons', badge:'badge-start'});
+    path.push({c:getColor(elaScore), num:2, title:'ELA Practice', sub:weakELA.length>0?weakELA.map(s=>s.name).join(', '):'Maintain strong performance', badge:elaScore>=80?'badge-skip':'badge-review'});
+  }
+  path.push({c:'#8B5CF6', num:3, title:'Re-Assessment in 2 Weeks', sub:'Check progress and unlock new topics', badge:'badge-review'});
+
+  // Skill status helpers
+  const statusLabel = s => s==='strong'?'Strong':s==='review'?'Review':'Focus Area';
+  const statusClass = s => `skill-${s==='strong'?'strong':s==='review'?'review':'focus'}`;
+  const skillDotColor = s => s==='strong'?'#10B981':s==='review'?'#F59E0B':'#EF4444';
+
+  // Circle progress SVG
+  const circle = (pct,color,size=110) => {
+    const r=44,c=size/2,circ=2*Math.PI*r;
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#F1F5F9" stroke-width="9"/>
+      <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color}" stroke-width="9"
+        stroke-dasharray="${circ}" stroke-dashoffset="${circ*(1-pct/100)}" stroke-linecap="round"
+        style="transition:stroke-dashoffset 1.2s ease"/>
+    </svg>`;
+  };
+
+  document.getElementById('reportDate').textContent = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('reportStudentName').textContent = state.student;
+  document.getElementById('reportGrade').textContent = state.grade;
+
+  document.getElementById('reportBody').innerHTML = `
+
+    <!-- OVERALL SCORE -->
+    <div class="overall-card">
+      <div class="score-circle-wrap">
+        ${circle(overallScore,getColor(overallScore))}
+        <div class="score-circle-val">
+          <div class="scv-num">${overallScore}%</div>
+          <div class="scv-lbl">Overall</div>
+        </div>
+      </div>
+      <div class="overall-info">
+        <div class="overall-grade-tag grade-${getGrade(overallScore)}">${getGrade(overallScore)} — ${getGradeLabel(overallScore)}</div>
+        <div class="overall-title">Assessment Complete for ${state.student}</div>
+        <div class="overall-desc">
+          ${state.student} completed the Grade ${state.grade} Placement Assessment. 
+          ${overallScore>=75?`Great performance overall! Focus on the highlighted areas to reach mastery.`:`There are clear areas to strengthen. The personalized path below will help ${state.student} build confidence quickly.`}
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBJECT BREAKDOWN -->
+    <div class="section-title">📊 Subject Breakdown</div>
+    <div class="subject-cards">
+      <div class="subject-card" style="--c:${getColor(elaScore)}">
+        <div class="sc-header">
+          <div class="sc-emoji">📖</div>
+          <div class="sc-name">ELA</div>
+          <div class="sc-pct">${elaScore}%</div>
+        </div>
+        <div class="sc-bar"><div class="sc-fill" style="width:${elaScore}%"></div></div>
+        <div class="sc-skills">
+          ${elaSkills.map(s=>`
+            <div class="skill-row">
+              <div class="skill-dot" style="background:${skillDotColor(s.status)}"></div>
+              <div class="skill-name">${s.name}</div>
+              <div class="skill-status ${statusClass(s.status)}">${statusLabel(s.status)}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+      <div class="subject-card" style="--c:${getColor(mathScore)}">
+        <div class="sc-header">
+          <div class="sc-emoji">🧮</div>
+          <div class="sc-name">Math</div>
+          <div class="sc-pct">${mathScore}%</div>
+        </div>
+        <div class="sc-bar"><div class="sc-fill" style="width:${mathScore}%"></div></div>
+        <div class="sc-skills">
+          ${mathSkills.map(s=>`
+            <div class="skill-row">
+              <div class="skill-dot" style="background:${skillDotColor(s.status)}"></div>
+              <div class="skill-name">${s.name}</div>
+              <div class="skill-status ${statusClass(s.status)}">${statusLabel(s.status)}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- RECOMMENDATIONS -->
+    <div class="section-title">🎯 Recommendations</div>
+    <div class="rec-cards">
+      ${recs.map((r,i)=>`
+        <div class="rec-card" style="--c:${r.c}">
+          <div class="rec-priority" style="background:${r.c}">${i+1}</div>
+          <div class="rec-body">
+            <div class="rec-tag" style="color:${r.c}">${r.label}</div>
+            <div class="rec-title">${r.title}</div>
+            <div class="rec-desc">${r.desc}</div>
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <!-- LEARNING PATH -->
+    <div class="section-title">🗺️ Suggested Learning Path</div>
+    <div class="path-cards">
+      ${path.map(p=>`
+        <div class="path-card">
+          <div class="path-num" style="background:${p.c}">${p.num}</div>
+          <div class="path-info">
+            <div class="path-title">${p.title}</div>
+            <div class="path-sub">${p.sub}</div>
+          </div>
+          <div class="path-badge ${p.badge}">${p.badge==='badge-start'?'Start Here':p.badge==='badge-skip'?'Maintain':'Review'}</div>
+        </div>`).join('')}
+    </div>
+
+    <!-- PARENT NOTE -->
+    <div class="parent-note">
+      <div class="pn-header">
+        <span style="font-size:1.2rem">💌</span>
+        <div class="pn-title">Note for ${state.parent}</div>
+      </div>
+      <div class="pn-text">
+        ${state.student} completed the ELABoost Placement Assessment today. 
+        ${overallScore>=80
+          ? `The results show strong foundational skills — especially in ${elaScore>=mathScore?'ELA':'Math'}. We recommend following the learning path above to maintain momentum and tackle the areas marked for review.`
+          : `The results help us understand exactly where to focus attention. Please review the "Focus Area" skills above — these are where ${state.student} will benefit most from targeted practice. With consistent 15–20 minute daily sessions, most students see measurable improvement within 2–3 weeks.`
+        }
+        <br><br>
+        <strong>Recommended daily practice:</strong> 15–20 minutes · 
+        <strong>Next re-assessment:</strong> ${new Date(Date.now()+14*24*60*60*1000).toLocaleDateString('en-US',{month:'long',day:'numeric'})}
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="action-row">
+      <button class="btn-primary" onclick="startLearning()">🚀 Start Learning Now</button>
+      <button class="btn-secondary" onclick="window.print()">🖨️ Print Report</button>
+      <button class="btn-secondary" onclick="location.reload()">↺ New Assessment</button>
+    </div>
+
+    <div class="report-date">ELABoost Assessment · Grade ${state.grade} · ${new Date().getFullYear()} · Common Core & Georgia GSE Aligned</div>
+  `;
+
+  showScreen('reportScreen');
+
+  // ── AUTO SAVE to Supabase + localStorage ──
+  saveAssessmentResult({
+    student: state.student,
+    grade: state.grade,
+    elaScore: elaScore,
+    mathScore: mathScore,
+    overallScore: overallScore,
+    elaSkills: elaSkills,
+    mathSkills: mathSkills,
+    recs: recs,
+    answers: state.answers
+  });
+}
+
+function startLearning() {
+  // Navigate to math via parent iframe
+  try { window.parent.postMessage({ type: 'navigate', page: 'math' }, '*'); } catch(e) { window.location.href = 'math.html'; }
+}
+function startLearning_OLD() {
+  alert(`Great! ${state.student}'s personalized learning path is ready.\n\nIn the full ELABoost platform, this would automatically open the first recommended lesson based on the assessment results.`);
+}
+</script>
+</body>
+</html>

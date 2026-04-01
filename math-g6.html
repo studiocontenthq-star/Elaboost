@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ELABoost · Grade 6 Math · Joshua</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0F172A;--sky:#3B82F6;--purple:#8B5CF6;--orange:#F97316;--green:#10B981;--red:#EF4444;--gold:#F59E0B;
+  --rp:#3B82F6;--ns:#8B5CF6;--ee:#F97316;--geo:#10B981;--sp:#EC4899;
+  --bg:#F0F4FF;--white:#fff;--border:#E2E8F0;--muted:#64748B;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;}
+
+/* ── NAV ── */
+.top-nav{background:var(--navy);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.3);}
+.nav-logo{font-family:'Fredoka One',cursive;color:#fff;font-size:1.1rem;}
+.nav-logo span{color:var(--gold);}
+.nav-grade{background:var(--orange);color:#fff;font-family:'Fredoka One',cursive;font-size:.8rem;padding:4px 12px;border-radius:14px;}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:calc(100vh - 54px);}
+
+/* ── SIDEBAR ── */
+.sidebar{width:240px;flex-shrink:0;background:var(--navy);overflow-y:auto;padding:12px 8px;}
+.sb-domain{font-family:'Fredoka One',cursive;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:12px 10px 4px;margin-top:4px;}
+.sb-domain:first-child{margin-top:0;}
+.lesson-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;border-radius:10px;border:none;background:transparent;color:rgba(255,255,255,.55);font-family:'Nunito',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;transition:all .2s;text-align:left;}
+.lesson-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
+.lesson-btn.active{background:rgba(255,255,255,.14);color:#fff;}
+.lb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;padding:24px;}
+
+/* ── LESSON HEADER ── */
+.lesson-header{border-radius:18px;padding:22px 24px;margin-bottom:22px;color:#fff;position:relative;overflow:hidden;}
+.lh-tag{font-size:.72rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;opacity:.75;margin-bottom:6px;}
+.lh-title{font-family:'Fredoka One',cursive;font-size:1.8rem;line-height:1.1;margin-bottom:4px;}
+.lh-sub{font-size:.82rem;opacity:.7;font-weight:700;}
+.lh-emoji{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.25;}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.tab-btn{font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;padding:8px 16px;border-radius:10px;border:2px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .2s;}
+.tab-btn.active{border-color:currentColor;color:var(--navy);background:#fff;}
+.panel{display:none;}
+.panel.active{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── CONCEPT CARD ── */
+.concept-card{background:#fff;border-radius:16px;border:2px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+.cc-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.cc-num{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--sky),var(--purple));color:#fff;font-family:'Fredoka One',cursive;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cc-title{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--navy);}
+.cc-std{margin-left:auto;font-size:.65rem;font-weight:900;background:#EFF6FF;color:var(--sky);padding:2px 8px;border-radius:6px;letter-spacing:.5px;}
+
+/* ── RULE CARD ── */
+.rule-card{background:linear-gradient(135deg,#EFF6FF,#F5F3FF);border:1.5px solid #C7D2FE;border-radius:12px;padding:14px 16px;margin:12px 0;display:flex;gap:10px;align-items:flex-start;}
+.rule-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+.rule-text{font-size:.85rem;color:var(--navy);line-height:1.65;font-weight:600;}
+
+/* ── EXAMPLE BOX ── */
+.example-box{background:#F8FAFC;border-left:4px solid var(--sky);border-radius:0 12px 12px 0;padding:14px 16px;margin:12px 0;}
+.ex-label{font-size:.68rem;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--sky);margin-bottom:6px;}
+.ex-problem{font-family:'Fredoka One',cursive;font-size:1.05rem;color:var(--navy);margin-bottom:10px;}
+.ex-steps{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.ex-steps li{display:flex;align-items:flex-start;gap:8px;font-size:.85rem;color:#334155;font-weight:600;}
+.step-num{width:22px;height:22px;border-radius:7px;background:var(--sky);color:#fff;font-size:.72rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+/* ── PRACTICE ── */
+.practice-area{display:flex;flex-direction:column;gap:16px;}
+.q-card{background:#fff;border-radius:16px;border:2px solid var(--border);padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+.q-num{font-size:.7rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.q-text{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--navy);margin-bottom:14px;line-height:1.4;}
+.opts{display:flex;flex-direction:column;gap:8px;}
+.opt-btn{text-align:left;background:#F8FAFC;border:2px solid var(--border);border-radius:12px;padding:11px 14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.88rem;color:#334155;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:10px;}
+.opt-btn:hover:not(:disabled){background:#EFF6FF;border-color:var(--sky);}
+.opt-btn.correct{background:#ECFDF5;border-color:var(--green);color:#065F46;}
+.opt-btn.wrong{background:#FEF2F2;border-color:var(--red);color:#991B1B;}
+.opt-btn:disabled{cursor:not-allowed;}
+.opt-letter{width:24px;height:24px;border-radius:8px;background:var(--border);color:var(--muted);font-size:.72rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;}
+.opt-btn.correct .opt-letter{background:var(--green);color:#fff;}
+.opt-btn.wrong .opt-letter{background:var(--red);color:#fff;}
+.feedback-box{margin-top:10px;padding:12px 14px;border-radius:10px;font-size:.82rem;font-weight:700;line-height:1.6;display:none;}
+.feedback-box.show{display:block;}
+.feedback-box.c{background:#ECFDF5;color:#065F46;border:1.5px solid #6EE7B7;}
+.feedback-box.w{background:#FEF2F2;color:#991B1B;border:1.5px solid #FECACA;}
+.btn-next{margin-top:12px;font-family:'Fredoka One',cursive;font-size:.95rem;padding:11px 22px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--sky),var(--purple));color:#fff;cursor:pointer;display:none;transition:all .2s;}
+.btn-next.show{display:inline-flex;align-items:center;gap:6px;}
+.btn-next:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(59,130,246,.4);}
+
+/* ── SCORE SCREEN ── */
+.score-screen{text-align:center;padding:30px 20px;background:#fff;border-radius:18px;border:2px solid var(--border);}
+.score-title{font-family:'Fredoka One',cursive;font-size:2.2rem;color:var(--navy);margin-bottom:8px;}
+.score-circle{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--sky),var(--purple));display:flex;flex-direction:column;align-items:center;justify-content:center;margin:16px auto;}
+.score-val{font-family:'Fredoka One',cursive;font-size:2rem;color:#fff;line-height:1;}
+.score-tot{font-size:.72rem;color:rgba(255,255,255,.8);font-weight:800;}
+.btn-retry{font-family:'Fredoka One',cursive;font-size:1rem;padding:12px 26px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--sky),var(--purple));color:#fff;cursor:pointer;margin-top:16px;}
+
+@media(max-width:640px){
+  .app{flex-direction:column;height:auto;}
+  .sidebar{width:100%;height:auto;display:flex;flex-wrap:wrap;gap:4px;padding:8px;}
+  .sb-domain{width:100%;padding:6px 4px 2px;}
+  .lesson-btn{width:auto;flex:0 0 auto;}
+  .main{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-logo">ELA<span>Boost</span> · Math</div>
+  <div style="font-family:'Fredoka One',cursive;font-size:.8rem;color:rgba(255,255,255,.5);" id="xpDisplay">⭐ 0 XP</div>
+  <div class="nav-grade">Grade 6</div>
+</nav>
+
+<div class="app">
+  <div class="sidebar">
+
+    <div class="sb-domain">6.RP · Ratios &amp; Proportions</div>
+    <button class="lesson-btn active" onclick="loadLesson('rp1',this)"><div class="lb-dot" style="background:var(--rp)"></div>Ratios &amp; Unit Rates</button>
+    <button class="lesson-btn" onclick="loadLesson('rp2',this)"><div class="lb-dot" style="background:var(--rp)"></div>Percents</button>
+
+    <div class="sb-domain">6.NS · Number System</div>
+    <button class="lesson-btn" onclick="loadLesson('ns1',this)"><div class="lb-dot" style="background:var(--ns)"></div>Dividing Fractions</button>
+    <button class="lesson-btn" onclick="loadLesson('ns2',this)"><div class="lb-dot" style="background:var(--ns)"></div>Negative Numbers</button>
+
+    <div class="sb-domain">6.EE · Expressions &amp; Equations</div>
+    <button class="lesson-btn" onclick="loadLesson('ee1',this)"><div class="lb-dot" style="background:var(--ee)"></div>Exponents &amp; Expressions</button>
+    <button class="lesson-btn" onclick="loadLesson('ee2',this)"><div class="lb-dot" style="background:var(--ee)"></div>Solving Equations</button>
+
+    <div class="sb-domain">6.G · Geometry</div>
+    <button class="lesson-btn" onclick="loadLesson('geo1',this)"><div class="lb-dot" style="background:var(--geo)"></div>Area of Polygons</button>
+    <button class="lesson-btn" onclick="loadLesson('geo2',this)"><div class="lb-dot" style="background:var(--geo)"></div>Surface Area &amp; Volume</button>
+
+    <div class="sb-domain">6.SP · Statistics</div>
+    <button class="lesson-btn" onclick="loadLesson('sp1',this)"><div class="lb-dot" style="background:var(--sp)"></div>Mean, Median, Mode</button>
+  </div>
+
+  <div class="main" id="mainContent"></div>
+</div>
+
+<script>
+let xp=0, currentLesson='rp1', practiceIdx=0, practiceScore=0, answered=false;
+
+const DOMAIN_COLORS = {
+  rp1:'#3B82F6',rp2:'#3B82F6',
+  ns1:'#8B5CF6',ns2:'#8B5CF6',
+  ee1:'#F97316',ee2:'#F97316',
+  geo1:'#10B981',geo2:'#10B981',
+  sp1:'#EC4899'
+};
+
+const LESSONS = {
+
+  rp1:{
+    title:'Ratios & Unit Rates',
+    emoji:'⚖️',
+    std:'MGSE6.RP.1-2',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num">1</div><div class="cc-title">What is a Ratio?</div><div class="cc-std">6.RP.1</div></div>
+      <p style="font-size:.88rem;font-weight:700;color:#555;margin-bottom:12px;line-height:1.65;">A <strong style="color:#3B82F6">ratio</strong> compares two quantities. You can write it 3 ways: <strong>3 to 4</strong> · <strong>3:4</strong> · <strong>3/4</strong></p>
+      <div class="rule-card"><div class="rule-icon">💡</div><div class="rule-text">Order matters! "3 cats to 4 dogs" is different from "4 dogs to 3 cats." Always read the problem carefully to know which quantity comes first.</div></div>
+      <div class="example-box">
+        <div class="ex-label">Example</div>
+        <div class="ex-problem">A class has 12 girls and 15 boys. Write the ratio of girls to boys.</div>
+        <ul class="ex-steps">
+          <li><div class="step-num">1</div>Girls = 12, Boys = 15</li>
+          <li><div class="step-num">2</div>Ratio of girls to boys = 12:15</li>
+          <li><div class="step-num">3</div>Simplify: divide both by 3 → <strong style="color:#3B82F6">4:5</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">Unit Rate</div><div class="cc-std">6.RP.2</div></div>
+      <p style="font-size:.88rem;font-weight:700;color:#555;margin-bottom:12px;line-height:1.65;">A <strong style="color:#F97316">unit rate</strong> is a ratio with a denominator of 1 — it tells you the amount <em>per one unit</em>.</p>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">🔑</div><div class="rule-text">To find a unit rate: divide the top number by the bottom number.</div></div>
+      <div class="example-box" style="border-left-color:#F97316">
+        <div class="ex-label" style="color:#F97316">Example</div>
+        <div class="ex-problem">A car drives 150 miles in 3 hours. What is the unit rate (miles per hour)?</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#F97316">1</div>Rate: 150 miles / 3 hours</li>
+          <li><div class="step-num" style="background:#F97316">2</div>Divide: 150 ÷ 3 = 50</li>
+          <li><div class="step-num" style="background:#F97316">3</div>Unit rate: <strong style="color:#F97316">50 miles per hour</strong> 🚗</li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'A recipe uses 2 cups of sugar for every 5 cups of flour. What is the ratio of sugar to flour?',opts:['5:2','2:5','2:7','5:7'],ans:1,exp:'Sugar comes first in "sugar to flour." There are 2 cups sugar and 5 cups flour, so the ratio is 2:5.'},
+      {text:'You earn $36 for 4 hours of work. What is your unit rate (pay per hour)?',opts:['$4/hr','$8/hr','$9/hr','$10/hr'],ans:2,exp:'Unit rate = total ÷ number of units. $36 ÷ 4 hours = $9 per hour.'},
+      {text:'A car travels 240 miles in 4 hours. How far does it travel in 7 hours at the same rate?',opts:['280 miles','360 miles','420 miles','480 miles'],ans:2,exp:'Unit rate = 240÷4 = 60 mph. In 7 hours: 60 × 7 = 420 miles.'},
+      {text:'A store sells 3 apples for $1.50. What is the cost per apple?',opts:['$0.25','$0.50','$0.75','$1.00'],ans:1,exp:'Unit rate = $1.50 ÷ 3 = $0.50 per apple.'},
+      {text:'The ratio of red to blue marbles is 4:6. What is this ratio in simplest form?',opts:['4:6','2:3','3:2','1:2'],ans:1,exp:'Divide both by 2: 4÷2=2, 6÷2=3. Simplest form is 2:3.'},
+    ]
+  },
+
+  rp2:{
+    title:'Percents',
+    emoji:'💯',
+    std:'MGSE6.RP.3c',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num">1</div><div class="cc-title">Percent = Per 100</div><div class="cc-std">6.RP.3c</div></div>
+      <p style="font-size:.88rem;font-weight:700;color:#555;margin-bottom:12px;line-height:1.65;"><strong style="color:#3B82F6">Percent</strong> literally means "out of 100." 30% = 30/100 = 0.30. You can convert between percent, fraction, and decimal!</p>
+      <div class="rule-card"><div class="rule-icon">🔄</div><div class="rule-text">Percent → Decimal: divide by 100 (move decimal 2 left). Decimal → Percent: multiply by 100 (move decimal 2 right). Percent → Fraction: put over 100 and simplify.</div></div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">Finding a Percent of a Number</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">✖️</div><div class="rule-text"><strong>Formula:</strong> Part = Percent × Whole. Convert percent to decimal first!</div></div>
+      <div class="example-box" style="border-left-color:#F97316">
+        <div class="ex-label" style="color:#F97316">Example 1 — Find the part</div>
+        <div class="ex-problem">What is 25% of 80?</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#F97316">1</div>Convert: 25% = 0.25</li>
+          <li><div class="step-num" style="background:#F97316">2</div>Multiply: 0.25 × 80 = <strong style="color:#F97316">20</strong></li>
+        </ul>
+      </div>
+      <div class="example-box" style="border-left-color:#8B5CF6">
+        <div class="ex-label" style="color:#8B5CF6">Example 2 — Find the percent</div>
+        <div class="ex-problem">15 is what percent of 60?</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#8B5CF6">1</div>Divide: 15 ÷ 60 = 0.25</li>
+          <li><div class="step-num" style="background:#8B5CF6">2</div>Convert to percent: 0.25 × 100 = <strong style="color:#8B5CF6">25%</strong></li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'What is 40% of 70?',opts:['14','24','28','35'],ans:2,exp:'40% = 0.40. 0.40 × 70 = 28.'},
+      {text:'A shirt costs $50. It is on sale for 20% off. How much do you save?',opts:['$8','$10','$12','$15'],ans:1,exp:'20% of $50: 0.20 × 50 = $10 savings.'},
+      {text:'18 out of 24 students passed the test. What percent passed?',opts:['60%','70%','75%','80%'],ans:2,exp:'18 ÷ 24 = 0.75. 0.75 × 100 = 75%.'},
+      {text:'Convert 3/4 to a percent.',opts:['34%','57%','70%','75%'],ans:3,exp:'3 ÷ 4 = 0.75. 0.75 × 100 = 75%.'},
+      {text:'A store marks up an item 30%. The original price is $40. What is the new price?',opts:['$42','$44','$52','$56'],ans:2,exp:'30% of $40 = $12. New price = $40 + $12 = $52.'},
+    ]
+  },
+
+  ns1:{
+    title:'Dividing Fractions by Fractions',
+    emoji:'➗',
+    std:'MGSE6.NS.1',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA)">1</div><div class="cc-title">Keep · Change · Flip (Review + Level Up!)</div><div class="cc-std">6.NS.1</div></div>
+      <p style="font-size:.88rem;font-weight:700;color:#555;margin-bottom:12px;line-height:1.65;">You learned KCF in Grade 5. In Grade 6, you'll use it with <strong style="color:#8B5CF6">more complex fractions</strong> and real-world problems.</p>
+      <div class="rule-card" style="background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border-color:#C4B5FD"><div class="rule-icon">🔑</div><div class="rule-text"><strong>Keep</strong> the first fraction → <strong>Change</strong> ÷ to × → <strong>Flip</strong> the second fraction → Multiply → Simplify</div></div>
+      <div class="example-box" style="border-left-color:#8B5CF6">
+        <div class="ex-label" style="color:#8B5CF6">Example</div>
+        <div class="ex-problem">(2/3) ÷ (3/4) = ?</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#8B5CF6">K</div>Keep 2/3</li>
+          <li><div class="step-num" style="background:#8B5CF6">C</div>Change ÷ to ×</li>
+          <li><div class="step-num" style="background:#8B5CF6">F</div>Flip 3/4 → 4/3</li>
+          <li><div class="step-num" style="background:#A78BFA">4</div>Multiply: 2/3 × 4/3 = 8/9 → Answer: <strong style="color:#8B5CF6">8/9</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#10B981,#34D399)">2</div><div class="cc-title">Real-World Division of Fractions</div></div>
+      <div class="example-box" style="border-left-color:#10B981">
+        <div class="ex-label" style="color:#10B981">Word Problem</div>
+        <div class="ex-problem">You have 3/4 of a yard of ribbon. Each bow needs 1/8 yard. How many bows can you make?</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#10B981">1</div>Set up: (3/4) ÷ (1/8)</li>
+          <li><div class="step-num" style="background:#10B981">2</div>KCF: 3/4 × 8/1 = 24/4</li>
+          <li><div class="step-num" style="background:#10B981">3</div>Simplify: 24/4 = <strong style="color:#10B981">6 bows</strong> 🎀</li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'(3/4) ÷ (1/2) = ?',opts:['3/8','3/2','6/4','3/8'],ans:1,exp:'KCF: 3/4 × 2/1 = 6/4 = 3/2. Or as a mixed number: 1½.'},
+      {text:'(2/5) ÷ (4/5) = ?',opts:['8/25','2/4','1/2','10/20'],ans:2,exp:'KCF: 2/5 × 5/4 = 10/20 = 1/2.'},
+      {text:'You have 5/6 of a pizza. Each person gets 1/6 of a pizza. How many people can be served?',opts:['4','5','6','7'],ans:1,exp:'(5/6) ÷ (1/6) = 5/6 × 6/1 = 30/6 = 5 people.'},
+      {text:'(2/3) ÷ (3/4) = ?',opts:['6/12','8/9','9/8','2/4'],ans:1,exp:'KCF: 2/3 × 4/3 = 8/9.'},
+      {text:'A recipe needs 2/3 cup of sugar per batch. You have 4 cups of sugar. How many batches can you make?',opts:['4','5','6','8'],ans:2,exp:'4 ÷ (2/3) = 4/1 × 3/2 = 12/2 = 6 batches.'},
+    ]
+  },
+
+  ns2:{
+    title:'Negative Numbers',
+    emoji:'➖',
+    std:'MGSE6.NS.5-6',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA)">1</div><div class="cc-title">Understanding Negative Numbers</div><div class="cc-std">6.NS.5</div></div>
+      <p style="font-size:.88rem;font-weight:700;color:#555;margin-bottom:12px;line-height:1.65;">Negative numbers are <strong style="color:#8B5CF6">less than zero</strong>. They appear on the left side of a number line and below 0 on a vertical line.</p>
+      <div class="rule-card" style="background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border-color:#C4B5FD"><div class="rule-icon">🌡️</div><div class="rule-text">Real-world negatives: Temperature below zero (-5°F), money you owe (-$20), below sea level (-200 feet), football yardage loss (-3 yards).</div></div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">Comparing & Ordering Integers</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">📏</div><div class="rule-text">On a number line, numbers get bigger as you move RIGHT. So -3 &lt; -1 &lt; 0 &lt; 2 &lt; 5. The farther left, the smaller the number!</div></div>
+      <div class="example-box" style="border-left-color:#F97316">
+        <div class="ex-label" style="color:#F97316">Absolute Value</div>
+        <div class="ex-problem">|−7| = 7 &nbsp;|&nbsp; |5| = 5</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#F97316">💡</div>Absolute value = distance from zero. It's always positive! |-7| means "how far is -7 from 0?" Answer: 7 steps.</li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'Which temperature is coldest?',opts:['-2°F','0°F','-15°F','3°F'],ans:2,exp:'-15°F is the farthest to the left on a number line — the coldest of all these options.'},
+      {text:'What is |-8| ?',opts:['-8','0','8','80'],ans:2,exp:'Absolute value is always the distance from zero — always positive. |-8| = 8.'},
+      {text:'Order from least to greatest: 3, -5, 0, -1, 7',opts:['-5,-1,0,3,7','7,3,0,-1,-5','-1,-5,0,3,7','0,-1,-5,3,7'],ans:0,exp:'On a number line from left to right: -5 < -1 < 0 < 3 < 7.'},
+      {text:'A submarine is at -200 feet. It rises 50 feet. What is its new position?',opts:['-250 feet','-150 feet','50 feet','150 feet'],ans:1,exp:'-200 + 50 = -150 feet. Rising means going up (adding positive value).'},
+      {text:'Which has the greatest absolute value: -9, 7, -4, 6?',opts:['7','-4','6','-9'],ans:3,exp:'|-9| = 9, |7| = 7, |-4| = 4, |6| = 6. The greatest absolute value is 9, which belongs to -9.'},
+    ]
+  },
+
+  ee1:{
+    title:'Exponents & Expressions',
+    emoji:'🔢',
+    std:'MGSE6.EE.1-2',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">1</div><div class="cc-title">Exponents</div><div class="cc-std">6.EE.1</div></div>
+      <p style="font-size:.88rem;font-weight:700;color:#555;margin-bottom:12px;line-height:1.65;">An <strong style="color:#F97316">exponent</strong> tells you how many times to multiply the base by itself. 2³ = 2 × 2 × 2 = 8.</p>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">📐</div><div class="rule-text">Base⁽ᵉˣᵖᵒⁿᵉⁿᵗ⁾ &nbsp;→&nbsp; 5² = 5×5 = 25 · &nbsp; 3⁴ = 3×3×3×3 = 81 · &nbsp; 10³ = 1,000</div></div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#3B82F6,#60A5FA)">2</div><div class="cc-title">Algebraic Expressions</div><div class="cc-std">6.EE.2</div></div>
+      <div class="rule-card"><div class="rule-icon">💡</div><div class="rule-text">An <strong>expression</strong> has numbers, variables (letters), and operations. A <strong>variable</strong> is a letter that represents an unknown number. 3x + 5 means "3 times some number, plus 5."</div></div>
+      <div class="example-box">
+        <div class="ex-label">Evaluating Expressions</div>
+        <div class="ex-problem">Evaluate 2x + 7 when x = 4</div>
+        <ul class="ex-steps">
+          <li><div class="step-num">1</div>Substitute x = 4: 2(4) + 7</li>
+          <li><div class="step-num">2</div>Multiply: 8 + 7</li>
+          <li><div class="step-num">3</div>Add: <strong style="color:#3B82F6">15</strong></li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'What is 3⁴?',opts:['12','27','64','81'],ans:3,exp:'3⁴ = 3×3×3×3 = 9×9 = 81.'},
+      {text:'Evaluate 5x - 3 when x = 6',opts:['22','27','30','33'],ans:1,exp:'5(6) - 3 = 30 - 3 = 27.'},
+      {text:'Which expression represents "7 more than twice a number n"?',opts:['7n + 2','2n + 7','2 + 7n','7 - 2n'],ans:1,exp:'"Twice a number n" = 2n. "7 more than" means + 7. So the expression is 2n + 7.'},
+      {text:'What is 2⁵?',opts:['10','25','32','64'],ans:2,exp:'2⁵ = 2×2×2×2×2 = 32.'},
+      {text:'Evaluate 3a² when a = 4',opts:['24','36','48','144'],ans:2,exp:'First find a² = 4² = 16. Then multiply by 3: 3 × 16 = 48.'},
+    ]
+  },
+
+  ee2:{
+    title:'Solving Equations',
+    emoji:'⚖️',
+    std:'MGSE6.EE.5-7',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">1</div><div class="cc-title">What is an Equation?</div><div class="cc-std">6.EE.5</div></div>
+      <p style="font-size:.88rem;font-weight:700;color:#555;margin-bottom:12px;line-height:1.65;">An <strong style="color:#F97316">equation</strong> says two things are equal (=). To solve, find the value of the variable that makes both sides equal.</p>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">⚖️</div><div class="rule-text">Think of an equation as a balance scale. Whatever you do to one side, you MUST do to the other side to keep it balanced!</div></div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#3B82F6,#60A5FA)">2</div><div class="cc-title">Solving One-Step Equations</div><div class="cc-std">6.EE.7</div></div>
+      <div class="example-box">
+        <div class="ex-label">Addition/Subtraction</div>
+        <div class="ex-problem">x + 9 = 15</div>
+        <ul class="ex-steps">
+          <li><div class="step-num">1</div>Goal: get x alone. Subtract 9 from both sides.</li>
+          <li><div class="step-num">2</div>x + 9 - 9 = 15 - 9</li>
+          <li><div class="step-num">3</div><strong style="color:#3B82F6">x = 6</strong> ✓ Check: 6 + 9 = 15 ✅</li>
+        </ul>
+      </div>
+      <div class="example-box" style="border-left-color:#F97316">
+        <div class="ex-label" style="color:#F97316">Multiplication/Division</div>
+        <div class="ex-problem">4x = 28</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#F97316">1</div>Divide both sides by 4</li>
+          <li><div class="step-num" style="background:#F97316">2</div>4x/4 = 28/4</li>
+          <li><div class="step-num" style="background:#F97316">3</div><strong style="color:#F97316">x = 7</strong> ✓ Check: 4×7 = 28 ✅</li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'Solve: x + 12 = 20',opts:['x = 6','x = 7','x = 8','x = 9'],ans:2,exp:'Subtract 12 from both sides: x = 20 - 12 = 8. Check: 8 + 12 = 20 ✓'},
+      {text:'Solve: 6n = 54',opts:['n = 6','n = 7','n = 8','n = 9'],ans:3,exp:'Divide both sides by 6: n = 54 ÷ 6 = 9. Check: 6 × 9 = 54 ✓'},
+      {text:'Solve: y - 7 = 15',opts:['y = 8','y = 18','y = 20','y = 22'],ans:3,exp:'Add 7 to both sides: y = 15 + 7 = 22. Check: 22 - 7 = 15 ✓'},
+      {text:'Joshua earned $45 mowing lawns. He earned $9 per lawn. How many lawns did he mow? Write and solve an equation.',opts:['4 lawns','5 lawns','6 lawns','7 lawns'],ans:1,exp:'Equation: 9x = 45. Divide both sides by 9: x = 45÷9 = 5 lawns.'},
+      {text:'Solve: x/3 = 12',opts:['x = 4','x = 9','x = 36','x = 15'],ans:2,exp:'Multiply both sides by 3: x = 12 × 3 = 36. Check: 36/3 = 12 ✓'},
+    ]
+  },
+
+  geo1:{
+    title:'Area of Polygons',
+    emoji:'📐',
+    std:'MGSE6.G.1',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#10B981,#34D399)">1</div><div class="cc-title">Area Formulas</div><div class="cc-std">6.G.1</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border-color:#6EE7B7">
+        <div class="rule-icon">📋</div>
+        <div class="rule-text">
+          <strong>Rectangle:</strong> A = length × width (A = lw)<br>
+          <strong>Triangle:</strong> A = ½ × base × height (A = ½bh)<br>
+          <strong>Parallelogram:</strong> A = base × height (A = bh)<br>
+          <strong>Trapezoid:</strong> A = ½ × (b₁ + b₂) × height
+        </div>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">Finding Area of Composite Figures</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">✂️</div><div class="rule-text">Complex shapes can be split into simpler shapes (rectangles + triangles). Find each area separately, then add them together!</div></div>
+      <div class="example-box" style="border-left-color:#10B981">
+        <div class="ex-label" style="color:#10B981">Example — Triangle</div>
+        <div class="ex-problem">Triangle with base = 8 cm, height = 5 cm</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#10B981">1</div>Formula: A = ½ × b × h</li>
+          <li><div class="step-num" style="background:#10B981">2</div>A = ½ × 8 × 5 = ½ × 40</li>
+          <li><div class="step-num" style="background:#10B981">3</div>A = <strong style="color:#10B981">20 cm²</strong></li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'Find the area of a triangle with base 10 cm and height 6 cm.',opts:['30 cm²','40 cm²','60 cm²','16 cm²'],ans:0,exp:'A = ½ × b × h = ½ × 10 × 6 = ½ × 60 = 30 cm².'},
+      {text:'A rectangle is 12 ft long and 7 ft wide. What is its area?',opts:['38 ft²','74 ft²','84 ft²','96 ft²'],ans:2,exp:'A = l × w = 12 × 7 = 84 ft².'},
+      {text:'A parallelogram has a base of 9 m and height of 4 m. What is its area?',opts:['13 m²','26 m²','36 m²','40 m²'],ans:2,exp:'A = b × h = 9 × 4 = 36 m².'},
+      {text:'A right triangle has legs of 6 in and 8 in. What is its area?',opts:['14 in²','24 in²','48 in²','28 in²'],ans:1,exp:'A = ½ × b × h = ½ × 6 × 8 = ½ × 48 = 24 in².'},
+      {text:'A trapezoid has parallel bases of 5 cm and 9 cm, and a height of 4 cm. What is its area?',opts:['24 cm²','28 cm²','36 cm²','18 cm²'],ans:1,exp:'A = ½ × (b₁ + b₂) × h = ½ × (5+9) × 4 = ½ × 14 × 4 = ½ × 56 = 28 cm².'},
+    ]
+  },
+
+  geo2:{
+    title:'Surface Area & Volume',
+    emoji:'📦',
+    std:'MGSE6.G.2-4',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#10B981,#34D399)">1</div><div class="cc-title">Volume of Rectangular Prisms</div><div class="cc-std">6.G.2</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#ECFDF5,#D1FAE5);border-color:#6EE7B7"><div class="rule-icon">📦</div><div class="rule-text"><strong>Volume = length × width × height</strong> (V = lwh). Measured in cubic units (cm³, ft³). It tells you how much fits INSIDE the shape.</div></div>
+      <div class="example-box" style="border-left-color:#10B981">
+        <div class="ex-label" style="color:#10B981">Example</div>
+        <div class="ex-problem">Box: l=5cm, w=4cm, h=3cm</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#10B981">1</div>V = 5 × 4 × 3</li>
+          <li><div class="step-num" style="background:#10B981">2</div>V = <strong style="color:#10B981">60 cm³</strong></li>
+        </ul>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#3B82F6,#60A5FA)">2</div><div class="cc-title">Surface Area Using Nets</div><div class="cc-std">6.G.4</div></div>
+      <div class="rule-card"><div class="rule-icon">🗺️</div><div class="rule-text">A <strong>net</strong> is a 3D shape unfolded flat. Surface area = the total area of all faces. For a rectangular prism: SA = 2(lw + lh + wh).</div></div>
+      <div class="example-box">
+        <div class="ex-label">Example</div>
+        <div class="ex-problem">Rectangular prism: l=4, w=3, h=2</div>
+        <ul class="ex-steps">
+          <li><div class="step-num">1</div>lw = 4×3 = 12; lh = 4×2 = 8; wh = 3×2 = 6</li>
+          <li><div class="step-num">2</div>SA = 2(12 + 8 + 6) = 2(26)</li>
+          <li><div class="step-num">3</div>SA = <strong style="color:#3B82F6">52 square units</strong></li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'Find the volume of a rectangular prism with l=6, w=4, h=3.',opts:['36','48','60','72'],ans:3,exp:'V = l × w × h = 6 × 4 × 3 = 72 cubic units.'},
+      {text:'A cube has a side length of 5 cm. What is its volume?',opts:['15 cm³','25 cm³','75 cm³','125 cm³'],ans:3,exp:'A cube has l=w=h=5. V = 5×5×5 = 125 cm³.'},
+      {text:'Find the surface area of a rectangular prism with l=3, w=2, h=4.',opts:['24','36','52','60'],ans:2,exp:'SA = 2(lw+lh+wh) = 2(6+12+8) = 2(26) = 52 square units.'},
+      {text:'A fish tank is 30 cm long, 15 cm wide, and 20 cm tall. How many cubic cm of water can it hold?',opts:['6,500','8,000','9,000','9,500'],ans:2,exp:'V = 30 × 15 × 20 = 9,000 cm³.'},
+      {text:'A cube has a surface area of 54 cm². What is the length of one side?',opts:['3 cm','6 cm','9 cm','27 cm'],ans:0,exp:'SA of cube = 6s². 6s² = 54 → s² = 9 → s = 3 cm.'},
+    ]
+  },
+
+  sp1:{
+    title:'Mean, Median, Mode & Range',
+    emoji:'📊',
+    std:'MGSE6.SP.1-3',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#EC4899,#F9A8D4)">1</div><div class="cc-title">Measures of Center</div><div class="cc-std">6.SP.2-3</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FDF2F8,#FCE7F3);border-color:#F9A8D4">
+        <div class="rule-icon">📊</div>
+        <div class="rule-text">
+          <strong>Mean (average):</strong> Add all values ÷ number of values<br>
+          <strong>Median:</strong> Middle value when ordered least→greatest<br>
+          <strong>Mode:</strong> Most frequently occurring value<br>
+          <strong>Range:</strong> Largest - smallest value
+        </div>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">Worked Example</div></div>
+      <div class="example-box" style="border-left-color:#EC4899">
+        <div class="ex-label" style="color:#EC4899">Data Set: 4, 7, 2, 9, 7, 5, 3</div>
+        <div class="ex-problem">Find the mean, median, mode, and range.</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#EC4899">📊</div><strong>Mean:</strong> (4+7+2+9+7+5+3)÷7 = 37÷7 ≈ 5.3</li>
+          <li><div class="step-num" style="background:#F97316">📍</div><strong>Median:</strong> Order: 2,3,4,<strong>5</strong>,7,7,9 → median = 5</li>
+          <li><div class="step-num" style="background:#10B981">🔁</div><strong>Mode:</strong> 7 appears twice → mode = 7</li>
+          <li><div class="step-num" style="background:#8B5CF6">↔</div><strong>Range:</strong> 9 - 2 = 7</li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'Find the mean of: 8, 4, 6, 10, 2',opts:['5','6','7','8'],ans:1,exp:'Mean = (8+4+6+10+2) ÷ 5 = 30 ÷ 5 = 6.'},
+      {text:'Find the median of: 3, 7, 1, 9, 5',opts:['1','5','7','3'],ans:1,exp:'Order: 1, 3, 5, 7, 9. Middle value = 5.'},
+      {text:'What is the mode of: 4, 8, 4, 6, 9, 4, 7?',opts:['4','6','7','9'],ans:0,exp:'4 appears 3 times — more than any other number. Mode = 4.'},
+      {text:'A student scored: 85, 92, 78, 92, 88. What is the range?',opts:['7','10','14','17'],ans:2,exp:'Range = highest - lowest = 92 - 78 = 14.'},
+      {text:'Which measure of center BEST represents this data set: 2, 3, 3, 4, 50?',opts:['Mean','Median','Mode','Range'],ans:1,exp:'The outlier 50 makes the mean much higher than most values. Median (3) better represents the "typical" value in this set. Mean would be skewed by the outlier.'},
+    ]
+  }
+};
+
+// ── RENDER ──
+function loadLesson(id, btn) {
+  currentLesson = id;
+  practiceIdx = 0; practiceScore = 0; answered = false;
+  document.querySelectorAll('.lesson-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const L = LESSONS[id];
+  const col = DOMAIN_COLORS[id];
+  document.getElementById('mainContent').innerHTML = `
+    <div class="lesson-header" style="background:linear-gradient(135deg,${col},${col}99)">
+      <div class="lh-tag">${L.std}</div>
+      <div class="lh-title">${L.title}</div>
+      <div class="lh-sub">Grade 6 · Georgia Standards of Excellence</div>
+      <div class="lh-emoji">${L.emoji}</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabLearn" onclick="switchTab('Learn')" style="color:${col}">📖 Learn</button>
+      <button class="tab-btn" id="tabPractice" onclick="switchTab('Practice')" style="color:${col}">✏️ Practice</button>
+    </div>
+    <div class="panel active" id="panelLearn">${L.learn}</div>
+    <div class="panel" id="panelPractice"><div id="practiceContent"></div></div>
+  `;
+  renderQuestion();
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab'+name).classList.add('active');
+  document.getElementById('panel'+name).classList.add('active');
+  if(name === 'Practice') renderQuestion();
+}
+
+function renderQuestion() {
+  const L = LESSONS[currentLesson];
+  const pc = document.getElementById('practiceContent');
+  if(!pc) return;
+  if(practiceIdx >= L.questions.length) { showScore(); return; }
+  const q = L.questions[practiceIdx];
+  answered = false;
+  const letters = ['A','B','C','D'];
+  pc.innerHTML = `
+    <div class="q-card">
+      <div class="q-num">Question ${practiceIdx+1} of ${L.questions.length}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="opts">
+        ${q.opts.map((o,i) => `
+          <button class="opt-btn" id="opt${i}" onclick="answer(${i})">
+            <div class="opt-letter">${letters[i]}</div>${o}
+          </button>`).join('')}
+      </div>
+      <div class="feedback-box" id="feedbackBox"></div>
+      <button class="btn-next" id="btnNext" onclick="nextQ()">Next →</button>
+    </div>`;
+}
+
+function answer(idx) {
+  if(answered) return;
+  answered = true;
+  const q = LESSONS[currentLesson].questions[practiceIdx];
+  const opts = document.querySelectorAll('.opt-btn');
+  opts.forEach(b => b.disabled = true);
+  const fb = document.getElementById('feedbackBox');
+  const next = document.getElementById('btnNext');
+  if(idx === q.ans) {
+    opts[idx].classList.add('correct');
+    fb.className = 'feedback-box show c';
+    fb.innerHTML = '✅ Correct! ' + q.exp;
+    practiceScore++;
+    xp += 10;
+    document.getElementById('xpDisplay').textContent = '⭐ ' + xp + ' XP';
+    try { window.parent.postMessage({type:'addXP',amount:10},'*'); } catch(e){}
+  } else {
+    opts[idx].classList.add('wrong');
+    opts[q.ans].classList.add('correct');
+    fb.className = 'feedback-box show w';
+    fb.innerHTML = '❌ Not quite. ' + q.exp;
+  }
+  next.classList.add('show');
+}
+
+function nextQ() {
+  practiceIdx++;
+  renderQuestion();
+}
+
+function showScore() {
+  const pc = document.getElementById('practiceContent');
+  const total = LESSONS[currentLesson].questions.length;
+  const pct = Math.round(practiceScore/total*100);
+  const msg = pct >= 80 ? '🎉 Excellent work!' : pct >= 60 ? '👍 Good effort!' : '💪 Keep practicing!';
+  pc.innerHTML = `
+    <div class="score-screen">
+      <div class="score-title">${msg}</div>
+      <div class="score-circle">
+        <div class="score-val">${practiceScore}</div>
+        <div class="score-tot">out of ${total}</div>
+      </div>
+      <p style="color:#64748B;font-weight:700;font-size:.9rem;">You scored ${pct}%</p>
+      <button class="btn-retry" onclick="retryLesson()">🔄 Try Again</button>
+    </div>`;
+}
+
+function retryLesson() {
+  practiceIdx = 0; practiceScore = 0; answered = false;
+  renderQuestion();
+}
+
+// Init
+loadLesson('rp1', document.querySelector('.lesson-btn'));
+</script>
+</body>
+</html>

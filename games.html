@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELABoost — Smart Review Zone</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0F172A;--sky:#3B82F6;--green:#10B981;--red:#EF4444;
+  --gold:#F59E0B;--purple:#8B5CF6;--orange:#F97316;--teal:#14B8A6;
+  --pink:#EC4899;--light:#F8FAFC;--muted:#64748B;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--light);min-height:100vh;}
+
+/* ── TRIGGER BANNER ── */
+.trigger-banner{
+  position:fixed;bottom:0;left:0;right:0;z-index:999;
+  background:linear-gradient(135deg,#7C3AED,#DB2777);
+  padding:14px 20px;display:flex;align-items:center;gap:14px;
+  box-shadow:0 -4px 24px rgba(124,58,237,.4);
+  animation:slideUp .4s ease;
+  transform-origin:bottom;
+}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.tb-icon{font-size:1.8rem;animation:shake .5s ease infinite alternate;}
+@keyframes shake{from{transform:rotate(-8deg);}to{transform:rotate(8deg);}}
+.tb-text{flex:1;}
+.tb-title{font-family:'Fredoka One',cursive;color:white;font-size:1.1rem;}
+.tb-sub{color:rgba(255,255,255,.8);font-size:.8rem;font-weight:700;}
+.tb-btn{
+  padding:10px 20px;border-radius:12px;border:none;
+  background:white;color:#7C3AED;font-family:'Fredoka One',cursive;
+  font-size:.95rem;cursor:pointer;transition:all .2s;white-space:nowrap;
+  box-shadow:0 4px 12px rgba(0,0,0,.2);
+}
+.tb-btn:hover{transform:scale(1.05);}
+.tb-dismiss{
+  color:rgba(255,255,255,.6);font-size:.75rem;font-weight:700;
+  cursor:pointer;padding:4px 8px;border-radius:6px;
+  transition:all .2s;white-space:nowrap;
+}
+.tb-dismiss:hover{color:white;background:rgba(255,255,255,.15);}
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:16px;backdrop-filter:blur(4px);
+  animation:fadeIn .3s ease;
+}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{
+  background:white;border-radius:28px;max-width:560px;width:100%;
+  max-height:90vh;overflow-y:auto;
+  animation:popUp .35s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 24px 64px rgba(0,0,0,.3);
+}
+@keyframes popUp{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:scale(1);}}
+
+/* MODAL HEADER */
+.modal-header{
+  padding:24px 24px 0;
+  background:linear-gradient(135deg,var(--c1,#7C3AED),var(--c2,#DB2777));
+  border-radius:28px 28px 0 0;
+  padding-bottom:20px;text-align:center;position:relative;
+}
+.modal-close{
+  position:absolute;top:14px;right:14px;width:32px;height:32px;
+  border-radius:50%;background:rgba(255,255,255,.2);border:none;
+  color:white;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;transition:all .2s;
+}
+.modal-close:hover{background:rgba(255,255,255,.35);}
+.modal-emoji{font-size:2.8rem;margin-bottom:8px;}
+.modal-title{font-family:'Fredoka One',cursive;color:white;font-size:1.5rem;margin-bottom:4px;}
+.modal-sub{color:rgba(255,255,255,.8);font-size:.82rem;font-weight:700;}
+
+/* GAME BODY */
+.game-body{padding:20px;}
+
+/* PROGRESS */
+.game-progress{
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+}
+.gp-label{font-size:.75rem;font-weight:800;color:var(--muted);white-space:nowrap;}
+.gp-bar{flex:1;height:8px;background:#E2E8F0;border-radius:4px;overflow:hidden;}
+.gp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--sky),var(--purple));transition:width .5s;}
+.gp-count{font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--navy);white-space:nowrap;}
+
+/* ── GAME TYPES ── */
+
+/* 1. SPOT THE MISTAKE */
+.stm-passage{
+  background:#F8FAFC;border-radius:14px;padding:16px;
+  font-size:.92rem;font-weight:600;color:#334155;line-height:1.9;
+  margin-bottom:14px;border:2px solid #E2E8F0;
+  cursor:default;
+}
+.stm-word{
+  display:inline;padding:2px 4px;border-radius:4px;cursor:pointer;
+  transition:all .15s;border-bottom:2px solid transparent;
+}
+.stm-word:hover{background:#EFF6FF;border-bottom-color:var(--sky);}
+.stm-word.selected{background:#FEF3C7;border-bottom-color:var(--gold);}
+.stm-word.correct-word{background:#ECFDF5;border-bottom-color:var(--green);color:#065F46;font-weight:800;}
+.stm-word.wrong-word{background:#FEF2F2;border-bottom-color:var(--red);color:#991B1B;}
+.stm-instruction{
+  font-size:.8rem;font-weight:800;color:var(--muted);margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+
+/* 2. FILL THE BLANK */
+.ftb-wrap{margin-bottom:14px;}
+.ftb-sentence{
+  font-size:1rem;font-weight:700;color:var(--navy);
+  line-height:2;margin-bottom:14px;
+}
+.ftb-blank{
+  display:inline-block;min-width:100px;border-bottom:3px solid var(--sky);
+  padding:0 8px;font-family:'Fredoka One',cursive;color:var(--sky);
+  text-align:center;cursor:pointer;transition:all .2s;
+  vertical-align:middle;
+}
+.ftb-blank.filled{border-color:var(--green);color:var(--green);}
+.ftb-blank.wrong-fill{border-color:var(--red);color:var(--red);}
+.ftb-options{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.ftb-opt{
+  padding:8px 16px;border-radius:10px;border:2px solid #E2E8F0;
+  background:white;font-family:'Fredoka One',cursive;font-size:.9rem;
+  color:var(--navy);cursor:pointer;transition:all .2s;
+}
+.ftb-opt:hover:not(.used){border-color:var(--sky);background:#EFF6FF;transform:scale(1.03);}
+.ftb-opt.used{opacity:.35;cursor:not-allowed;}
+.ftb-opt.correct-opt{border-color:var(--green);background:#ECFDF5;color:#065F46;}
+.ftb-opt.wrong-opt{border-color:var(--red);background:#FEF2F2;color:#991B1B;}
+
+/* 3. DRAG & SORT */
+.drag-instruction{font-size:.8rem;font-weight:800;color:var(--muted);margin-bottom:10px;}
+.drag-items{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.drag-item{
+  padding:12px 16px;border-radius:12px;border:2.5px solid #E2E8F0;
+  background:white;font-weight:700;font-size:.88rem;color:var(--navy);
+  cursor:grab;display:flex;align-items:center;gap:10px;
+  transition:all .2s;user-select:none;
+}
+.drag-item:active{cursor:grabbing;transform:scale(1.02);box-shadow:0 8px 24px rgba(0,0,0,.15);}
+.drag-item.dragging{opacity:.4;}
+.drag-item.drag-over{border-color:var(--sky);background:#EFF6FF;}
+.drag-item.correct-pos{border-color:var(--green);background:#ECFDF5;}
+.drag-item.wrong-pos{border-color:var(--red);background:#FEF2F2;}
+.drag-handle{color:#CBD5E1;font-size:1.1rem;flex-shrink:0;}
+.drag-num{
+  width:26px;height:26px;border-radius:8px;background:#F1F5F9;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fredoka One',cursive;font-size:.8rem;color:var(--muted);flex-shrink:0;
+}
+
+/* 4. MATCH PAIRS */
+.match-instruction{font-size:.8rem;font-weight:800;color:var(--muted);margin-bottom:10px;}
+.match-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.match-col{display:flex;flex-direction:column;gap:6px;}
+.match-card{
+  padding:10px 12px;border-radius:12px;border:2.5px solid #E2E8F0;
+  background:white;font-weight:700;font-size:.82rem;color:var(--navy);
+  cursor:pointer;transition:all .2s;text-align:center;min-height:44px;
+  display:flex;align-items:center;justify-content:center;
+}
+.match-card:hover:not(.matched):not(.selected){border-color:var(--sky);background:#EFF6FF;}
+.match-card.selected{border-color:var(--purple);background:#F5F3FF;}
+.match-card.matched{border-color:var(--green);background:#ECFDF5;cursor:default;}
+.match-card.wrong-match{border-color:var(--red);background:#FEF2F2;animation:shake2 .3s;}
+@keyframes shake2{0%,100%{transform:translateX(0);}33%{transform:translateX(-6px);}66%{transform:translateX(6px);}}
+
+/* FEEDBACK */
+.game-feedback{
+  border-radius:14px;padding:14px 16px;margin-bottom:12px;
+  display:flex;gap:10px;align-items:flex-start;animation:popIn .3s ease;
+}
+@keyframes popIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
+.game-feedback.correct{background:#ECFDF5;border:2px solid #6EE7B7;}
+.game-feedback.wrong{background:#FEF2F2;border:2px solid #FCA5A5;}
+.gf-emoji{font-size:1.2rem;flex-shrink:0;}
+.gf-title{font-weight:900;font-size:.9rem;margin-bottom:3px;}
+.gf-title.c{color:#065F46;}
+.gf-title.w{color:#991B1B;}
+.gf-exp{font-size:.82rem;font-weight:600;color:#475569;line-height:1.6;}
+
+/* NEXT BUTTON */
+.game-next-btn{
+  width:100%;padding:13px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--sky),var(--purple));color:white;
+  font-family:'Fredoka One',cursive;font-size:1.05rem;cursor:pointer;
+  transition:all .2s;box-shadow:0 4px 16px rgba(59,130,246,.3);
+  display:none;
+}
+.game-next-btn.show{display:block;}
+.game-next-btn:hover{transform:translateY(-2px);}
+
+/* CHECK BUTTON */
+.game-check-btn{
+  width:100%;padding:13px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--orange),var(--gold));color:white;
+  font-family:'Fredoka One',cursive;font-size:1.05rem;cursor:pointer;
+  transition:all .2s;box-shadow:0 4px 16px rgba(249,115,22,.3);
+  margin-bottom:10px;
+}
+.game-check-btn:hover{transform:translateY(-2px);}
+.game-check-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+/* VICTORY SCREEN */
+.victory-screen{text-align:center;padding:24px;}
+.victory-emoji{font-size:4rem;animation:bounce 1s ease infinite alternate;margin-bottom:12px;}
+@keyframes bounce{from{transform:translateY(0);}to{transform:translateY(-12px);}}
+.victory-title{font-family:'Fredoka One',cursive;font-size:1.8rem;color:var(--navy);margin-bottom:6px;}
+.victory-sub{color:var(--muted);font-size:.9rem;font-weight:700;margin-bottom:20px;}
+.victory-stars{font-size:1.8rem;letter-spacing:6px;margin-bottom:16px;}
+.victory-stats{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;
+}
+.vstat{
+  background:#F8FAFC;border-radius:14px;padding:14px;text-align:center;
+}
+.vstat-val{font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--sky);}
+.vstat-lbl{font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.victory-btn{
+  width:100%;padding:14px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--green),var(--teal));color:white;
+  font-family:'Fredoka One',cursive;font-size:1.1rem;cursor:pointer;
+  transition:all .2s;box-shadow:0 4px 16px rgba(16,185,129,.3);
+}
+.victory-btn:hover{transform:translateY(-2px);}
+
+/* CONFETTI */
+.confetti-piece{
+  position:fixed;pointer-events:none;z-index:9999;border-radius:2px;
+  animation:confFall 1.4s ease-out forwards;
+}
+@keyframes confFall{
+  0%{opacity:1;transform:translateY(-10px) rotate(0deg);}
+  100%{opacity:0;transform:translateY(100vh) rotate(540deg);}
+}
+
+/* DEMO AREA */
+.demo-area{max-width:800px;margin:0 auto;padding:32px 16px;}
+.demo-title{font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--navy);margin-bottom:6px;}
+.demo-sub{color:var(--muted);font-weight:700;font-size:.9rem;margin-bottom:24px;}
+.demo-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.demo-card{
+  background:white;border-radius:20px;padding:20px;
+  box-shadow:0 4px 16px rgba(0,0,0,.07);
+  border:2.5px solid #E2E8F0;cursor:pointer;transition:all .25s;
+  text-align:center;
+}
+.demo-card:hover{border-color:var(--sky);transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.12);}
+.dc-emoji{font-size:2.2rem;margin-bottom:8px;}
+.dc-name{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--navy);margin-bottom:4px;}
+.dc-desc{font-size:.75rem;color:var(--muted);font-weight:700;}
+.dc-badge{
+  display:inline-block;margin-top:8px;padding:3px 10px;border-radius:10px;
+  font-size:.68rem;font-weight:800;
+}
+.badge-ela{background:#EFF6FF;color:var(--sky);}
+.badge-math{background:#FFF7ED;color:var(--orange);}
+
+/* NAV */
+nav{
+  background:var(--navy);padding:0 24px;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:200;
+}
+.nav-logo{font-family:'Fredoka One',cursive;color:white;font-size:1.3rem;}
+.nav-logo span{color:var(--gold);}
+.nav-badge{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7);
+  font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:10px;margin-left:8px;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">ELA<span>Boost</span> <span class="nav-badge">🎮 Smart Review Zone</span></div>
+</nav>
+
+<!-- DEMO AREA -->
+<div class="demo-area">
+  <div class="demo-title">🧠 Smart Review Games</div>
+  <div class="demo-sub">Triggered automatically when a student keeps making the same mistake. They must PLAY through the concept — not just read it — before continuing.</div>
+
+  <div class="demo-cards">
+    <div class="demo-card" onclick="launchGame('spot_ela')">
+      <div class="dc-emoji">🔍</div>
+      <div class="dc-name">Spot the Mistake</div>
+      <div class="dc-desc">Find the wrong word in the passage</div>
+      <div class="dc-badge badge-ela">ELA — Point of View</div>
+    </div>
+    <div class="demo-card" onclick="launchGame('fill_math')">
+      <div class="dc-emoji">✏️</div>
+      <div class="dc-name">Fill the Blank</div>
+      <div class="dc-desc">Complete the rule using word bank</div>
+      <div class="dc-badge badge-math">Math — Fractions</div>
+    </div>
+    <div class="demo-card" onclick="launchGame('sort_ela')">
+      <div class="dc-emoji">🔀</div>
+      <div class="dc-name">Sort & Order</div>
+      <div class="dc-desc">Put the steps in correct order</div>
+      <div class="dc-badge badge-ela">ELA — Text Evidence</div>
+    </div>
+    <div class="demo-card" onclick="launchGame('match_math')">
+      <div class="dc-emoji">🎯</div>
+      <div class="dc-name">Match Pairs</div>
+      <div class="dc-desc">Connect fractions to their models</div>
+      <div class="dc-badge badge-math">Math — Equivalent Fractions</div>
+    </div>
+    <div class="demo-card" onclick="launchGame('fill_ela')">
+      <div class="dc-emoji">📝</div>
+      <div class="dc-name">Fill the Blank</div>
+      <div class="dc-desc">Complete the concept definition</div>
+      <div class="dc-badge badge-ela">ELA — Theme</div>
+    </div>
+    <div class="demo-card" onclick="launchGame('sort_math')">
+      <div class="dc-emoji">🔢</div>
+      <div class="dc-name">Sort & Order</div>
+      <div class="dc-desc">Order fractions from least to greatest</div>
+      <div class="dc-badge badge-math">Math — Fraction Comparison</div>
+    </div>
+  </div>
+
+  <!-- TRIGGER DEMO -->
+  <div style="margin-top:32px;background:white;border-radius:20px;padding:24px;box-shadow:0 4px 16px rgba(0,0,0,.07);border:2px dashed #E2E8F0;">
+    <div style="font-family:'Fredoka One',cursive;font-size:1rem;color:var(--navy);margin-bottom:8px;">🔔 Trigger Banner Demo</div>
+    <div style="font-size:.85rem;color:var(--muted);font-weight:700;margin-bottom:14px;">This banner appears at the bottom of the screen after a student gets 2+ wrong answers on the same concept.</div>
+    <button onclick="showTriggerBanner('Theme Analysis','ELA')" style="padding:10px 20px;border-radius:12px;border:none;background:linear-gradient(135deg,#7C3AED,#DB2777);color:white;font-family:'Fredoka One',cursive;font-size:.95rem;cursor:pointer;margin-right:10px;">
+      Simulate ELA Trigger
+    </button>
+    <button onclick="showTriggerBanner('Adding Fractions','Math')" style="padding:10px 20px;border-radius:12px;border:none;background:linear-gradient(135deg,#F97316,#F59E0B);color:white;font-family:'Fredoka One',cursive;font-size:.95rem;cursor:pointer;">
+      Simulate Math Trigger
+    </button>
+  </div>
+</div>
+
+<!-- MODAL (dynamically filled) -->
+<div class="modal-overlay" id="modalOverlay" style="display:none;" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header" id="modalHeader">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-emoji" id="modalEmoji">🎮</div>
+      <div class="modal-title" id="modalTitle">Review Game</div>
+      <div class="modal-sub" id="modalSub">Complete this to unlock your next lesson</div>
+    </div>
+    <div class="game-body" id="gameBody"></div>
+  </div>
+</div>
+
+<!-- TRIGGER BANNER -->
+<div class="trigger-banner" id="triggerBanner" style="display:none;">
+  <div class="tb-icon">🚨</div>
+  <div class="tb-text">
+    <div class="tb-title" id="tbTitle">You've missed Theme 2 times!</div>
+    <div class="tb-sub">Quick 2-min review game required before continuing</div>
+  </div>
+  <button class="tb-btn" id="tbBtn" onclick="launchFromBanner()">Play Review Game →</button>
+  <div class="tb-dismiss" onclick="dismissBanner()">Skip (–50 XP)</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// GAME DATA
+// ═══════════════════════════════════════════
+const GAMES = {
+
+  // ─── SPOT THE MISTAKE (ELA POV) ───
+  spot_ela: {
+    type:'spot',
+    title:'Spot the POV Mistake',
+    emoji:'🔍',
+    subject:'ela',
+    c1:'#3B82F6', c2:'#8B5CF6',
+    concept:'Point of View',
+    rounds:[
+      {
+        instruction:'The narrator says "I" — but then suddenly switches. Tap the word that DOESN\'T belong!',
+        passage:'I walked into the dark forest. I could hear strange sounds. She felt terrified of every shadow. I ran back to the path.',
+        mistake:'She',
+        correction:'I',
+        exp:'"She" breaks first-person point of view. When using "I", the narrator must stay as "I" throughout — never switch to "she/he/they".'
+      },
+      {
+        instruction:'This passage is third-person — but one word gives it away as wrong. Find it!',
+        passage:'The old man walked slowly down the street. He carried a heavy bag. I noticed the children staring at him. He smiled at them.',
+        mistake:'I',
+        correction:'He',
+        exp:'"I" jumps to first person in a third-person story. The narrator is not a character — they observe from outside using "he/she/they".'
+      },
+      {
+        instruction:'Find the word that breaks the narrative point of view!',
+        passage:'Maria opened the letter with trembling hands. She read the words twice. You could not believe what it said. She sat down slowly.',
+        mistake:'You',
+        correction:'She',
+        exp:'"You" is second-person — it directly addresses the reader. In a third-person story about Maria, it should be "She could not believe".'
+      }
+    ]
+  },
+
+  // ─── FILL BLANK (Math Fractions) ───
+  fill_math: {
+    type:'fill',
+    title:'Complete the Fraction Rule',
+    emoji:'✏️',
+    subject:'math',
+    c1:'#F97316', c2:'#F59E0B',
+    concept:'Fractions',
+    rounds:[
+      {
+        before:'In a fraction, the',
+        blank:'DENOMINATOR',
+        after:'tells you the total number of equal parts.',
+        options:['NUMERATOR','DENOMINATOR','QUOTIENT','DIVIDEND'],
+        ans:'DENOMINATOR',
+        exp:'The DENOMINATOR is the bottom number. It tells you how many equal parts the whole is divided into. The NUMERATOR (top) tells you how many parts you have.'
+      },
+      {
+        before:'To add fractions with different denominators, you must first find the',
+        blank:'LCD',
+        after:'(Least Common Denominator).',
+        options:['GCF','LCD','LCM','HCF'],
+        ans:'LCD',
+        exp:'LCD = Least Common Denominator. It\'s the smallest number that both denominators divide into evenly. This lets you add fractions fairly!'
+      },
+      {
+        before:'When fractions have the same value but look different, they are called',
+        blank:'EQUIVALENT',
+        after:'fractions.',
+        options:['SIMILAR','EQUAL','EQUIVALENT','IDENTICAL'],
+        ans:'EQUIVALENT',
+        exp:'Equivalent fractions look different but represent the same amount. Example: 1/2 = 2/4 = 4/8. They are all equivalent!'
+      }
+    ]
+  },
+
+  // ─── SORT STEPS (ELA Text Evidence) ───
+  sort_ela: {
+    type:'sort',
+    title:'Put the Steps in Order',
+    emoji:'🔀',
+    subject:'ela',
+    c1:'#10B981', c2:'#14B8A6',
+    concept:'Text Evidence',
+    rounds:[
+      {
+        instruction:'Drag to put the C-E-R writing steps in the correct order:',
+        items:[
+          {text:'Write your CLAIM — your main argument', order:1},
+          {text:'Add EVIDENCE — a direct quote or paraphrase from the text', order:2},
+          {text:'Write REASONING — explain WHY the evidence proves your claim', order:3},
+        ],
+        exp:'C-E-R = Claim → Evidence → Reasoning. Always start with your argument, then prove it with text, then explain the connection.'
+      },
+      {
+        instruction:'Put the steps for finding text evidence in order:',
+        items:[
+          {text:'Read the text carefully for relevant details', order:1},
+          {text:'Identify the specific quote or passage that supports your point', order:2},
+          {text:'Explain how the evidence connects to your claim', order:3},
+        ],
+        exp:'Always read first, find your evidence second, then analyze it. The explanation is what makes evidence powerful — not just dropping a quote!'
+      }
+    ]
+  },
+
+  // ─── MATCH PAIRS (Math Equivalent Fractions) ───
+  match_math: {
+    type:'match',
+    title:'Match Equivalent Fractions',
+    emoji:'🎯',
+    subject:'math',
+    c1:'#8B5CF6', c2:'#EC4899',
+    concept:'Equivalent Fractions',
+    rounds:[
+      {
+        instruction:'Match each fraction on the left to its equivalent on the right:',
+        pairs:[
+          {left:'1/2', right:'4/8'},
+          {left:'2/3', right:'6/9'},
+          {left:'3/4', right:'9/12'},
+          {left:'1/4', right:'3/12'},
+        ],
+        exp:'To find equivalent fractions, multiply or divide both numerator AND denominator by the same number. 1/2 × 4/4 = 4/8 ✓'
+      },
+      {
+        instruction:'Match each fraction to its simplified form:',
+        pairs:[
+          {left:'6/8',  right:'3/4'},
+          {left:'4/10', right:'2/5'},
+          {left:'6/9',  right:'2/3'},
+          {left:'8/12', right:'2/3'},
+        ],
+        exp:'To simplify, find the Greatest Common Factor (GCF) and divide both parts. 6/8 ÷ 2/2 = 3/4. Always simplify to lowest terms!'
+      }
+    ]
+  },
+
+  // ─── FILL BLANK (ELA Theme) ───
+  fill_ela: {
+    type:'fill',
+    title:'Complete the Theme Rule',
+    emoji:'📝',
+    subject:'ela',
+    c1:'#3B82F6', c2:'#8B5CF6',
+    concept:'Theme',
+    rounds:[
+      {
+        before:'A theme is NOT a topic. A theme must be written as a complete',
+        blank:'SENTENCE',
+        after:'that states a life lesson.',
+        options:['WORD','SENTENCE','PARAGRAPH','TITLE'],
+        ans:'SENTENCE',
+        exp:'Topics are single words ("friendship"). Themes are complete sentences with a claim ("True friendship requires sacrifice"). Always write a full thought!'
+      },
+      {
+        before:'Themes are',
+        blank:'UNIVERSAL',
+        after:'— they apply to anyone\'s life, not just the characters in the story.',
+        options:['SPECIFIC','PERSONAL','UNIVERSAL','CULTURAL'],
+        ans:'UNIVERSAL',
+        exp:'Universal means it applies to EVERYONE. "Hard work leads to success" is universal. "Marcus worked hard" is just a plot summary, not a theme.'
+      },
+      {
+        before:'To find the theme, ask what the main character',
+        blank:'LEARNS',
+        after:'or how they CHANGE by the end of the story.',
+        options:['EATS','LEARNS','OWNS','SAYS'],
+        ans:'LEARNS',
+        exp:'Theme comes from character growth! Ask: What did they learn? How did they change? What mistake did they make and correct? That reveals the life lesson.'
+      }
+    ]
+  },
+
+  // ─── SORT (Math Fraction Comparison) ───
+  sort_math: {
+    type:'sort',
+    title:'Order the Fractions',
+    emoji:'🔢',
+    subject:'math',
+    c1:'#F97316', c2:'#EF4444',
+    concept:'Fraction Comparison',
+    rounds:[
+      {
+        instruction:'Drag to order these fractions from SMALLEST to LARGEST:',
+        items:[
+          {text:'1/4  (= 0.25)', order:1},
+          {text:'1/2  (= 0.50)', order:2},
+          {text:'3/4  (= 0.75)', order:3},
+        ],
+        exp:'Convert to decimals or common denominator to compare. 1/4 < 1/2 < 3/4. The bigger the numerator with the same denominator, the larger the fraction!'
+      },
+      {
+        instruction:'Order these fractions from SMALLEST to LARGEST:',
+        items:[
+          {text:'1/8  (tiny piece)', order:1},
+          {text:'1/4  (quarter)', order:2},
+          {text:'1/2  (half)', order:3},
+        ],
+        exp:'With the same numerator (1), the LARGER the denominator, the SMALLER the fraction. Dividing into more pieces makes each piece smaller!'
+      }
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let gameState = {
+  gameId:null, roundIdx:0, score:0,
+  answered:false, bannerGame:null,
+  matchSelected:null, matchType:null,
+  matchPairs:[], matchMatched:0,
+  dragItems:[], dragOver:null
+};
+
+// ═══════════════════════════════════════════
+// LAUNCH GAME
+// ═══════════════════════════════════════════
+function launchGame(id) {
+  const G = GAMES[id];
+  gameState = { gameId:id, roundIdx:0, score:0, answered:false,
+    matchSelected:null, matchType:null, matchPairs:[], matchMatched:0,
+    dragItems:[], dragOver:null };
+
+  // Set modal header colors
+  document.getElementById('modalHeader').style.background =
+    `linear-gradient(135deg,${G.c1},${G.c2})`;
+  document.getElementById('modalEmoji').textContent = G.emoji;
+  document.getElementById('modalTitle').textContent = G.title;
+  document.getElementById('modalSub').textContent =
+    `Complete all rounds to unlock your next lesson · Concept: ${G.concept}`;
+
+  document.getElementById('modalOverlay').style.display = 'flex';
+  renderRound();
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+}
+function closeModalOnBg(e) {
+  if(e.target===document.getElementById('modalOverlay')) closeModal();
+}
+
+// ═══════════════════════════════════════════
+// RENDER ROUND
+// ═══════════════════════════════════════════
+function renderRound() {
+  const G = GAMES[gameState.gameId];
+  const rounds = G.rounds;
+  const total = rounds.length;
+  const idx = gameState.roundIdx;
+
+  if(idx >= total) { renderVictory(); return; }
+
+  const round = rounds[idx];
+  const pct = Math.round((idx/total)*100);
+
+  const body = document.getElementById('gameBody');
+  body.innerHTML = `
+    <div class="game-progress">
+      <div class="gp-label">Round</div>
+      <div class="gp-bar"><div class="gp-fill" style="width:${pct}%"></div></div>
+      <div class="gp-count">${idx+1}/${total}</div>
+    </div>
+    <div id="roundContent"></div>
+    <div id="gameFeedback"></div>
+    <button class="game-next-btn" id="gameNextBtn" onclick="nextRound()">
+      ${idx===total-1?'🏆 Finish & Unlock!':'Next Round →'}
+    </button>`;
+
+  gameState.answered = false;
+
+  if(G.type==='spot')   renderSpot(round);
+  if(G.type==='fill')   renderFill(round);
+  if(G.type==='sort')   renderSort(round);
+  if(G.type==='match')  renderMatch(round);
+}
+
+// ─── SPOT THE MISTAKE ───
+function renderSpot(round) {
+  const words = round.passage.split(' ');
+  const content = document.getElementById('roundContent');
+  content.innerHTML = `
+    <div class="stm-instruction">👆 Tap the word that doesn't belong</div>
+    <div class="stm-passage" id="stmPassage">
+      ${words.map((w,i)=>{
+        const clean = w.replace(/[.,!?]/g,'');
+        return `<span class="stm-word" id="stmW${i}" onclick="selectSpotWord('${clean}','${round.mistake}','${encodeURIComponent(round.exp)}')">${w} </span>`;
+      }).join('')}
+    </div>`;
+}
+
+function selectSpotWord(word, mistake, expEnc) {
+  if(gameState.answered) return;
+  gameState.answered = true;
+  const exp = decodeURIComponent(expEnc);
+  const correct = word === mistake;
+
+  // Highlight all occurrences of mistake
+  document.querySelectorAll('.stm-word').forEach(el=>{
+    const w = el.textContent.trim().replace(/[.,!?]/g,'');
+    if(w===mistake) el.classList.add('correct-word');
+    else el.style.opacity='.5';
+  });
+  if(!correct) {
+    // Mark the wrong selection
+    document.querySelectorAll('.stm-word').forEach(el=>{
+      if(el.textContent.trim().replace(/[.,!?]/g,'')===word) el.classList.add('wrong-word');
+    });
+  }
+  showGameFeedback(correct, exp);
+  if(correct) gameState.score++;
+  document.getElementById('gameNextBtn').classList.add('show');
+}
+
+// ─── FILL THE BLANK ───
+function renderFill(round) {
+  const shuffled = [...round.options].sort(()=>Math.random()-.5);
+  document.getElementById('roundContent').innerHTML = `
+    <div class="ftb-wrap">
+      <div class="ftb-sentence">
+        ${round.before} <span class="ftb-blank" id="ftbBlank">_______</span> ${round.after}
+      </div>
+      <div class="ftb-options" id="ftbOptions">
+        ${shuffled.map(o=>`
+          <button class="ftb-opt" id="ftbOpt_${o}" onclick="selectFill('${o}','${round.ans}','${encodeURIComponent(round.exp)}')">${o}</button>
+        `).join('')}
+      </div>
+    </div>`;
+}
+
+function selectFill(chosen, ans, expEnc) {
+  if(gameState.answered) return;
+  gameState.answered = true;
+  const exp = decodeURIComponent(expEnc);
+  const correct = chosen===ans;
+  const blank = document.getElementById('ftbBlank');
+  blank.textContent = chosen;
+  blank.classList.add(correct?'filled':'wrong-fill');
+  document.querySelectorAll('.ftb-opt').forEach(b=>{
+    b.classList.add('used');
+    if(b.id===`ftbOpt_${ans}`) b.classList.add('correct-opt');
+    if(b.id===`ftbOpt_${chosen}` && !correct) b.classList.add('wrong-opt');
+  });
+  showGameFeedback(correct, exp);
+  if(correct) gameState.score++;
+  document.getElementById('gameNextBtn').classList.add('show');
+}
+
+// ─── DRAG SORT ───
+function renderSort(round) {
+  // Shuffle items
+  const shuffled = [...round.items].sort(()=>Math.random()-.5);
+  gameState.dragItems = shuffled.map((item,i)=>({...item, currentPos:i}));
+
+  document.getElementById('roundContent').innerHTML = `
+    <div class="drag-instruction">🖱️ Drag to put in the correct order (1 = first)</div>
+    <div class="drag-items" id="dragList">
+      ${gameState.dragItems.map((item,i)=>`
+        <div class="drag-item" id="dragItem${i}" draggable="true"
+          ondragstart="dragStart(${i})" ondragover="dragOver(event,${i})"
+          ondrop="dragDrop(${i})" ondragleave="dragLeave(${i})">
+          <div class="drag-handle">⠿</div>
+          <div class="drag-num" id="dragNum${i}">${i+1}</div>
+          <div>${item.text}</div>
+        </div>`).join('')}
+    </div>
+    <button class="game-check-btn" id="sortCheckBtn" onclick="checkSort('${encodeURIComponent(round.exp)}')">
+      ✓ Check My Order
+    </button>`;
+}
+
+let dragSrc = null;
+function dragStart(i) {
+  dragSrc = i;
+  document.getElementById(`dragItem${i}`).classList.add('dragging');
+}
+function dragOver(e,i) {
+  e.preventDefault();
+  document.querySelectorAll('.drag-item').forEach(el=>el.classList.remove('drag-over'));
+  document.getElementById(`dragItem${i}`).classList.add('drag-over');
+}
+function dragLeave(i) {
+  document.getElementById(`dragItem${i}`).classList.remove('drag-over');
+}
+function dragDrop(target) {
+  if(dragSrc===null||dragSrc===target) return;
+  document.getElementById(`dragItem${dragSrc}`).classList.remove('dragging');
+  document.querySelectorAll('.drag-item').forEach(el=>el.classList.remove('drag-over'));
+  // Swap
+  const tmp = gameState.dragItems[dragSrc];
+  gameState.dragItems[dragSrc] = gameState.dragItems[target];
+  gameState.dragItems[target] = tmp;
+  // Re-render list
+  const list = document.getElementById('dragList');
+  list.innerHTML = gameState.dragItems.map((item,i)=>`
+    <div class="drag-item" id="dragItem${i}" draggable="true"
+      ondragstart="dragStart(${i})" ondragover="dragOver(event,${i})"
+      ondrop="dragDrop(${i})" ondragleave="dragLeave(${i})">
+      <div class="drag-handle">⠿</div>
+      <div class="drag-num" id="dragNum${i}">${i+1}</div>
+      <div>${item.text}</div>
+    </div>`).join('');
+  dragSrc = null;
+}
+
+function checkSort(expEnc) {
+  if(gameState.answered) return;
+  gameState.answered = true;
+  const exp = decodeURIComponent(expEnc);
+  const correct = gameState.dragItems.every((item,i)=>item.order===i+1);
+  document.getElementById('sortCheckBtn').disabled = true;
+  gameState.dragItems.forEach((item,i)=>{
+    const el = document.getElementById(`dragItem${i}`);
+    if(el) el.classList.add(item.order===i+1?'correct-pos':'wrong-pos');
+    el.setAttribute('draggable','false');
+  });
+  showGameFeedback(correct, exp);
+  if(correct) gameState.score++;
+  document.getElementById('gameNextBtn').classList.add('show');
+}
+
+// ─── MATCH PAIRS ───
+function renderMatch(round) {
+  const pairs = round.pairs;
+  const shuffledRight = [...pairs].map(p=>p.right).sort(()=>Math.random()-.5);
+  gameState.matchPairs = pairs;
+  gameState.matchMatched = 0;
+  gameState.matchSelected = null;
+  gameState.matchType = null;
+
+  document.getElementById('roundContent').innerHTML = `
+    <div class="match-instruction">👆 Tap a left card, then tap its match on the right</div>
+    <div class="match-cols">
+      <div class="match-col" id="leftCol">
+        ${pairs.map((p,i)=>`
+          <div class="match-card" id="left${i}" onclick="selectMatchCard('left',${i},'${p.left}')">${p.left}</div>
+        `).join('')}
+      </div>
+      <div class="match-col" id="rightCol">
+        ${shuffledRight.map((r,i)=>`
+          <div class="match-card" id="right${i}" onclick="selectMatchCard('right',${i},'${r}')">${r}</div>
+        `).join('')}
+      </div>
+    </div>
+    <div id="matchStatus" style="text-align:center;font-family:'Fredoka One',cursive;font-size:.9rem;color:var(--muted);margin-bottom:8px;">
+      Matched: 0 / ${pairs.length}
+    </div>`;
+}
+
+function selectMatchCard(side, idx, val) {
+  const el = document.getElementById(`${side}${idx}`);
+  if(el.classList.contains('matched')) return;
+
+  if(gameState.matchType===null) {
+    // First selection
+    document.querySelectorAll('.match-card').forEach(c=>c.classList.remove('selected'));
+    el.classList.add('selected');
+    gameState.matchSelected = {side, idx, val};
+    gameState.matchType = side;
+  } else if(gameState.matchType===side) {
+    // Same side — switch selection
+    document.querySelectorAll('.match-card').forEach(c=>c.classList.remove('selected'));
+    el.classList.add('selected');
+    gameState.matchSelected = {side, idx, val};
+  } else {
+    // Different side — check match
+    const prev = gameState.matchSelected;
+    document.querySelectorAll('.match-card:not(.matched)').forEach(c=>c.classList.remove('selected'));
+
+    // Find correct pair
+    const leftVal = side==='left'?val:prev.val;
+    const rightVal = side==='right'?val:prev.val;
+    const pair = gameState.matchPairs.find(p=>p.left===leftVal);
+    const isMatch = pair && pair.right===rightVal;
+
+    if(isMatch) {
+      // Correct!
+      document.getElementById(`left${side==='left'?idx:prev.idx}`).classList.add('matched');
+      document.getElementById(`right${side==='right'?idx:prev.idx}`).classList.add('matched');
+      gameState.matchMatched++;
+      document.getElementById('matchStatus').innerHTML = `Matched: ${gameState.matchMatched} / ${gameState.matchPairs.length}`;
+      if(gameState.matchMatched===gameState.matchPairs.length) {
+        // All matched!
+        gameState.answered = true;
+        gameState.score++;
+        const G = GAMES[gameState.gameId];
+        const round = G.rounds[gameState.roundIdx];
+        showGameFeedback(true, round.exp);
+        document.getElementById('gameNextBtn').classList.add('show');
+        spawnConfetti();
+      }
+    } else {
+      // Wrong
+      const leftEl = document.getElementById(`left${side==='left'?idx:prev.idx}`);
+      const rightEl = document.getElementById(`right${side==='right'?idx:prev.idx}`);
+      leftEl.classList.add('wrong-match');
+      rightEl.classList.add('wrong-match');
+      setTimeout(()=>{
+        leftEl.classList.remove('wrong-match','selected');
+        rightEl.classList.remove('wrong-match','selected');
+      },700);
+    }
+    gameState.matchSelected = null;
+    gameState.matchType = null;
+  }
+}
+
+// ─── FEEDBACK ───
+function showGameFeedback(correct, exp) {
+  document.getElementById('gameFeedback').innerHTML = `
+    <div class="game-feedback ${correct?'correct':'wrong'}">
+      <div class="gf-emoji">${correct?'🎉':'💡'}</div>
+      <div>
+        <div class="gf-title ${correct?'c':'w'}">${correct?'Correct! Great work!':'Not quite — here\'s why:'}</div>
+        <div class="gf-exp">${exp}</div>
+      </div>
+    </div>`;
+}
+
+function nextRound() {
+  gameState.roundIdx++;
+  renderRound();
+}
+
+// ─── VICTORY ───
+function renderVictory() {
+  const G = GAMES[gameState.gameId];
+  const total = G.rounds.length;
+  const pct = Math.round(gameState.score/total*100);
+  spawnConfetti();
+  document.getElementById('gameBody').innerHTML = `
+    <div class="victory-screen">
+      <div class="victory-emoji">${pct===100?'🏆':pct>=66?'⭐':'💪'}</div>
+      <div class="victory-title">${pct===100?'Perfect!':pct>=66?'Great Job!':'Keep Practicing!'}</div>
+      <div class="victory-sub">You completed the ${G.concept} review game</div>
+      <div class="victory-stars">${'⭐'.repeat(Math.max(1,Math.round(pct/33)))}</div>
+      <div class="victory-stats">
+        <div class="vstat">
+          <div class="vstat-val">${gameState.score}/${total}</div>
+          <div class="vstat-lbl">Correct Rounds</div>
+        </div>
+        <div class="vstat">
+          <div class="vstat-val">${pct}%</div>
+          <div class="vstat-lbl">Score</div>
+        </div>
+      </div>
+      <button class="victory-btn" onclick="closeModal()">
+        ${pct>=66?'🔓 Unlock Next Lesson!':'🔄 Play Again'}
+      </button>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+// TRIGGER BANNER
+// ═══════════════════════════════════════════
+let bannerGameId = null;
+function showTriggerBanner(concept, subject) {
+  const gameMap = {
+    'Theme Analysis':'fill_ela', 'Adding Fractions':'fill_math',
+    'Point of View':'spot_ela', 'Equivalent Fractions':'match_math'
+  };
+  bannerGameId = gameMap[concept] || (subject==='ELA'?'fill_ela':'fill_math');
+  document.getElementById('tbTitle').textContent = `You've missed ${concept} 2 times!`;
+  document.getElementById('triggerBanner').style.display = 'flex';
+}
+function dismissBanner() {
+  document.getElementById('triggerBanner').style.display = 'none';
+}
+function launchFromBanner() {
+  document.getElementById('triggerBanner').style.display = 'none';
+  if(bannerGameId) launchGame(bannerGameId);
+}
+
+// ═══════════════════════════════════════════
+// CONFETTI
+// ═══════════════════════════════════════════
+function spawnConfetti() {
+  const colors=['#3B82F6','#F59E0B','#10B981','#EF4444','#8B5CF6','#F97316'];
+  for(let i=0;i<24;i++) {
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    const size=Math.random()*10+6;
+    el.style.cssText=`
+      left:${20+Math.random()*60}vw;top:30vh;
+      width:${size}px;height:${size}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${Math.random()>.5?'50%':'3px'};
+      animation-delay:${Math.random()*.4}s;
+      animation-duration:${Math.random()*.8+1.2}s;
+    `;
+    document.body.appendChild(el);
+    el.addEventListener('animationend',()=>el.remove());
+  }
+}
+</script>
+</body>
+</html>

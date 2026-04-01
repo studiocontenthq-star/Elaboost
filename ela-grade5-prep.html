@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELABoost · 5th Grade Exam Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #4f6ef7;
+    --primary-light: #eef0ff;
+    --secondary: #f97316;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --bg: #f8f9ff;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --radius: 16px;
+    --shadow: 0 4px 24px rgba(79,110,247,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #4f6ef7 0%, #7c3aed 100%);
+    color: #fff;
+    padding: 28px 32px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon { width: 44px; height: 44px; background: rgba(255,255,255,0.2); border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .logo h1 { font-size: 1.6rem; font-weight: 900; letter-spacing: -0.5px; }
+  .logo span { font-size: 0.85rem; opacity: 0.85; font-weight: 600; }
+  .exam-badge {
+    background: rgba(255,255,255,0.18); border: 1.5px solid rgba(255,255,255,0.3);
+    border-radius: 50px; padding: 8px 18px; font-size: 0.85rem; font-weight: 700;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .countdown-dot { width: 8px; height: 8px; background: #fbbf24; border-radius: 50%; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar-outer { height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; margin-top: 8px; }
+  .progress-bar-inner { height: 6px; background: #fbbf24; border-radius: 3px; transition: width 0.5s; }
+
+  /* ── TABS ── */
+  .tabs-wrapper { background: var(--card); border-bottom: 2px solid var(--border); padding: 0 32px; display: flex; gap: 4px; overflow-x: auto; }
+  .tab {
+    padding: 14px 20px; cursor: pointer; font-weight: 700; font-size: 0.92rem;
+    border-bottom: 3px solid transparent; color: var(--text-muted); white-space: nowrap;
+    transition: all 0.2s; display: flex; align-items: center; gap: 7px;
+  }
+  .tab:hover { color: var(--primary); }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .tab-badge { background: var(--primary-light); color: var(--primary); font-size: 0.7rem; font-weight: 800;
+    padding: 2px 8px; border-radius: 50px; }
+  .tab.active .tab-badge { background: var(--primary); color: #fff; }
+
+  /* ── MAIN ── */
+  main { max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  /* ── SECTION PANEL ── */
+  .section-panel { display: none; animation: fadeUp 0.3s ease; }
+  .section-panel.active { display: block; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── SECTION HEADER ── */
+  .section-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 24px; }
+  .section-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center;
+    justify-content: center; font-size: 24px; flex-shrink: 0; }
+  .section-icon.rl { background: #ede9fe; }
+  .section-icon.ri { background: #fef3c7; }
+  .section-icon.w  { background: #dcfce7; }
+  .section-icon.l  { background: #fce7f3; }
+  .section-title h2 { font-size: 1.25rem; font-weight: 900; }
+  .section-title p  { font-size: 0.85rem; color: var(--text-muted); margin-top: 3px; }
+  .standard-tag { display: inline-block; background: var(--primary-light); color: var(--primary);
+    font-size: 0.72rem; font-weight: 800; padding: 2px 10px; border-radius: 50px; margin-top: 5px; }
+
+  /* ── PASSAGE CARD ── */
+  .passage-card {
+    background: var(--card); border-radius: var(--radius); border: 1.5px solid var(--border);
+    padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow);
+  }
+  .passage-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--text-muted); margin-bottom: 10px; }
+  .passage-text { font-family: 'Merriweather', serif; font-size: 0.92rem; line-height: 1.85; color: var(--text); }
+  .passage-text em { font-style: italic; }
+
+  /* ── QUESTION CARD ── */
+  .q-card {
+    background: var(--card); border-radius: var(--radius); border: 1.5px solid var(--border);
+    padding: 22px; margin-bottom: 14px; box-shadow: var(--shadow);
+  }
+  .q-num { display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; background: var(--primary); color: #fff;
+    border-radius: 8px; font-size: 0.78rem; font-weight: 800; margin-right: 8px; flex-shrink: 0; }
+  .q-text { font-size: 0.95rem; font-weight: 700; line-height: 1.5; display: flex; align-items: flex-start; }
+  .q-standard { font-size: 0.7rem; color: var(--text-muted); font-weight: 600; margin: 6px 0 14px 34px; }
+
+  /* ── OPTIONS ── */
+  .options { display: flex; flex-direction: column; gap: 9px; margin-top: 14px; }
+  .option {
+    display: flex; align-items: center; gap: 11px; padding: 11px 16px;
+    border: 1.5px solid var(--border); border-radius: 12px; cursor: pointer;
+    transition: all 0.18s; font-size: 0.9rem; font-weight: 600; background: #fff;
+  }
+  .option:hover { border-color: var(--primary); background: var(--primary-light); }
+  .option.selected { border-color: var(--primary); background: var(--primary-light); }
+  .option.correct  { border-color: var(--success); background: #f0fdf4; color: #166534; }
+  .option.wrong    { border-color: var(--danger); background: #fef2f2; color: #991b1b; }
+  .opt-letter { width: 26px; height: 26px; border-radius: 7px; background: var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 0.78rem;
+    font-weight: 800; flex-shrink: 0; transition: all 0.18s; }
+  .option.selected .opt-letter { background: var(--primary); color: #fff; }
+  .option.correct  .opt-letter { background: var(--success); color: #fff; }
+  .option.wrong    .opt-letter { background: var(--danger); color: #fff; }
+
+  /* ── FEEDBACK ── */
+  .feedback { display: none; margin-top: 12px; padding: 12px 16px; border-radius: 11px; font-size: 0.87rem; font-weight: 600; line-height: 1.5; }
+  .feedback.correct { background: #f0fdf4; border: 1.5px solid #86efac; color: #166534; display: flex; }
+  .feedback.wrong   { background: #fef2f2; border: 1.5px solid #fca5a5; color: #991b1b; display: flex; }
+  .feedback-icon { font-size: 1.1rem; margin-right: 8px; flex-shrink: 0; }
+
+  /* ── CHECK BUTTON ── */
+  .btn { padding: 11px 26px; border-radius: 11px; font-weight: 800; font-size: 0.9rem;
+    cursor: pointer; border: none; transition: all 0.18s; display: inline-flex; align-items: center; gap: 7px; }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 14px rgba(79,110,247,0.3); }
+  .btn-primary:hover { background: #3b57d8; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-secondary { background: var(--border); color: var(--text); }
+  .btn-secondary:hover { background: #cbd5e1; }
+  .btn-success { background: var(--success); color: #fff; }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+  /* ── SCORE BANNER ── */
+  .score-banner { background: linear-gradient(135deg, var(--primary), #7c3aed);
+    color: #fff; border-radius: var(--radius); padding: 20px 24px; margin-top: 20px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .score-banner h3 { font-size: 1rem; opacity: 0.9; }
+  .score-big { font-size: 2.2rem; font-weight: 900; }
+  .score-stars { font-size: 1.3rem; }
+
+  /* ── WRITING SECTION ── */
+  .prompt-card { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 1.5px solid #86efac;
+    border-radius: var(--radius); padding: 22px; margin-bottom: 20px; }
+  .prompt-card .prompt-type { font-size: 0.72rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1px; color: #166534; margin-bottom: 8px; }
+  .prompt-card p { font-size: 0.95rem; font-weight: 700; line-height: 1.6; color: #1e293b; }
+  .prompt-card .tips { margin-top: 14px; padding-top: 14px; border-top: 1px solid #86efac; }
+  .prompt-card .tips h4 { font-size: 0.82rem; font-weight: 800; color: #166534; margin-bottom: 8px; }
+  .prompt-card .tips ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+  .prompt-card .tips li { font-size: 0.83rem; color: #374151; display: flex; gap: 7px; }
+  .prompt-card .tips li::before { content: '✓'; color: var(--success); font-weight: 800; flex-shrink: 0; }
+
+  textarea {
+    width: 100%; min-height: 180px; padding: 16px; border: 1.5px solid var(--border);
+    border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 0.92rem; line-height: 1.7;
+    resize: vertical; transition: border-color 0.2s; color: var(--text); background: #fff;
+  }
+  textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,110,247,0.12); }
+  .word-count { font-size: 0.78rem; color: var(--text-muted); text-align: right; margin-top: 6px; font-weight: 600; }
+
+  /* ── AI FEEDBACK ── */
+  .ai-feedback-box { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius);
+    padding: 20px; margin-top: 16px; display: none; }
+  .ai-feedback-box.visible { display: block; animation: fadeUp 0.3s ease; }
+  .ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .ai-avatar { width: 32px; height: 32px; background: linear-gradient(135deg,#4f6ef7,#7c3aed);
+    border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0; }
+  .ai-header span { font-size: 0.85rem; font-weight: 800; color: var(--primary); }
+  .ai-content { font-size: 0.88rem; line-height: 1.7; color: var(--text); }
+  .ai-content h4 { font-size: 0.88rem; font-weight: 800; margin: 12px 0 5px; color: var(--text); }
+  .ai-content ul { list-style: disc; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+  .loading-dots span { animation: blink 1.2s infinite; display: inline-block; }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+  /* ── RUBRIC ── */
+  .rubric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 16px; }
+  .rubric-item { background: var(--bg); border: 1px solid var(--border); border-radius: 11px; padding: 12px 14px; }
+  .rubric-item .r-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); }
+  .rubric-item .r-score { font-size: 1.5rem; font-weight: 900; color: var(--primary); margin: 4px 0; }
+  .rubric-item .r-bar { height: 5px; background: var(--border); border-radius: 3px; }
+  .rubric-item .r-fill { height: 5px; background: var(--primary); border-radius: 3px; }
+
+  /* ── GRAMMAR SECTION ── */
+  .fill-blank { display: inline-block; border-bottom: 2px solid var(--primary); min-width: 90px; }
+  .fill-input { border: 1.5px solid var(--border); border-radius: 8px; padding: 5px 10px;
+    font-family: 'Nunito'; font-size: 0.9rem; font-weight: 600; min-width: 90px;
+    text-align: center; outline: none; transition: border-color 0.2s; }
+  .fill-input:focus { border-color: var(--primary); }
+  .fill-input.correct-ans { border-color: var(--success); background: #f0fdf4; color: #166534; }
+  .fill-input.wrong-ans { border-color: var(--danger); background: #fef2f2; color: #991b1b; }
+
+  /* ── OVERVIEW CARDS ── */
+  .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin-bottom: 28px; }
+  .ov-card { background: var(--card); border-radius: var(--radius); border: 1.5px solid var(--border);
+    padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 5px; }
+  .ov-card .ov-icon { font-size: 1.6rem; }
+  .ov-card .ov-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 700; }
+  .ov-card .ov-val { font-size: 1.4rem; font-weight: 900; color: var(--primary); }
+  .ov-card .ov-sub  { font-size: 0.75rem; color: var(--text-muted); }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width:600px) {
+    header { padding: 18px 16px; }
+    .tabs-wrapper { padding: 0 10px; }
+    main { padding: 18px 12px 50px; }
+    .passage-text { font-size: 0.87rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">📚</div>
+    <div>
+      <h1>ELABoost</h1>
+      <span>5th Grade · Georgia Standards</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+    <div class="exam-badge">
+      <div class="countdown-dot"></div>
+      <span id="countdown-text">Exam: April 21</span>
+    </div>
+    <div style="font-size:0.78rem;opacity:0.8;font-weight:600">Hi Joshua! Let's practice 🎯</div>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs-wrapper">
+  <div class="tab active" onclick="switchTab('rl')">📖 Reading Lit <span class="tab-badge">RL</span></div>
+  <div class="tab" onclick="switchTab('ri')">🔎 Reading Info <span class="tab-badge">RI</span></div>
+  <div class="tab" onclick="switchTab('w')">✍️ Writing <span class="tab-badge">W</span></div>
+  <div class="tab" onclick="switchTab('l')">🔤 Language <span class="tab-badge">L</span></div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main>
+
+<!-- ══ RL: READING LITERATURE ══ -->
+<div id="panel-rl" class="section-panel active">
+  <div class="section-header">
+    <div class="section-icon rl">📖</div>
+    <div class="section-title">
+      <h2>Reading Literature</h2>
+      <p>Theme, character, plot, figurative language, structure</p>
+      <span class="standard-tag">ELAGSE5RL.1 · RL.2 · RL.3 · RL.4 · RL.6</span>
+    </div>
+  </div>
+
+  <!-- Passage -->
+  <div class="passage-card">
+    <div class="passage-label">📄 Passage — Fiction</div>
+    <div class="passage-text">
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;Maya had lived next to the old lighthouse her entire life, but she had never once climbed its spiral staircase. The lighthouse keeper, Mr. Holloway, was a quiet man who rarely spoke to anyone in town. People whispered that he had sealed himself inside after losing his fishing boat in the great storm of 1987.</p>
+      <br>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;One gray November afternoon, Maya found the lighthouse door swinging open. She stepped inside and called out, but heard only her own echo. The stairs wound upward like a sleeping snake. <em>What harm could there be in one small peek?</em> she thought. As she climbed, photographs lined the stone walls—Mr. Holloway laughing with a crew of fishermen, a wedding portrait, a little boy blowing out birthday candles.</p>
+      <br>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;At the top, the great lamp sat cold and dark. Maya pressed her face to the glass and saw the whole village below—the crooked rooftops, the silver ribbon of the river, and her own tiny house with its red door. Then she heard slow footsteps on the stairs.</p>
+      <br>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;"I haven't been up here in twelve years," Mr. Holloway said, not unkindly. He looked at the photographs as if seeing old friends. "After the storm, I locked the door because I thought forgetting would hurt less." He paused. "I was wrong."</p>
+      <br>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;Maya didn't say anything. She simply stood beside him as they watched the sun break through the clouds and scatter gold across the water.</p>
+    </div>
+  </div>
+
+  <!-- Questions -->
+  <div id="rl-questions">
+
+    <div class="q-card" data-q="rl1">
+      <div class="q-text"><span class="q-num">1</span>What is the most likely theme of this story?</div>
+      <div class="q-standard">ELAGSE5RL.2 — Determine theme from details in the text</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'rl1','A')"><div class="opt-letter">A</div>Old buildings should be explored carefully.</div>
+        <div class="option" onclick="selectOption(this,'rl1','B')"><div class="opt-letter">B</div>Facing the past can help us heal and move forward.</div>
+        <div class="option" onclick="selectOption(this,'rl1','C')"><div class="opt-letter">C</div>Storms are dangerous and can destroy lives.</div>
+        <div class="option" onclick="selectOption(this,'rl1','D')"><div class="opt-letter">D</div>Curiosity always leads to trouble.</div>
+      </div>
+      <div class="feedback" id="fb-rl1"></div>
+    </div>
+
+    <div class="q-card" data-q="rl2">
+      <div class="q-text"><span class="q-num">2</span>Read this sentence: <em>"The stairs wound upward like a sleeping snake."</em><br>What literary device is used?</div>
+      <div class="q-standard">ELAGSE5RL.4 — Figurative language and word meanings</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'rl2','A')"><div class="opt-letter">A</div>Personification</div>
+        <div class="option" onclick="selectOption(this,'rl2','B')"><div class="opt-letter">B</div>Metaphor</div>
+        <div class="option" onclick="selectOption(this,'rl2','C')"><div class="opt-letter">C</div>Simile</div>
+        <div class="option" onclick="selectOption(this,'rl2','D')"><div class="opt-letter">D</div>Hyperbole</div>
+      </div>
+      <div class="feedback" id="fb-rl2"></div>
+    </div>
+
+    <div class="q-card" data-q="rl3">
+      <div class="q-text"><span class="q-num">3</span>What does Mr. Holloway's decision to lock the lighthouse door reveal about his character?</div>
+      <div class="q-standard">ELAGSE5RL.3 — Compare and contrast characters using story details</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'rl3','A')"><div class="opt-letter">A</div>He was angry at the villagers for not helping him.</div>
+        <div class="option" onclick="selectOption(this,'rl3','B')"><div class="opt-letter">B</div>He tried to avoid painful memories by isolating himself.</div>
+        <div class="option" onclick="selectOption(this,'rl3','C')"><div class="opt-letter">C</div>He no longer cared about the lighthouse or the sea.</div>
+        <div class="option" onclick="selectOption(this,'rl3','D')"><div class="opt-letter">D</div>He was too busy to climb the stairs every day.</div>
+      </div>
+      <div class="feedback" id="fb-rl3"></div>
+    </div>
+
+    <div class="q-card" data-q="rl4">
+      <div class="q-text"><span class="q-num">4</span>Which detail BEST supports the idea that Mr. Holloway missed his past life?</div>
+      <div class="q-standard">ELAGSE5RL.1 — Quote accurately from a text</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'rl4','A')"><div class="opt-letter">A</div>Maya found the lighthouse door swinging open.</div>
+        <div class="option" onclick="selectOption(this,'rl4','B')"><div class="opt-letter">B</div>He looked at the photographs as if seeing old friends.</div>
+        <div class="option" onclick="selectOption(this,'rl4','C')"><div class="opt-letter">C</div>The great lamp sat cold and dark.</div>
+        <div class="option" onclick="selectOption(this,'rl4','D')"><div class="opt-letter">D</div>Maya pressed her face to the glass.</div>
+      </div>
+      <div class="feedback" id="fb-rl4"></div>
+    </div>
+
+    <div class="q-card" data-q="rl5">
+      <div class="q-text"><span class="q-num">5</span>From whose point of view is the story told?</div>
+      <div class="q-standard">ELAGSE5RL.6 — Describe narrator's point of view</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'rl5','A')"><div class="opt-letter">A</div>First person — Maya tells the story using "I"</div>
+        <div class="option" onclick="selectOption(this,'rl5','B')"><div class="opt-letter">B</div>First person — Mr. Holloway tells the story</div>
+        <div class="option" onclick="selectOption(this,'rl5','C')"><div class="opt-letter">C</div>Third person — an outside narrator focuses on Maya</div>
+        <div class="option" onclick="selectOption(this,'rl5','D')"><div class="opt-letter">D</div>Second person — the reader is addressed as "you"</div>
+      </div>
+      <div class="feedback" id="fb-rl5"></div>
+    </div>
+
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="checkSection('rl')">✅ Check Answers</button>
+    <button class="btn btn-secondary" onclick="resetSection('rl')">🔄 Reset</button>
+  </div>
+  <div id="score-rl" style="display:none" class="score-banner">
+    <div><h3>Section Score</h3><div class="score-big" id="score-rl-text"></div></div>
+    <div class="score-stars" id="score-rl-stars"></div>
+  </div>
+</div>
+
+<!-- ══ RI: READING INFORMATIONAL ══ -->
+<div id="panel-ri" class="section-panel">
+  <div class="section-header">
+    <div class="section-icon ri">🔎</div>
+    <div class="section-title">
+      <h2>Reading Informational Text</h2>
+      <p>Main idea, evidence, text structure, author's purpose</p>
+      <span class="standard-tag">ELAGSE5RI.1 · RI.2 · RI.3 · RI.5 · RI.8</span>
+    </div>
+  </div>
+
+  <div class="passage-card">
+    <div class="passage-label">📄 Passage — Informational Text</div>
+    <div class="passage-text">
+      <p><strong>The Problem with Plastic Straws</strong></p>
+      <br>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;Every day, Americans use approximately 500 million plastic straws. Many of these straws end up in oceans and waterways, where they harm marine life. Sea turtles, for example, often mistake straws for food, which can block their digestive systems and lead to death.</p>
+      <br>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;Unlike aluminum cans or glass bottles, plastic straws are too lightweight to be sorted by recycling machines. As a result, most straws end up in landfills or are swept into the ocean. Once in the ocean, plastic breaks into tiny pieces called microplastics, which can enter the food chain when fish eat them.</p>
+      <br>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;Several cities and countries have already banned single-use plastic straws. In 2018, Seattle became the first major U.S. city to do so. Many restaurants now offer paper straws, bamboo straws, or stainless steel reusable straws as alternatives. Critics of the ban argue that people with certain disabilities rely on flexible plastic straws and that alternatives are not always effective.</p>
+      <br>
+      <p>&nbsp;&nbsp;&nbsp;&nbsp;Scientists agree that reducing plastic pollution is essential to protecting ocean ecosystems. While straws represent only a small percentage of ocean plastic, raising awareness about them can encourage people to rethink their everyday plastic use more broadly.</p>
+    </div>
+  </div>
+
+  <div id="ri-questions">
+
+    <div class="q-card" data-q="ri1">
+      <div class="q-text"><span class="q-num">1</span>What is the main idea of this article?</div>
+      <div class="q-standard">ELAGSE5RI.2 — Determine main idea; summarize</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'ri1','A')"><div class="opt-letter">A</div>Sea turtles are the animals most harmed by ocean pollution.</div>
+        <div class="option" onclick="selectOption(this,'ri1','B')"><div class="opt-letter">B</div>Plastic straws cause environmental harm and many cities are working to reduce their use.</div>
+        <div class="option" onclick="selectOption(this,'ri1','C')"><div class="opt-letter">C</div>Recycling machines need to be updated to handle plastic straws.</div>
+        <div class="option" onclick="selectOption(this,'ri1','D')"><div class="opt-letter">D</div>Paper straws are always better than plastic straws.</div>
+      </div>
+      <div class="feedback" id="fb-ri1"></div>
+    </div>
+
+    <div class="q-card" data-q="ri2">
+      <div class="q-text"><span class="q-num">2</span>According to the article, why can't plastic straws be recycled?</div>
+      <div class="q-standard">ELAGSE5RI.1 — Quote accurately; explain what text says explicitly</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'ri2','A')"><div class="opt-letter">A</div>They are made of a special type of plastic that no facility accepts.</div>
+        <div class="option" onclick="selectOption(this,'ri2','B')"><div class="opt-letter">B</div>They are too lightweight to be sorted by recycling machines.</div>
+        <div class="option" onclick="selectOption(this,'ri2','C')"><div class="opt-letter">C</div>Recycling centers do not accept any items from restaurants.</div>
+        <div class="option" onclick="selectOption(this,'ri2','D')"><div class="opt-letter">D</div>Plastic straws break apart before they reach recycling plants.</div>
+      </div>
+      <div class="feedback" id="fb-ri2"></div>
+    </div>
+
+    <div class="q-card" data-q="ri3">
+      <div class="q-text"><span class="q-num">3</span>What is the text structure of paragraph 3 (starting with "Several cities...")?</div>
+      <div class="q-standard">ELAGSE5RI.5 — Compare and contrast text structure</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'ri3','A')"><div class="opt-letter">A</div>Cause and effect</div>
+        <div class="option" onclick="selectOption(this,'ri3','B')"><div class="opt-letter">B</div>Chronological order</div>
+        <div class="option" onclick="selectOption(this,'ri3','C')"><div class="opt-letter">C</div>Problem and solution with counterargument</div>
+        <div class="option" onclick="selectOption(this,'ri3','D')"><div class="opt-letter">D</div>Compare and contrast</div>
+      </div>
+      <div class="feedback" id="fb-ri3"></div>
+    </div>
+
+    <div class="q-card" data-q="ri4">
+      <div class="q-text"><span class="q-num">4</span>The author includes the detail about disabilities in the third paragraph in order to —</div>
+      <div class="q-standard">ELAGSE5RI.8 — Explain how an author uses reasons and evidence</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'ri4','A')"><div class="opt-letter">A</div>prove that plastic straws should never be banned</div>
+        <div class="option" onclick="selectOption(this,'ri4','B')"><div class="opt-letter">B</div>show that the issue is more complicated than it first appears</div>
+        <div class="option" onclick="selectOption(this,'ri4','C')"><div class="opt-letter">C</div>argue that people with disabilities cause too much pollution</div>
+        <div class="option" onclick="selectOption(this,'ri4','D')"><div class="opt-letter">D</div>explain why paper straws were invented</div>
+      </div>
+      <div class="feedback" id="fb-ri4"></div>
+    </div>
+
+    <div class="q-card" data-q="ri5">
+      <div class="q-text"><span class="q-num">5</span>Based on the passage, what can the reader conclude about microplastics?</div>
+      <div class="q-standard">ELAGSE5RI.3 — Explain relationships between concepts</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'ri5','A')"><div class="opt-letter">A</div>They only affect sea turtles and no other animals.</div>
+        <div class="option" onclick="selectOption(this,'ri5','B')"><div class="opt-letter">B</div>They are too small to cause serious environmental problems.</div>
+        <div class="option" onclick="selectOption(this,'ri5','C')"><div class="opt-letter">C</div>They can enter the food chain through fish that eat them.</div>
+        <div class="option" onclick="selectOption(this,'ri5','D')"><div class="opt-letter">D</div>They are only found in areas near recycling centers.</div>
+      </div>
+      <div class="feedback" id="fb-ri5"></div>
+    </div>
+
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="checkSection('ri')">✅ Check Answers</button>
+    <button class="btn btn-secondary" onclick="resetSection('ri')">🔄 Reset</button>
+  </div>
+  <div id="score-ri" style="display:none" class="score-banner">
+    <div><h3>Section Score</h3><div class="score-big" id="score-ri-text"></div></div>
+    <div class="score-stars" id="score-ri-stars"></div>
+  </div>
+</div>
+
+<!-- ══ W: WRITING ══ -->
+<div id="panel-w" class="section-panel">
+  <div class="section-header">
+    <div class="section-icon w">✍️</div>
+    <div class="section-title">
+      <h2>Writing</h2>
+      <p>Opinion, informative, and narrative writing practice</p>
+      <span class="standard-tag">ELAGSE5W.1 · W.2 · W.3 · W.4 · W.5</span>
+    </div>
+  </div>
+
+  <!-- Writing Prompt 1 -->
+  <div class="prompt-card">
+    <div class="prompt-type">✍️ Opinion / Argument Writing · ELAGSE5W.1</div>
+    <p>Some schools are thinking about removing recess to add more classroom time. <strong>Write an opinion paragraph</strong> stating whether you agree or disagree with removing recess. Support your opinion with at least <strong>two reasons and evidence</strong>.</p>
+    <div class="tips">
+      <h4>📌 Strong Opinion Paragraph Checklist:</h4>
+      <ul>
+        <li>Clear opinion statement (claim) in the first sentence</li>
+        <li>At least 2 reasons with evidence or examples</li>
+        <li>Linking words: <em>because, therefore, for example, in addition, as a result</em></li>
+        <li>Concluding sentence that restates your opinion</li>
+      </ul>
+    </div>
+  </div>
+  <textarea id="write-opinion" placeholder="Write your opinion paragraph here..." oninput="updateWordCount('write-opinion','wc-opinion')"></textarea>
+  <div class="word-count" id="wc-opinion">0 words</div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="getAIFeedback('opinion')">🤖 Get AI Feedback</button>
+    <button class="btn btn-secondary" onclick="clearWriting('write-opinion','wc-opinion','ai-fb-opinion')">🗑️ Clear</button>
+  </div>
+  <div class="ai-feedback-box" id="ai-fb-opinion">
+    <div class="ai-header">
+      <div class="ai-avatar">✨</div>
+      <span>ELABoost AI Feedback</span>
+    </div>
+    <div class="ai-content" id="ai-content-opinion"></div>
+  </div>
+
+  <!-- Writing Prompt 2 -->
+  <div class="prompt-card" style="margin-top:28px;background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#93c5fd;">
+    <div class="prompt-type" style="color:#1d4ed8;">📝 Informative Writing · ELAGSE5W.2</div>
+    <p>Think about an animal that has an interesting way of protecting itself from predators. <strong>Write an informative paragraph</strong> explaining how this animal defends itself. Use facts and specific details.</p>
+    <div class="tips" style="border-top-color:#93c5fd;">
+      <h4 style="color:#1d4ed8;">📌 Strong Informative Paragraph Checklist:</h4>
+      <ul>
+        <li>Topic sentence that introduces your subject clearly</li>
+        <li>At least 3 specific facts or details</li>
+        <li>Domain-specific vocabulary (scientific or technical words)</li>
+        <li>Concluding sentence that summarizes the key idea</li>
+      </ul>
+    </div>
+  </div>
+  <textarea id="write-info" placeholder="Write your informative paragraph here..." oninput="updateWordCount('write-info','wc-info')"></textarea>
+  <div class="word-count" id="wc-info">0 words</div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="getAIFeedback('info')">🤖 Get AI Feedback</button>
+    <button class="btn btn-secondary" onclick="clearWriting('write-info','wc-info','ai-fb-info')">🗑️ Clear</button>
+  </div>
+  <div class="ai-feedback-box" id="ai-fb-info">
+    <div class="ai-header">
+      <div class="ai-avatar">✨</div>
+      <span>ELABoost AI Feedback</span>
+    </div>
+    <div class="ai-content" id="ai-content-info"></div>
+  </div>
+
+  <!-- Writing Prompt 3 -->
+  <div class="prompt-card" style="margin-top:28px;background:linear-gradient(135deg,#fff7ed,#fed7aa);border-color:#fb923c;">
+    <div class="prompt-type" style="color:#c2410c;">📖 Narrative Writing · ELAGSE5W.3</div>
+    <p>Write a short narrative about a time (real or imagined) when you had to make a difficult decision. <strong>Use vivid details, dialogue, and a clear beginning, middle, and end.</strong></p>
+    <div class="tips" style="border-top-color:#fb923c;">
+      <h4 style="color:#c2410c;">📌 Strong Narrative Checklist:</h4>
+      <ul>
+        <li>Engaging opening that hooks the reader</li>
+        <li>Sensory details (what you saw, heard, felt)</li>
+        <li>At least one line of dialogue with correct punctuation</li>
+        <li>Clear resolution showing what happened in the end</li>
+      </ul>
+    </div>
+  </div>
+  <textarea id="write-narrative" placeholder="Write your narrative here..." style="min-height:220px" oninput="updateWordCount('write-narrative','wc-narrative')"></textarea>
+  <div class="word-count" id="wc-narrative">0 words</div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="getAIFeedback('narrative')">🤖 Get AI Feedback</button>
+    <button class="btn btn-secondary" onclick="clearWriting('write-narrative','wc-narrative','ai-fb-narrative')">🗑️ Clear</button>
+  </div>
+  <div class="ai-feedback-box" id="ai-fb-narrative">
+    <div class="ai-header">
+      <div class="ai-avatar">✨</div>
+      <span>ELABoost AI Feedback</span>
+    </div>
+    <div class="ai-content" id="ai-content-narrative"></div>
+  </div>
+</div>
+
+<!-- ══ L: LANGUAGE / GRAMMAR ══ -->
+<div id="panel-l" class="section-panel">
+  <div class="section-header">
+    <div class="section-icon l">🔤</div>
+    <div class="section-title">
+      <h2>Language & Grammar</h2>
+      <p>Conventions, vocabulary, figurative language</p>
+      <span class="standard-tag">ELAGSE5L.1 · L.2 · L.3 · L.4 · L.5</span>
+    </div>
+  </div>
+
+  <!-- Grammar MCQ -->
+  <div id="l-questions">
+
+    <div class="q-card" data-q="l1">
+      <div class="q-text"><span class="q-num">1</span>Which sentence uses a <strong>comma correctly</strong> in a compound sentence?</div>
+      <div class="q-standard">ELAGSE5L.2a — Use punctuation to separate clauses</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'l1','A')"><div class="opt-letter">A</div>She studied hard, but she still felt nervous about the test.</div>
+        <div class="option" onclick="selectOption(this,'l1','B')"><div class="opt-letter">B</div>She studied hard but, she still felt nervous about the test.</div>
+        <div class="option" onclick="selectOption(this,'l1','C')"><div class="opt-letter">C</div>She studied hard but she still, felt nervous about the test.</div>
+        <div class="option" onclick="selectOption(this,'l1','D')"><div class="opt-letter">D</div>She studied, hard but she still felt nervous about the test.</div>
+      </div>
+      <div class="feedback" id="fb-l1"></div>
+    </div>
+
+    <div class="q-card" data-q="l2">
+      <div class="q-text"><span class="q-num">2</span>Choose the correct verb form to complete the sentence:<br><em>"Each of the students ______ responsible for turning in their own work."</em></div>
+      <div class="q-standard">ELAGSE5L.1c — Use verb tense and subject-verb agreement</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'l2','A')"><div class="opt-letter">A</div>are</div>
+        <div class="option" onclick="selectOption(this,'l2','B')"><div class="opt-letter">B</div>is</div>
+        <div class="option" onclick="selectOption(this,'l2','C')"><div class="opt-letter">C</div>were</div>
+        <div class="option" onclick="selectOption(this,'l2','D')"><div class="opt-letter">D</div>have been</div>
+      </div>
+      <div class="feedback" id="fb-l2"></div>
+    </div>
+
+    <div class="q-card" data-q="l3">
+      <div class="q-text"><span class="q-num">3</span>What does the word <strong>"illuminate"</strong> most likely mean in this sentence?<br><em>"The scientist hoped to illuminate the mystery of why bees are disappearing."</em></div>
+      <div class="q-standard">ELAGSE5L.4a — Use context clues to determine word meaning</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'l3','A')"><div class="opt-letter">A</div>To light up with a bright lamp</div>
+        <div class="option" onclick="selectOption(this,'l3','B')"><div class="opt-letter">B</div>To make darker or more mysterious</div>
+        <div class="option" onclick="selectOption(this,'l3','C')"><div class="opt-letter">C</div>To make something clear or easier to understand</div>
+        <div class="option" onclick="selectOption(this,'l3','D')"><div class="opt-letter">D</div>To ignore a problem completely</div>
+      </div>
+      <div class="feedback" id="fb-l3"></div>
+    </div>
+
+    <div class="q-card" data-q="l4">
+      <div class="q-text"><span class="q-num">4</span>Which sentence contains a <strong>misplaced modifier</strong>?</div>
+      <div class="q-standard">ELAGSE5L.1 — Recognize and correct modifier errors</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'l4','A')"><div class="opt-letter">A</div>Running quickly, Marcus reached the finish line first.</div>
+        <div class="option" onclick="selectOption(this,'l4','B')"><div class="opt-letter">B</div>Barking loudly, the dog woke up the neighbors.</div>
+        <div class="option" onclick="selectOption(this,'l4','C')"><div class="opt-letter">C</div>She almost drove her children to school every day.</div>
+        <div class="option" onclick="selectOption(this,'l4','D')"><div class="opt-letter">D</div>Smiling brightly, the student accepted the award.</div>
+      </div>
+      <div class="feedback" id="fb-l4"></div>
+    </div>
+
+    <div class="q-card" data-q="l5">
+      <div class="q-text"><span class="q-num">5</span>Which is the best example of an <strong>idiom</strong>?</div>
+      <div class="q-standard">ELAGSE5L.5b — Recognize and explain idioms</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'l5','A')"><div class="opt-letter">A</div>"The thunder boomed like a cannon shot."</div>
+        <div class="option" onclick="selectOption(this,'l5','B')"><div class="opt-letter">B</div>"Break a leg on your performance tonight!"</div>
+        <div class="option" onclick="selectOption(this,'l5','C')"><div class="opt-letter">C</div>"The stars were tiny diamonds in the sky."</div>
+        <div class="option" onclick="selectOption(this,'l5','D')"><div class="opt-letter">D</div>"The wind whispered through the trees."</div>
+      </div>
+      <div class="feedback" id="fb-l5"></div>
+    </div>
+
+    <div class="q-card" data-q="l6">
+      <div class="q-text"><span class="q-num">6</span>Which sentence uses an <strong>apostrophe correctly</strong>?</div>
+      <div class="q-standard">ELAGSE5L.2b — Use apostrophes for possessives and contractions</div>
+      <div class="options">
+        <div class="option" onclick="selectOption(this,'l6','A')"><div class="opt-letter">A</div>The student's projects were displayed in the hallway.</div>
+        <div class="option" onclick="selectOption(this,'l6','B')"><div class="opt-letter">B</div>The students project's were displayed in the hallway.</div>
+        <div class="option" onclick="selectOption(this,'l6','C')"><div class="opt-letter">C</div>The student's project's were displayed in the hallway.</div>
+        <div class="option" onclick="selectOption(this,'l6','D')"><div class="opt-letter">D</div>The students projects' were displayed in the hallway.</div>
+      </div>
+      <div class="feedback" id="fb-l6"></div>
+    </div>
+
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="checkSection('l')">✅ Check Answers</button>
+    <button class="btn btn-secondary" onclick="resetSection('l')">🔄 Reset</button>
+  </div>
+  <div id="score-l" style="display:none" class="score-banner">
+    <div><h3>Section Score</h3><div class="score-big" id="score-l-text"></div></div>
+    <div class="score-stars" id="score-l-stars"></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ── ANSWER KEY ──────────────────────────────────────
+const ANSWERS = {
+  rl1:'B', rl2:'C', rl3:'B', rl4:'B', rl5:'C',
+  ri1:'B', ri2:'B', ri3:'C', ri4:'B', ri5:'C',
+  l1:'A',  l2:'B',  l3:'C',  l4:'C',  l5:'B',  l6:'A'
+};
+const EXPLANATIONS = {
+  rl1: "The story shows Mr. Holloway learning that avoiding the past didn't help him heal — facing it did. This is the central theme.",
+  rl2: "\"Like a sleeping snake\" compares the stairs to a snake using the word <em>like</em>, making it a simile.",
+  rl3: "Mr. Holloway locked the door to escape painful memories, showing he isolated himself to cope with grief.",
+  rl4: "Looking at the photos \"as if seeing old friends\" directly shows he missed the people and life he had lost.",
+  rl5: "The story uses <em>she</em> and <em>her</em> — a third-person outside narrator — but follows Maya's perspective throughout.",
+  ri1: "The article discusses how plastic straws harm the environment and what communities are doing to address the problem.",
+  ri2: "The article explicitly states that plastic straws are \"too lightweight to be sorted by recycling machines.\"",
+  ri3: "Paragraph 3 presents a solution (bans and alternatives) alongside a counterargument (disability concerns), fitting problem-solution-counterargument structure.",
+  ri4: "By including a viewpoint that challenges the ban, the author shows the issue has multiple sides and is more complex.",
+  ri5: "The article states that fish eat microplastics, which allows them to enter the food chain — potentially affecting humans too.",
+  l1:  "A comma is placed before a coordinating conjunction (but) to join two independent clauses correctly.",
+  l2:  "\"Each\" is a singular indefinite pronoun, so the verb must be singular: <em>is</em>.",
+  l3:  "In context, the scientist wants to make the mystery clearer and understandable, so <em>illuminate</em> means to clarify.",
+  l4:  "\"Almost drove her children to school every day\" suggests she almost never drove them — the word <em>almost</em> is misplaced. It should be: \"She drove her children to school almost every day.\"",
+  l5:  "\"Break a leg\" is a well-known idiom meaning good luck — its meaning cannot be understood from the literal words.",
+  l6:  "\"student's\" correctly uses an apostrophe to show that the projects belong to one student."
+};
+
+// ── STATE ──────────────────────────────────────────
+const selected = {};
+
+// ── TAB SWITCHING ──────────────────────────────────
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+}
+
+// ── OPTION SELECTION ──────────────────────────────
+function selectOption(el, qid, letter) {
+  const card = document.querySelector(`[data-q="${qid}"]`);
+  if (card.dataset.checked) return;
+  card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selected[qid] = letter;
+}
+
+// ── CHECK SECTION ─────────────────────────────────
+function checkSection(sec) {
+  const qs = document.querySelectorAll(`#${sec}-questions .q-card`);
+  let correct = 0;
+  qs.forEach(card => {
+    const qid = card.dataset.q;
+    card.dataset.checked = '1';
+    const ans = ANSWERS[qid];
+    const pick = selected[qid];
+    const fb = document.getElementById('fb-'+qid);
+    card.querySelectorAll('.option').forEach(opt => {
+      const letter = opt.querySelector('.opt-letter').textContent;
+      if (letter === ans) opt.classList.add('correct');
+      else if (letter === pick && pick !== ans) opt.classList.add('wrong');
+    });
+    if (pick === ans) {
+      correct++;
+      fb.className = 'feedback correct';
+      fb.innerHTML = `<span class="feedback-icon">✅</span><span><strong>Correct!</strong> ${EXPLANATIONS[qid]}</span>`;
+    } else {
+      fb.className = 'feedback wrong';
+      fb.innerHTML = `<span class="feedback-icon">❌</span><span><strong>The correct answer is ${ans}.</strong> ${EXPLANATIONS[qid]}</span>`;
+    }
+  });
+  const total = qs.length;
+  const pct = Math.round(correct/total*100);
+  const stars = pct >= 80 ? '⭐⭐⭐' : pct >= 60 ? '⭐⭐' : '⭐';
+  document.getElementById(`score-${sec}`).style.display = 'flex';
+  document.getElementById(`score-${sec}-text`).textContent = `${correct} / ${total}  (${pct}%)`;
+  document.getElementById(`score-${sec}-stars`).textContent = stars;
+}
+
+// ── RESET SECTION ─────────────────────────────────
+function resetSection(sec) {
+  const qs = document.querySelectorAll(`#${sec}-questions .q-card`);
+  qs.forEach(card => {
+    delete card.dataset.checked;
+    const qid = card.dataset.q;
+    delete selected[qid];
+    card.querySelectorAll('.option').forEach(o => o.className = 'option');
+    const fb = document.getElementById('fb-'+qid);
+    fb.className = 'feedback'; fb.innerHTML = '';
+  });
+  document.getElementById(`score-${sec}`).style.display = 'none';
+}
+
+// ── WORD COUNT ────────────────────────────────────
+function updateWordCount(tid, wcid) {
+  const text = document.getElementById(tid).value.trim();
+  const words = text ? text.split(/\s+/).length : 0;
+  document.getElementById(wcid).textContent = `${words} word${words!==1?'s':''}`;
+}
+
+function clearWriting(tid, wcid, fbid) {
+  document.getElementById(tid).value = '';
+  document.getElementById(wcid).textContent = '0 words';
+  document.getElementById(fbid).classList.remove('visible');
+}
+
+// ── AI WRITING FEEDBACK ───────────────────────────
+const WRITING_PROMPTS = {
+  opinion: {
+    text: document.getElementById ? '' : '',
+    type: 'Opinion/Argument',
+    criteria: 'clear opinion claim, at least 2 reasons with evidence, linking words, concluding sentence'
+  },
+  info: {
+    type: 'Informative',
+    criteria: 'topic sentence, at least 3 specific facts, domain-specific vocabulary, concluding sentence'
+  },
+  narrative: {
+    type: 'Narrative',
+    criteria: 'engaging opening, sensory details, at least one dialogue line with correct punctuation, clear resolution'
+  }
+};
+
+async function getAIFeedback(type) {
+  const textareaId = type === 'opinion' ? 'write-opinion' : type === 'info' ? 'write-info' : 'write-narrative';
+  const text = document.getElementById(textareaId).value.trim();
+  const fbBox = document.getElementById(`ai-fb-${type}`);
+  const fbContent = document.getElementById(`ai-content-${type}`);
+  const wtype = WRITING_PROMPTS[type].type;
+  const criteria = WRITING_PROMPTS[type].criteria;
+
+  if (!text || text.split(/\s+/).length < 10) {
+    fbBox.classList.add('visible');
+    fbContent.innerHTML = '<p>⚠️ Please write at least a few sentences before requesting feedback!</p>';
+    return;
+  }
+
+  fbBox.classList.add('visible');
+  fbContent.innerHTML = `<p>Analyzing your writing <span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></p>`;
+
+  const systemPrompt = `You are ELABoost, a supportive 5th-grade ELA writing coach following Georgia Standards. 
+Give feedback in a warm, encouraging tone suitable for a 5th grader named Joshua.
+Respond in this exact structure:
+1. One sentence of genuine praise about something specific they did well.
+2. **Strengths:** (2-3 bullet points of specific things done well related to: ${criteria})
+3. **Grow:** (2 specific, actionable suggestions for improvement, phrased positively)
+4. **Quick Tip:** One short sentence tip they can apply right away.
+Keep total response under 200 words. Use simple, friendly language.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{
+          role: 'user',
+          content: `Please give me feedback on my ${wtype} writing for 5th grade ELA:\n\n"${text}"`
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content?.map(c => c.text||'').join('') || 'Unable to generate feedback.';
+    
+    // Convert markdown to HTML
+    let html = raw
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n- /g, '<br>• ')
+      .replace(/\n\d\. /g, '<br>')
+      .replace(/^\n/, '');
+    
+    fbContent.innerHTML = `<p>${html}</p>`;
+  } catch(e) {
+    fbContent.innerHTML = '<p>⚠️ Feedback unavailable right now. Keep writing — practice makes perfect! 💪</p>';
+  }
+}
+
+// ── COUNTDOWN ─────────────────────────────────────
+function updateCountdown() {
+  const exam = new Date('2026-04-21T08:00:00');
+  const now = new Date();
+  const diff = exam - now;
+  if (diff > 0) {
+    const days = Math.floor(diff / 86400000);
+    document.getElementById('countdown-text').textContent = `${days} day${days!==1?'s':''} until exam!`;
+  } else {
+    document.getElementById('countdown-text').textContent = 'Exam Day! Good luck! 🍀';
+  }
+}
+updateCountdown();
+</script>
+</body>
+</html>

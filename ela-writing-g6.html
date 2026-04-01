@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELABoost · Grade 6 Writing · Joshua</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0f14;
+  --surface: #151820;
+  --surface2: #1c2030;
+  --border: #252a38;
+  --text: #e8eaf0;
+  --muted: #6b7385;
+  --arg: #ff6b35;
+  --arg-dim: rgba(255,107,53,0.12);
+  --res: #00c9a7;
+  --res-dim: rgba(0,201,167,0.12);
+  --lit: #a78bfa;
+  --lit-dim: rgba(167,139,250,0.12);
+  --gold: #fbbf24;
+  --radius: 16px;
+  --font-head: 'Playfair Display', Georgia, serif;
+  --font-body: 'Space Grotesk', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── HEADER ── */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo {
+  font-family: var(--font-head);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.logo em { font-style: italic; color: var(--gold); }
+.grade-pill {
+  background: linear-gradient(135deg, var(--arg), #ff9a5c);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+#countdown {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ── HERO ── */
+.hero {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 28px 32px;
+  position: relative;
+}
+.hero-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--arg);
+  margin-bottom: 12px;
+}
+.hero h1 {
+  font-family: var(--font-head);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+.hero h1 span { color: var(--gold); font-style: italic; }
+.hero p {
+  color: var(--muted);
+  font-size: 1rem;
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+/* ── UPGRADE BANNER ── */
+.upgrade-banner {
+  display: flex;
+  gap: 16px;
+  margin: 20px 0 0;
+  flex-wrap: wrap;
+}
+.up-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.up-item .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── TABS ── */
+.tabs {
+  max-width: 960px;
+  margin: 32px auto 0;
+  padding: 0 28px;
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+.tab-btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+  white-space: nowrap;
+  border-radius: 8px 8px 0 0;
+}
+.tab-btn:hover { color: var(--text); background: var(--surface2); }
+.tab-btn.arg.active  { color: var(--arg); border-bottom-color: var(--arg); background: var(--arg-dim); }
+.tab-btn.res.active  { color: var(--res); border-bottom-color: var(--res); background: var(--res-dim); }
+.tab-btn.lit.active  { color: var(--lit); border-bottom-color: var(--lit); background: var(--lit-dim); }
+.tab-btn.rub.active  { color: var(--gold); border-bottom-color: var(--gold); background: rgba(251,191,36,0.1); }
+
+/* ── MAIN ── */
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 28px 80px;
+}
+.panel { display: none; }
+.panel.active { display: block; animation: fadeUp 0.3s ease; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── CARD ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+.card.arg-card { border-top: 3px solid var(--arg); }
+.card.res-card { border-top: 3px solid var(--res); }
+.card.lit-card { border-top: 3px solid var(--lit); }
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.card-icon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.icon-arg { background: var(--arg-dim); }
+.icon-res { background: var(--res-dim); }
+.icon-lit { background: var(--lit-dim); }
+
+.card-title {
+  font-family: var(--font-head);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.card-sub { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+.std-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+.tag-arg { background: var(--arg-dim); color: var(--arg); }
+.tag-res { background: var(--res-dim); color: var(--res); }
+.tag-lit { background: var(--lit-dim); color: var(--lit); }
+
+/* ── UPGRADE CALLOUT ── */
+.upgrade-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-size: 0.83rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.upgrade-callout .uc-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.upgrade-callout strong { color: var(--text); }
+
+/* ── PROMPT ── */
+.prompt-box {
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  font-size: 0.93rem;
+  line-height: 1.7;
+}
+.prompt-arg { background: var(--arg-dim); border-left: 3px solid var(--arg); }
+.prompt-res { background: var(--res-dim); border-left: 3px solid var(--res); }
+.prompt-lit { background: var(--lit-dim); border-left: 3px solid var(--lit); }
+
+.prompt-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.btn-new-prompt {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 5px 14px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 20px;
+  font-family: var(--font-body);
+}
+.btn-new-prompt:hover { border-color: var(--text); color: var(--text); }
+
+/* ── SOURCE BOX (Research) ── */
+.source-box {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.source-box h4 {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--res);
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.source-item {
+  font-size: 0.83rem;
+  color: var(--muted);
+  line-height: 1.6;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.source-item:last-child { border-bottom: none; }
+.source-item strong { color: var(--text); }
+
+/* ── CHECKLIST ── */
+.checklist { margin: 0 0 20px; display: flex; flex-direction: column; gap: 8px; }
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.check-item:hover { border-color: var(--muted); }
+.check-item input[type=checkbox] {
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  cursor: pointer;
+}
+.check-item.arg input { accent-color: var(--arg); }
+.check-item.res input { accent-color: var(--res); }
+.check-item.lit input { accent-color: var(--lit); }
+
+/* ── TEXTAREA ── */
+.write-area {
+  width: 100%;
+  min-height: 240px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.write-area::placeholder { color: var(--muted); }
+.write-area:focus { border-color: var(--muted); }
+.write-area.arg:focus { border-color: var(--arg); }
+.write-area.res:focus { border-color: var(--res); }
+.write-area.lit:focus { border-color: var(--lit); }
+
+.word-count {
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 6px;
+  margin-bottom: 16px;
+}
+
+/* ── SUBMIT BTN ── */
+.btn-submit {
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 13px 26px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-arg { background: var(--arg); color: #fff; }
+.btn-arg:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,107,53,0.35); }
+.btn-res { background: var(--res); color: #0d0f14; }
+.btn-res:hover { filter: brightness(1.05); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,201,167,0.35); }
+.btn-lit { background: var(--lit); color: #fff; }
+.btn-lit:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(167,139,250,0.35); }
+.btn-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; filter: none; box-shadow: none; }
+
+/* ── SPINNER ── */
+.spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── AI FEEDBACK ── */
+.ai-feedback {
+  background: linear-gradient(135deg, #0a0e1a, #111520);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-top: 20px;
+  display: none;
+  animation: fadeUp 0.4s ease;
+}
+.ai-feedback.show { display: block; }
+.ai-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.ai-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: var(--gold);
+  color: #0d0f14;
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+.ai-name {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+}
+.scores-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.score-box {
+  flex: 1;
+  min-width: 90px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+.score-num {
+  font-family: var(--font-head);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.score-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.ai-text {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #c8cad4;
+  white-space: pre-wrap;
+}
+
+/* ── RUBRIC PANEL ── */
+.rubric-intro {
+  background: linear-gradient(135deg, #1a1030, #101520);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.rubric-intro-icon { font-size: 2.8rem; flex-shrink: 0; }
+.rubric-intro h2 {
+  font-family: var(--font-head);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.rubric-intro p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+.rubric-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+@media(max-width:600px) { .rubric-grid { grid-template-columns: 1fr; } }
+
+.rubric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.rubric-card h3 {
+  font-family: var(--font-head);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.score-levels { display: flex; flex-direction: column; gap: 5px; margin-top: 12px; }
+.level {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+.level-num {
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+.l4 { background: #166534; color: #86efac; }
+.l3 { background: #1e40af; color: #93c5fd; }
+.l2 { background: #92400e; color: #fcd34d; }
+.l1 { background: #7f1d1d; color: #fca5a5; }
+
+/* ── COMPARISON TABLE ── */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+  margin-top: 8px;
+}
+.compare-table th {
+  background: var(--surface2);
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.compare-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.5;
+  vertical-align: top;
+}
+.compare-table tr:last-child td { border-bottom: none; }
+.compare-table td:first-child { color: var(--muted); font-weight: 600; }
+
+/* ── TIPS GRID ── */
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 8px;
+}
+.tip-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+.tip-card h4 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.tip-card ul {
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.8;
+}
+.tip-card li::before { content: "→ "; color: var(--gold); }
+
+/* ── SESSION TRACKER ── */
+.session-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.session-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
+.session-dots { display: flex; gap: 8px; }
+.session-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: var(--muted);
+  font-weight: 700;
+  transition: all 0.3s;
+}
+.session-dot.done-arg { background: var(--arg); border-color: var(--arg); color: #fff; }
+.session-dot.done-res { background: var(--res); border-color: var(--res); color: #0d0f14; }
+.session-dot.done-lit { background: var(--lit); border-color: var(--lit); color: #fff; }
+.session-progress { font-size: 0.78rem; color: var(--muted); margin-left: auto; }
+
+@media(max-width:640px) {
+  header { padding: 14px 18px; }
+  .hero, .tabs, main { padding-left: 18px; padding-right: 18px; }
+  .card { padding: 20px; }
+  .ai-feedback { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">ELA<em>Boost</em> · <span style="color:var(--lit);font-style:normal;">Grade 6</span></div>
+  <div id="countdown" style="font-size:0.78rem;color:var(--muted);">Loading...</div>
+  <div class="grade-pill">Middle School</div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">Georgia ELAGSE6 · Writing Standards</div>
+  <h1>Welcome to<br><span>Middle School</span> Writing</h1>
+  <p>Grade 6 writing is a big step up. You'll argue with evidence, research real topics, and analyze literature — all skills you'll use for the rest of your life.</p>
+
+  <div class="upgrade-banner">
+    <div class="up-item">
+      <div class="dot" style="background:var(--arg)"></div>
+      <span><strong style="color:var(--text);">Opinion → Argument</strong> · Now you must address the other side</span>
+    </div>
+    <div class="up-item">
+      <div class="dot" style="background:var(--res)"></div>
+      <span><strong style="color:var(--text);">Info → Research</strong> · Cite your sources by name</span>
+    </div>
+    <div class="up-item">
+      <div class="dot" style="background:var(--lit)"></div>
+      <span><strong style="color:var(--text);">New: Literary Analysis</strong> · Write about books with text evidence</span>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn arg active" onclick="switchTab('arg', this)">⚔️ Argument (W.1)</button>
+  <button class="tab-btn res" onclick="switchTab('res', this)">🔬 Research (W.2)</button>
+  <button class="tab-btn lit" onclick="switchTab('lit', this)">📚 Literary Analysis (W.9)</button>
+  <button class="tab-btn rub" onclick="switchTab('rub', this)">📋 Rubric &amp; Tips</button>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- SESSION TRACKER -->
+  <div class="session-bar">
+    <span class="session-label">Today's Practice</span>
+    <div class="session-dots">
+      <div class="session-dot" id="dot-arg" title="Argument">ARG</div>
+      <div class="session-dot" id="dot-res" title="Research">RES</div>
+      <div class="session-dot" id="dot-lit" title="Literary Analysis">LIT</div>
+    </div>
+    <span class="session-progress" id="sessionProgress">0 / 3 completed</span>
+  </div>
+
+  <!-- ══════════════ ARGUMENT PANEL ══════════════ -->
+  <div class="panel active" id="panel-arg">
+    <div class="card arg-card">
+      <div class="std-tag tag-arg">ELAGSE6W1 · Argument Writing</div>
+      <div class="card-header">
+        <div class="card-icon icon-arg">⚔️</div>
+        <div>
+          <div class="card-title">Argument Writing</div>
+          <div class="card-sub">Make a strong claim, support it with evidence from sources, AND address the opposing viewpoint. This is the #1 upgrade from Grade 5 Opinion writing.</div>
+        </div>
+      </div>
+
+      <div class="upgrade-callout">
+        <div class="uc-icon">⬆️</div>
+        <div><strong>Grade 5 → 6 Upgrade:</strong> In Grade 5, you just gave your opinion and reasons. In Grade 6, you must also <strong>acknowledge the other side</strong> (counterclaim) and explain why your argument is still stronger. This is called a <em>rebuttal</em>.</div>
+      </div>
+
+      <div class="prompt-arg prompt-box">
+        <div class="prompt-label">📝 Your Argument Prompt</div>
+        <span id="argPromptText">Some people argue that middle school students should not be allowed to use cell phones during school hours. Others believe that phones are useful learning tools. Write an argument essay for or against cell phone use in school. Include a counterclaim and rebuttal. Support your position with at least two pieces of evidence.</span>
+      </div>
+      <button class="btn-new-prompt" onclick="newPrompt('arg')">🔀 New Prompt</button>
+
+      <div class="checklist">
+        <label class="check-item arg"><input type="checkbox" class="arg"> My introduction has a hook AND clearly states my claim/position.</label>
+        <label class="check-item arg"><input type="checkbox" class="arg"> I have at least 2 body paragraphs, each with a reason + evidence.</label>
+        <label class="check-item arg"><input type="checkbox" class="arg"> I included a counterclaim (what the other side believes).</label>
+        <label class="check-item arg"><input type="checkbox" class="arg"> I wrote a rebuttal that explains why my argument is stronger.</label>
+        <label class="check-item arg"><input type="checkbox" class="arg"> I used formal academic language (avoid "I think" — say "Evidence shows...")</label>
+        <label class="check-item arg"><input type="checkbox" class="arg"> My conclusion restates the claim and ends with a strong statement.</label>
+        <label class="check-item arg"><input type="checkbox" class="arg"> I checked grammar, spelling, and punctuation.</label>
+      </div>
+
+      <textarea class="write-area arg" id="argText" placeholder="Start your argument essay here...&#10;&#10;Try opening with a surprising fact or question to hook your reader before stating your claim." oninput="wordCount('arg')"></textarea>
+      <div class="word-count"><span id="argWords">0</span> words · Aim for 300–400 words</div>
+
+      <button class="btn-submit btn-arg" onclick="submitWriting('arg')" id="argBtn">🤖 Get AI Feedback</button>
+    </div>
+
+    <div class="ai-feedback" id="argFeedback">
+      <div class="ai-header">
+        <div class="ai-badge">Gemini AI Coach</div>
+        <div class="ai-name">Feedback for Joshua</div>
+      </div>
+      <div class="scores-row" id="argScores"></div>
+      <div class="ai-text" id="argFeedbackText"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ RESEARCH PANEL ══════════════ -->
+  <div class="panel" id="panel-res">
+    <div class="card res-card">
+      <div class="std-tag tag-res">ELAGSE6W2 · Research / Informational Writing</div>
+      <div class="card-header">
+        <div class="card-icon icon-res">🔬</div>
+        <div>
+          <div class="card-title">Research Writing</div>
+          <div class="card-sub">Write an informational essay using multiple sources. You must summarize, paraphrase, and cite your sources — no copying!</div>
+        </div>
+      </div>
+
+      <div class="upgrade-callout">
+        <div class="uc-icon">⬆️</div>
+        <div><strong>Grade 5 → 6 Upgrade:</strong> You must now reference <strong>where your information comes from</strong>. Use phrases like "According to National Geographic..." or "A 2023 study found that..." instead of just stating facts.</div>
+      </div>
+
+      <div class="prompt-res prompt-box">
+        <div class="prompt-label">📝 Your Research Prompt</div>
+        <span id="resPromptText">Using the source information provided below, write an informational essay explaining how climate change affects ocean ecosystems. Use information from at least two of the sources. Cite your sources by referring to them by name in your writing.</span>
+      </div>
+      <button class="btn-new-prompt" onclick="newPrompt('res')">🔀 New Prompt</button>
+
+      <div class="source-box" id="resSources">
+        <h4>📂 Sources to Use</h4>
+        <div class="source-item"><strong>Source A — NOAA (National Oceanic and Atmospheric Administration):</strong> Ocean temperatures have risen by about 0.13°C per decade since 1901. Warmer waters cause coral bleaching, which has damaged over 50% of the world's coral reefs. Coral reefs support about 25% of all marine species.</div>
+        <div class="source-item"><strong>Source B — National Geographic, 2023:</strong> As oceans absorb CO₂ from the atmosphere, they become more acidic — a process called ocean acidification. This makes it harder for shellfish, crabs, and corals to build their shells. Scientists warn that acidification could threaten the entire ocean food chain.</div>
+        <div class="source-item"><strong>Source C — WWF (World Wildlife Fund):</strong> Sea level rise caused by melting ice threatens coastal ecosystems like mangroves and salt marshes, which are nursery habitats for many fish species. Without these habitats, fish populations that humans depend on for food could collapse.</div>
+      </div>
+
+      <div class="checklist">
+        <label class="check-item res"><input type="checkbox" class="res"> My introduction clearly states what the essay will explain.</label>
+        <label class="check-item res"><input type="checkbox" class="res"> I used information from at least 2 of the 3 sources.</label>
+        <label class="check-item res"><input type="checkbox" class="res"> I cited each source by name (e.g., "According to NOAA...").</label>
+        <label class="check-item res"><input type="checkbox" class="res"> I paraphrased the information — I did NOT copy it word for word.</label>
+        <label class="check-item res"><input type="checkbox" class="res"> I used transition words between paragraphs (furthermore, in addition, however).</label>
+        <label class="check-item res"><input type="checkbox" class="res"> My conclusion summarizes the key points and explains why it matters.</label>
+        <label class="check-item res"><input type="checkbox" class="res"> I used formal, academic vocabulary throughout.</label>
+      </div>
+
+      <textarea class="write-area res" id="resText" placeholder="Start your research essay here...&#10;&#10;Begin with an interesting fact from one of the sources to hook your reader, then explain what your essay will cover." oninput="wordCount('res')"></textarea>
+      <div class="word-count"><span id="resWords">0</span> words · Aim for 300–450 words</div>
+
+      <button class="btn-submit btn-res" onclick="submitWriting('res')" id="resBtn">🤖 Get AI Feedback</button>
+    </div>
+
+    <div class="ai-feedback" id="resFeedback">
+      <div class="ai-header">
+        <div class="ai-badge">Gemini AI Coach</div>
+        <div class="ai-name">Feedback for Joshua</div>
+      </div>
+      <div class="scores-row" id="resScores"></div>
+      <div class="ai-text" id="resFeedbackText"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ LITERARY ANALYSIS PANEL ══════════════ -->
+  <div class="panel" id="panel-lit">
+    <div class="card lit-card">
+      <div class="std-tag tag-lit">ELAGSE6W9 · Literary Analysis</div>
+      <div class="card-header">
+        <div class="card-icon icon-lit">📚</div>
+        <div>
+          <div class="card-title">Literary Analysis Writing</div>
+          <div class="card-sub">Write analytically about a story or poem. Explain theme, character development, or author's craft — and back up every claim with text evidence (quotes).</div>
+        </div>
+      </div>
+
+      <div class="upgrade-callout">
+        <div class="uc-icon">⭐</div>
+        <div><strong>Brand New in Grade 6:</strong> Literary Analysis is writing <em>about</em> what you read. You pick a theme or idea, make a claim about it, and prove it using <strong>quotes from the text</strong>. This skill is used all the way through high school and college.</div>
+      </div>
+
+      <div class="prompt-lit prompt-box">
+        <div class="prompt-label">📝 Your Literary Analysis Prompt</div>
+        <span id="litPromptText">Read the passage below, then write a literary analysis essay explaining how the author develops the theme that "courage means acting despite fear." Use at least two pieces of text evidence (direct quotes) to support your analysis.</span>
+      </div>
+      <button class="btn-new-prompt" onclick="newPrompt('lit')">🔀 New Prompt</button>
+
+      <div class="source-box">
+        <h4>📖 Passage: "The Storm" (excerpt)</h4>
+        <div class="source-item" style="color:var(--text);font-style:italic;line-height:1.8;">
+          Maya stood at the edge of the cliff, her knees trembling. Below, the river churned white and angry. Her brother was down there somewhere, carried by the current after the bridge collapsed. "I can't," she whispered. But then she remembered what her grandmother always said: <em>"The brave ones aren't the ones who aren't afraid. They're the ones who jump anyway."</em> Maya closed her eyes. She thought of her brother's laugh, the way he always saved her the last piece of pizza, how he'd once climbed a tree to rescue her kite without being asked. She opened her eyes. The river roared. She jumped.
+        </div>
+        <div class="source-item" style="margin-top:8px;color:var(--text);line-height:1.8;">
+          Three hours later, wrapped in a rescue blanket, Maya couldn't stop shaking — but not from cold. "Were you scared?" the paramedic asked. She almost laughed. "Terrified," she said. "Still am." He raised an eyebrow. "Then why'd you do it?" Maya looked at her brother sleeping in the cot beside her, his chest rising and falling. "Because being scared wasn't a good enough reason not to."
+        </div>
+      </div>
+
+      <div class="checklist">
+        <label class="check-item lit"><input type="checkbox" class="lit"> My introduction names the title/author and clearly states my analytical claim (thesis).</label>
+        <label class="check-item lit"><input type="checkbox" class="lit"> I used at least 2 direct quotes from the text (in quotation marks).</label>
+        <label class="check-item lit"><input type="checkbox" class="lit"> After each quote, I explained what it shows (don't just drop the quote — analyze it!).</label>
+        <label class="check-item lit"><input type="checkbox" class="lit"> I analyzed the author's word choices or techniques, not just the plot.</label>
+        <label class="check-item lit"><input type="checkbox" class="lit"> I used literary analysis phrases: "This suggests...", "The author shows...", "This reveals..."</label>
+        <label class="check-item lit"><input type="checkbox" class="lit"> My conclusion connects back to my thesis and explains the bigger meaning.</label>
+        <label class="check-item lit"><input type="checkbox" class="lit"> I wrote in present tense (literary present): "Maya jumps" not "Maya jumped".</label>
+      </div>
+
+      <textarea class="write-area lit" id="litText" placeholder="Start your literary analysis here...&#10;&#10;Begin with your thesis: 'In [title], the author develops the theme that courage means acting despite fear through...' " oninput="wordCount('lit')"></textarea>
+      <div class="word-count"><span id="litWords">0</span> words · Aim for 250–400 words</div>
+
+      <button class="btn-submit btn-lit" onclick="submitWriting('lit')" id="litBtn">🤖 Get AI Feedback</button>
+    </div>
+
+    <div class="ai-feedback" id="litFeedback">
+      <div class="ai-header">
+        <div class="ai-badge">Gemini AI Coach</div>
+        <div class="ai-name">Feedback for Joshua</div>
+      </div>
+      <div class="scores-row" id="litScores"></div>
+      <div class="ai-text" id="litFeedbackText"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ RUBRIC PANEL ══════════════ -->
+  <div class="panel" id="panel-rub">
+
+    <div class="rubric-intro">
+      <div class="rubric-intro-icon">📋</div>
+      <div>
+        <h2>Georgia Grade 6 Writing Rubric</h2>
+        <p>Same 4 categories as Grade 5 — but the expectations are higher. Each category is worth 1–4 points. Know these and you know exactly what your teacher is looking for.</p>
+      </div>
+    </div>
+
+    <div class="rubric-grid">
+      <div class="rubric-card">
+        <h3>💡 <span style="color:var(--arg)">Ideas & Content</span></h3>
+        <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;">Is your claim or thesis clear? Do you have specific evidence? Does everything connect to your main idea?</p>
+        <div class="score-levels">
+          <div class="level"><div class="level-num l4">4</div><span style="font-size:0.78rem;color:var(--muted);">Strong thesis; specific, relevant evidence throughout</span></div>
+          <div class="level"><div class="level-num l3">3</div><span style="font-size:0.78rem;color:var(--muted);">Clear idea; mostly supported with some gaps</span></div>
+          <div class="level"><div class="level-num l2">2</div><span style="font-size:0.78rem;color:var(--muted);">Idea present but lacks specifics or evidence</span></div>
+          <div class="level"><div class="level-num l1">1</div><span style="font-size:0.78rem;color:var(--muted);">Unclear or off-topic</span></div>
+        </div>
+      </div>
+      <div class="rubric-card">
+        <h3>🗂️ <span style="color:var(--res)">Organization</span></h3>
+        <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;">Clear intro → body → conclusion? Effective transitions? Does the structure support your argument?</p>
+        <div class="score-levels">
+          <div class="level"><div class="level-num l4">4</div><span style="font-size:0.78rem;color:var(--muted);">Strong structure; transitions guide the reader naturally</span></div>
+          <div class="level"><div class="level-num l3">3</div><span style="font-size:0.78rem;color:var(--muted);">Mostly organized; minor issues with flow</span></div>
+          <div class="level"><div class="level-num l2">2</div><span style="font-size:0.78rem;color:var(--muted);">Some structure but choppy or out of order</span></div>
+          <div class="level"><div class="level-num l1">1</div><span style="font-size:0.78rem;color:var(--muted);">Difficult to follow</span></div>
+        </div>
+      </div>
+      <div class="rubric-card">
+        <h3>🎨 <span style="color:var(--lit)">Style & Voice</span></h3>
+        <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;">Appropriate formal tone? Varied sentence structures? Strong academic vocabulary?</p>
+        <div class="score-levels">
+          <div class="level"><div class="level-num l4">4</div><span style="font-size:0.78rem;color:var(--muted);">Formal, engaging; varied sentences; strong word choice</span></div>
+          <div class="level"><div class="level-num l3">3</div><span style="font-size:0.78rem;color:var(--muted);">Appropriate tone; some variety</span></div>
+          <div class="level"><div class="level-num l2">2</div><span style="font-size:0.78rem;color:var(--muted);">Flat or informal; repetitive phrasing</span></div>
+          <div class="level"><div class="level-num l1">1</div><span style="font-size:0.78rem;color:var(--muted);">Very basic; inappropriate tone</span></div>
+        </div>
+      </div>
+      <div class="rubric-card">
+        <h3>✏️ <span style="color:var(--gold)">Conventions</span></h3>
+        <p style="font-size:0.82rem;color:var(--muted);line-height:1.6;">Grammar, spelling, punctuation, capitalization, complete sentences?</p>
+        <div class="score-levels">
+          <div class="level"><div class="level-num l4">4</div><span style="font-size:0.78rem;color:var(--muted);">Very few errors; easy and clear to read</span></div>
+          <div class="level"><div class="level-num l3">3</div><span style="font-size:0.78rem;color:var(--muted);">Some errors but does not impede understanding</span></div>
+          <div class="level"><div class="level-num l2">2</div><span style="font-size:0.78rem;color:var(--muted);">Frequent errors; sometimes distracting</span></div>
+          <div class="level"><div class="level-num l1">1</div><span style="font-size:0.78rem;color:var(--muted);">Errors make it hard to understand</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- G5 vs G6 Comparison -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-title" style="margin-bottom:14px;">⬆️ Grade 5 vs Grade 6: What's Different?</div>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th style="color:var(--muted);">Grade 5</th>
+            <th style="color:var(--arg);">Grade 6</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Opinion/Argument</td>
+            <td style="color:var(--muted);">State opinion + 2 reasons + conclusion</td>
+            <td style="color:var(--text);">Claim + evidence + <strong style="color:var(--arg)">counterclaim + rebuttal</strong></td>
+          </tr>
+          <tr>
+            <td>Informational</td>
+            <td style="color:var(--muted);">Explain a topic with facts</td>
+            <td style="color:var(--text);">Research-based; <strong style="color:var(--res)">cite sources by name</strong></td>
+          </tr>
+          <tr>
+            <td>Narrative</td>
+            <td style="color:var(--muted);">Story with beginning/middle/end</td>
+            <td style="color:var(--text);">More complex plot structure; <strong style="color:var(--lit)">deeper character development</strong></td>
+          </tr>
+          <tr>
+            <td>NEW: Literary Analysis</td>
+            <td style="color:var(--muted);">Not required</td>
+            <td style="color:var(--text);"><strong style="color:var(--lit)">Thesis + text evidence + analysis of author's craft</strong></td>
+          </tr>
+          <tr>
+            <td>Length</td>
+            <td style="color:var(--muted);">150–250 words</td>
+            <td style="color:var(--text);">300–450 words</td>
+          </tr>
+          <tr>
+            <td>Vocabulary</td>
+            <td style="color:var(--muted);">Grade-appropriate</td>
+            <td style="color:var(--text);">Academic/formal vocabulary expected</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Quick Tips -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;">💡 Quick Tips by Writing Type</div>
+      <div class="tips-grid">
+        <div class="tip-card" style="border-top:2px solid var(--arg)">
+          <h4>⚔️ Argument</h4>
+          <ul>
+            <li>Open with a surprising statistic</li>
+            <li>Each body ¶ = 1 reason + evidence</li>
+            <li>Counterclaim: "Some argue that..."</li>
+            <li>Rebuttal: "However, evidence shows..."</li>
+            <li>Avoid "I think" — say "Evidence suggests"</li>
+          </ul>
+        </div>
+        <div class="tip-card" style="border-top:2px solid var(--res)">
+          <h4>🔬 Research</h4>
+          <ul>
+            <li>Always name your source in the sentence</li>
+            <li>Paraphrase, never copy</li>
+            <li>Use: "According to... / [Source] states..."</li>
+            <li>Link sources with transitions</li>
+            <li>End with why the topic matters</li>
+          </ul>
+        </div>
+        <div class="tip-card" style="border-top:2px solid var(--lit)">
+          <h4>📚 Literary Analysis</h4>
+          <ul>
+            <li>Thesis = claim about theme/character</li>
+            <li>Quote → Explain → Connect</li>
+            <li>Use literary present tense</li>
+            <li>Phrases: "This reveals... / suggests... / demonstrates..."</li>
+            <li>Don't summarize — analyze!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end rubric panel -->
+
+</main>
+
+<script>
+// ── COUNTDOWN ──
+function updateCountdown() {
+  const exam = new Date('2026-04-21T08:00:00');
+  const now = new Date();
+  const diff = exam - now;
+  if (diff <= 0) { document.getElementById('countdown').textContent = '🎉 Milestone Done!'; return; }
+  const days = Math.floor(diff / 86400000);
+  document.getElementById('countdown').textContent = `⏰ ${days} days to GA Milestone`;
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+
+// ── TABS ──
+function switchTab(name, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── PROMPTS ──
+const prompts = {
+  arg: [
+    "Some people argue that middle school students should not be allowed to use cell phones during school hours. Others believe that phones are useful learning tools. Write an argument essay for or against cell phone use in school. Include a counterclaim and rebuttal. Support your position with at least two pieces of evidence.",
+    "Should middle schools require students to wear uniforms? Write an argument essay taking a clear position. Address the opposing viewpoint and explain why your argument is stronger. Use specific reasons and evidence.",
+    "Some experts say social media is harmful for students under 14. Others say it helps teens stay connected and learn. Write an argument essay stating your position on whether students under 14 should use social media. Include a counterclaim and rebuttal.",
+    "Should schools replace traditional letter grades with written feedback only? Argue for or against this idea. Support your claim with evidence and address at least one counterargument.",
+    "Some people believe that competitive sports should be removed from middle schools to reduce pressure on students. Others say sports teach valuable life skills. Write an argument essay defending your position. Include a counterclaim and rebuttal.",
+  ],
+  res: [
+    "Using the source information provided below, write an informational essay explaining how climate change affects ocean ecosystems. Use information from at least two of the sources. Cite your sources by referring to them by name in your writing.",
+    "Using the sources below, write an informational essay explaining how the human brain learns and remembers new information. Reference at least two sources by name in your essay.\n\nSource A — Stanford Medicine: Sleep is critical for memory consolidation. During deep sleep, the brain replays and stores information from the day, transferring it from short-term to long-term memory. Students who sleep less than 8 hours retain significantly less from what they studied.\nSource B — Harvard Education Review: Active retrieval practice — testing yourself on material rather than re-reading — improves long-term memory by up to 50%. This is known as the 'testing effect.'\nSource C — National Sleep Foundation: Teenagers need 8–10 hours of sleep per night, but the average American teen gets only 6.5–7.5 hours on school nights.",
+    "Using the sources below, write an informational essay explaining the causes and effects of deforestation. Cite at least two sources by name.\n\nSource A — WWF: Each year, approximately 10 million hectares of forest are cleared — an area roughly the size of South Korea. The Amazon rainforest, called 'the lungs of the Earth,' has lost 17% of its total area in the past 50 years.\nSource B — NASA Earth Observatory: Deforestation contributes 10–15% of global carbon emissions annually. Trees absorb CO₂; when they're cut or burned, that carbon is released back into the atmosphere.\nSource C — United Nations Food and Agriculture: 80% of global deforestation is driven by agriculture, particularly cattle ranching and soy farming. Sustainable farming practices could reduce this by 50%.",
+  ],
+  lit: [
+    "Read the passage below, then write a literary analysis essay explaining how the author develops the theme that 'courage means acting despite fear.' Use at least two pieces of text evidence (direct quotes) to support your analysis.",
+    "Reread the passage about Maya and the storm. Write a literary analysis essay analyzing how the author uses dialogue to reveal Maya's character development. Use at least two direct quotes from the text and explain what each one reveals.",
+    "Write a literary analysis essay arguing that the author of 'The Storm' uses contrast between Maya's internal thoughts and external actions to develop theme. Support your analysis with at least two pieces of text evidence.",
+    "Analyze how the author of 'The Storm' uses sensory details and imagery to build tension. In your essay, identify at least two examples of imagery and explain how each contributes to the story's emotional impact.",
+  ]
+};
+
+const promptIdx = { arg: 0, res: 0, lit: 0 };
+
+function newPrompt(type) {
+  promptIdx[type] = (promptIdx[type] + 1) % prompts[type].length;
+  document.getElementById(type + 'PromptText').textContent = prompts[type][promptIdx[type]];
+  // Update research sources if needed
+  if (type === 'res' && promptIdx.res > 0) {
+    const sourceBox = document.getElementById('resSources');
+    // Sources are already embedded in the res prompts for prompts[1] and [2]
+    // For prompt[0] keep the original climate sources visible
+    if (promptIdx.res === 0) {
+      sourceBox.style.display = 'block';
+    } else {
+      sourceBox.style.display = 'none'; // Sources embedded in prompt text
+    }
+  }
+  document.getElementById(type + 'Text').value = '';
+  wordCount(type);
+  document.getElementById(type + 'Feedback').classList.remove('show');
+}
+
+// ── WORD COUNT ──
+function wordCount(type) {
+  const val = document.getElementById(type + 'Text').value.trim();
+  const count = val ? val.split(/\s+/).length : 0;
+  document.getElementById(type + 'Words').textContent = count;
+}
+
+// ── SESSION TRACKER ──
+const done = { arg: false, res: false, lit: false };
+function markDone(type) {
+  done[type] = true;
+  const dot = document.getElementById('dot-' + type);
+  dot.classList.add('done-' + type);
+  dot.textContent = '✓';
+  const count = Object.values(done).filter(Boolean).length;
+  document.getElementById('sessionProgress').textContent = `${count} / 3 completed`;
+}
+
+// ── RENDER SCORES ──
+function renderScores(containerId, scores, type) {
+  const colors = { arg: 'var(--arg)', res: 'var(--res)', lit: 'var(--lit)', gold: 'var(--gold)' };
+  const c = type === 'arg' ? colors.arg : type === 'res' ? colors.res : colors.lit;
+  const labels = ['💡 Ideas', '🗂️ Organization', '🎨 Style', '✏️ Conventions'];
+  const scoreColors = ['var(--arg)', 'var(--res)', 'var(--lit)', 'var(--gold)'];
+  let html = '';
+  labels.forEach((label, i) => {
+    html += `<div class="score-box">
+      <div class="score-num" style="color:${scoreColors[i]}">${scores[i] || '–'}</div>
+      <div class="score-label">${label}</div>
+    </div>`;
+  });
+  document.getElementById(containerId).innerHTML = html;
+}
+
+// ── SUBMIT ──
+async function submitWriting(type) {
+  const text = document.getElementById(type + 'Text').value.trim();
+  if (text.length < 40) {
+    alert('Please write a bit more before getting feedback!');
+    return;
+  }
+
+  const btn = document.getElementById(type + 'Btn');
+  const feedbackEl = document.getElementById(type + 'Feedback');
+  const feedbackText = document.getElementById(type + 'FeedbackText');
+  const promptText = document.getElementById(type + 'PromptText').textContent;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+  const typeInfo = {
+    arg: { label: 'Argument Essay (ELAGSE6W1)', standard: 'Grade 6 Argument Writing — must include claim, evidence, counterclaim, and rebuttal' },
+    res: { label: 'Research/Informational Essay (ELAGSE6W2)', standard: 'Grade 6 Research Writing — must cite sources by name and paraphrase information' },
+    lit: { label: 'Literary Analysis Essay (ELAGSE6W9)', standard: 'Grade 6 Literary Analysis — must include thesis, text evidence with quotes, and analysis of author\'s craft' },
+  };
+
+  const fullPrompt = `You are an experienced middle school ELA writing coach helping a student named Joshua who just finished 5th grade and is preparing for 6th grade. He is a capable student learning new academic writing skills.
+
+Give him specific, actionable, encouraging feedback. Be honest about weaknesses but celebrate real strengths. Use language a rising 6th grader can understand.
+
+Writing Type: ${typeInfo[type].label}
+Standard: ${typeInfo[type].standard}
+
+Georgia Grade 6 Writing Rubric (score each 1–4):
+- Ideas & Content: Clear thesis/claim? Specific evidence? Stays on topic?
+- Organization: Strong intro/body/conclusion? Effective transitions?
+- Style & Voice: Formal academic tone? Varied sentences? Strong vocabulary?
+- Conventions: Grammar, spelling, punctuation, capitalization correct?
+
+${type === 'arg' ? 'IMPORTANT: For argument writing, specifically check if Joshua included a counterclaim AND a rebuttal. This is the key Grade 6 skill.' : ''}
+${type === 'res' ? 'IMPORTANT: For research writing, specifically check if Joshua cited sources by name in the text (not just at the end). This is the key Grade 6 skill.' : ''}
+${type === 'lit' ? 'IMPORTANT: For literary analysis, specifically check if Joshua used direct quotes from the text AND analyzed what they mean — not just summarized the plot. This is the key Grade 6 skill.' : ''}
+
+FORMAT your response EXACTLY like this (no changes):
+SCORES: [Ideas:X] [Organization:X] [Style:X] [Conventions:X]
+
+⭐ What Joshua Did Well:
+(2-3 specific strengths with examples from his writing)
+
+🔧 Top 3 Things to Improve:
+1. (specific, actionable — name the Grade 6 skill he needs to develop)
+2. (specific, actionable)
+3. (specific, actionable)
+
+💡 Try This Revision:
+(Show Joshua ONE specific sentence from his essay and how he could rewrite it to be stronger)
+
+🎯 Grade 6 Skill Check:
+(Specifically address the key Grade 6 skill for this writing type — did he do it? How well?)
+
+Keep total response under 350 words. Be encouraging and specific.
+
+Writing Prompt: "${promptText}"
+
+Joshua's essay:
+"""
+${text}
+"""`;
+
+  const GEMINI_KEY = 'AIzaSyCpuHb2LdHLvcV5KnFPgy3kFpNIjXUBvXk';
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: fullPrompt }] }],
+          generationConfig: { maxOutputTokens: 1000, temperature: 0.7 }
+        })
+      }
+    );
+
+    const data = await response.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Could not get feedback. Please try again.';
+
+    // Parse scores
+    const scoreMatch = raw.match(/SCORES:\s*\[Ideas:(\d)\]\s*\[Organization:(\d)\]\s*\[Style:(\d)\]\s*\[Conventions:(\d)\]/);
+    if (scoreMatch) {
+      renderScores(type + 'Scores', [+scoreMatch[1], +scoreMatch[2], +scoreMatch[3], +scoreMatch[4]], type);
+    }
+
+    const cleanText = raw.replace(/SCORES:.*?\n/, '').trim();
+    feedbackText.textContent = cleanText;
+    feedbackEl.classList.add('show');
+    feedbackEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    markDone(type);
+
+  } catch (err) {
+    feedbackText.textContent = '⚠️ Could not connect to AI. Check your internet connection and try again.\n\nError: ' + err.message;
+    feedbackEl.classList.add('show');
+  }
+
+  btn.disabled = false;
+  const labels = { arg: '🤖 Get AI Feedback', res: '🤖 Get AI Feedback', lit: '🤖 Get AI Feedback' };
+  btn.innerHTML = labels[type];
+}
+</script>
+</body>
+</html>

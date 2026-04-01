@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELABoost — My Exam Schedule</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0F172A;--sky:#3B82F6;--green:#10B981;--red:#EF4444;
+  --gold:#F59E0B;--purple:#8B5CF6;--orange:#F97316;--teal:#14B8A6;
+  --pink:#EC4899;--light:#F0F4FF;--muted:#64748B;--white:#FFFFFF;
+  --card-shadow:0 4px 20px rgba(0,0,0,0.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--light);min-height:100vh;}
+
+/* NAV */
+nav{
+  background:var(--navy);height:56px;padding:0 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 16px rgba(0,0,0,.3);
+}
+.nav-logo{font-family:'Fredoka One',cursive;color:white;font-size:1.25rem;}
+.nav-logo span{color:var(--gold);}
+.nav-right{display:flex;align-items:center;gap:10px;}
+.nav-student{
+  background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);
+  font-size:.78rem;font-weight:800;padding:5px 12px;border-radius:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.add-btn{
+  padding:7px 16px;border-radius:10px;border:none;
+  background:linear-gradient(135deg,var(--sky),var(--purple));
+  color:white;font-family:'Fredoka One',cursive;font-size:.9rem;
+  cursor:pointer;transition:all .2s;
+}
+.add-btn:hover{transform:scale(1.05);}
+
+/* LAYOUT */
+.page{max-width:960px;margin:0 auto;padding:20px 16px;}
+
+/* HEADER STRIP */
+.page-header{
+  background:linear-gradient(135deg,var(--navy),#1a3a6b);
+  border-radius:20px;padding:22px 24px;margin-bottom:20px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  box-shadow:0 6px 24px rgba(15,23,42,.25);
+  position:relative;overflow:hidden;
+}
+.page-header::after{
+  content:'📅';position:absolute;right:20px;top:50%;transform:translateY(-50%);
+  font-size:4rem;opacity:.12;pointer-events:none;
+}
+.ph-text{flex:1;}
+.ph-title{font-family:'Fredoka One',cursive;color:white;font-size:1.5rem;margin-bottom:3px;}
+.ph-sub{color:rgba(255,255,255,.6);font-size:.82rem;font-weight:700;}
+.ph-stats{display:flex;gap:10px;flex-wrap:wrap;}
+.ph-stat{
+  background:rgba(255,255,255,.1);border-radius:12px;padding:8px 14px;
+  text-align:center;min-width:70px;
+}
+.ph-stat-val{font-family:'Fredoka One',cursive;font-size:1.2rem;color:white;}
+.ph-stat-lbl{font-size:.65rem;font-weight:800;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;}
+
+/* TABS */
+.tabs{display:flex;gap:8px;margin-bottom:18px;overflow-x:auto;padding-bottom:2px;}
+.tab{
+  padding:9px 20px;border-radius:50px;border:2px solid #DDE5F4;
+  background:white;font-family:'Nunito',sans-serif;font-weight:800;font-size:.83rem;
+  cursor:pointer;transition:all .2s;color:var(--muted);white-space:nowrap;
+}
+.tab:hover{border-color:var(--sky);color:var(--sky);}
+.tab.active{background:var(--navy);border-color:var(--navy);color:white;}
+
+/* URGENCY BANNER */
+.urgency-banner{
+  border-radius:16px;padding:14px 18px;margin-bottom:16px;
+  display:flex;align-items:center;gap:12px;
+  animation:slideDown .3s ease;
+}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+.urgency-banner.danger{background:linear-gradient(135deg,#FEF2F2,#FFE4E4);border:2px solid #FCA5A5;}
+.urgency-banner.warning{background:linear-gradient(135deg,#FFFBEB,#FEF3C7);border:2px solid #FDE68A;}
+.ub-icon{font-size:1.5rem;flex-shrink:0;}
+.ub-text{flex:1;}
+.ub-title{font-weight:900;font-size:.9rem;color:var(--navy);}
+.ub-sub{font-size:.78rem;font-weight:700;color:var(--muted);}
+.ub-action{
+  padding:7px 14px;border-radius:10px;border:none;
+  font-family:'Fredoka One',cursive;font-size:.82rem;cursor:pointer;
+  transition:all .2s;white-space:nowrap;
+}
+.danger .ub-action{background:var(--red);color:white;}
+.warning .ub-action{background:var(--gold);color:var(--navy);}
+
+/* ══ CALENDAR VIEW ══ */
+.calendar-wrap{background:white;border-radius:20px;box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:20px;}
+.cal-header{
+  background:var(--navy);padding:16px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.cal-nav{display:flex;align-items:center;gap:12px;}
+.cal-nav-btn{
+  width:32px;height:32px;border-radius:8px;border:none;
+  background:rgba(255,255,255,.15);color:white;font-size:1rem;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;
+}
+.cal-nav-btn:hover{background:rgba(255,255,255,.25);}
+.cal-month{font-family:'Fredoka One',cursive;color:white;font-size:1.1rem;}
+.cal-grid-header{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  background:#F8FAFC;border-bottom:1px solid #E2E8F0;
+}
+.cal-day-name{
+  padding:10px 4px;text-align:center;
+  font-size:.72rem;font-weight:900;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-cell{
+  min-height:72px;padding:6px;border:1px solid #F1F5F9;
+  position:relative;cursor:pointer;transition:background .15s;
+}
+.cal-cell:hover{background:#F8FAFF;}
+.cal-cell.today{background:#EFF6FF;}
+.cal-cell.other-month{background:#FAFAFA;}
+.cal-cell.other-month .cal-date{color:#CBD5E1;}
+.cal-date{
+  font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--navy);
+  width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;margin-bottom:4px;
+}
+.cal-cell.today .cal-date{background:var(--sky);color:white;}
+.exam-dot{
+  border-radius:6px;padding:2px 6px;margin-bottom:2px;
+  font-size:.64rem;font-weight:800;truncate:true;overflow:hidden;
+  white-space:nowrap;max-width:100%;text-overflow:ellipsis;cursor:pointer;
+  transition:opacity .15s;
+}
+.exam-dot:hover{opacity:.8;}
+
+/* ══ LIST VIEW ══ */
+.exam-list{display:flex;flex-direction:column;gap:12px;}
+.exam-card{
+  background:white;border-radius:18px;padding:18px 20px;
+  box-shadow:var(--card-shadow);
+  border-left:5px solid var(--c,var(--sky));
+  display:flex;align-items:flex-start;gap:16px;
+  transition:all .2s;cursor:default;
+  animation:fadeUp .3s ease;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.exam-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.1);}
+.ec-date-block{
+  flex-shrink:0;width:56px;height:60px;border-radius:14px;
+  background:var(--c,var(--sky));display:flex;flex-direction:column;
+  align-items:center;justify-content:center;color:white;
+}
+.ec-day{font-family:'Fredoka One',cursive;font-size:1.5rem;line-height:1;}
+.ec-month{font-size:.62rem;font-weight:900;text-transform:uppercase;opacity:.85;}
+.ec-info{flex:1;min-width:0;}
+.ec-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.ec-title{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--navy);}
+.ec-type-tag{
+  font-size:.65rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
+  padding:2px 8px;border-radius:8px;
+}
+.type-school{background:#EFF6FF;color:var(--sky);}
+.type-platform{background:#F5F3FF;color:var(--purple);}
+.ec-countdown{
+  font-family:'Fredoka One',cursive;font-size:.78rem;
+  padding:3px 10px;border-radius:8px;white-space:nowrap;
+}
+.cd-danger{background:#FEF2F2;color:var(--red);}
+.cd-warning{background:#FFFBEB;color:var(--gold);}
+.cd-ok{background:#ECFDF5;color:var(--green);}
+.cd-past{background:#F1F5F9;color:var(--muted);}
+.ec-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
+.ec-grade{font-size:.78rem;font-weight:800;color:var(--muted);}
+.ec-topics{
+  display:flex;gap:5px;flex-wrap:wrap;
+}
+.topic-chip{
+  font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:8px;
+  background:#F1F5F9;color:var(--muted);
+}
+.ec-study-bar{margin-top:8px;}
+.esb-label{font-size:.72rem;font-weight:800;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between;}
+.esb-track{height:7px;background:#F1F5F9;border-radius:4px;overflow:hidden;}
+.esb-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--c,var(--sky)),var(--c2,var(--purple)));transition:width 1s ease;}
+.ec-links{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.ec-link-btn{
+  display:flex;align-items:center;gap:5px;
+  padding:6px 12px;border-radius:10px;border:2px solid #E2E8F0;
+  background:white;font-size:.75rem;font-weight:800;color:var(--navy);
+  cursor:pointer;transition:all .2s;text-decoration:none;
+}
+.ec-link-btn:hover{border-color:var(--sky);background:#EFF6FF;color:var(--sky);}
+.ec-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0;}
+.ec-action-btn{
+  width:34px;height:34px;border-radius:10px;border:none;
+  background:#F8FAFC;color:var(--muted);font-size:.9rem;
+  cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;
+}
+.ec-action-btn:hover{background:var(--sky);color:white;}
+.ec-action-btn.del:hover{background:var(--red);}
+
+/* STUDY REMINDER SECTION */
+.reminder-section{background:white;border-radius:20px;padding:20px;box-shadow:var(--card-shadow);margin-bottom:16px;}
+.rs-title{font-family:'Fredoka One',cursive;color:var(--navy);font-size:1rem;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.reminder-cards{display:flex;flex-direction:column;gap:8px;}
+.reminder-card{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border-radius:14px;border:2px solid #E2E8F0;
+  transition:all .2s;
+}
+.reminder-card.active{border-color:var(--sky);background:#F0F9FF;}
+.rc-time{
+  font-family:'Fredoka One',cursive;font-size:.9rem;
+  color:var(--sky);min-width:80px;
+}
+.rc-desc{flex:1;font-size:.82rem;font-weight:700;color:var(--navy);}
+.rc-subject{font-size:.72rem;font-weight:800;padding:2px 8px;border-radius:8px;}
+.rc-toggle{
+  width:40px;height:22px;border-radius:11px;border:none;cursor:pointer;
+  position:relative;transition:background .2s;flex-shrink:0;
+}
+.rc-toggle.on{background:var(--green);}
+.rc-toggle.off{background:#CBD5E1;}
+.rc-toggle::after{
+  content:'';position:absolute;top:3px;width:16px;height:16px;border-radius:50%;background:white;
+  transition:left .2s;
+}
+.rc-toggle.on::after{left:21px;}
+.rc-toggle.off::after{left:3px;}
+
+/* ADD EXAM MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+  z-index:200;display:none;align-items:center;justify-content:center;padding:16px;
+}
+.modal-overlay.show{display:flex;}
+.modal{
+  background:white;border-radius:24px;max-width:480px;width:100%;
+  max-height:90vh;overflow-y:auto;
+  animation:popUp .3s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 24px 60px rgba(0,0,0,.25);
+}
+@keyframes popUp{from{opacity:0;transform:scale(.88);}to{opacity:1;transform:scale(1);}}
+.modal-head{
+  background:linear-gradient(135deg,var(--sky),var(--purple));
+  padding:22px 24px;border-radius:24px 24px 0 0;
+  display:flex;align-items:center;gap:12px;
+}
+.modal-head-emoji{font-size:2rem;}
+.modal-head-title{font-family:'Fredoka One',cursive;color:white;font-size:1.2rem;}
+.modal-head-sub{color:rgba(255,255,255,.75);font-size:.78rem;font-weight:700;}
+.modal-close-btn{
+  margin-left:auto;width:30px;height:30px;border-radius:50%;border:none;
+  background:rgba(255,255,255,.2);color:white;font-size:1rem;
+  cursor:pointer;transition:all .2s;
+}
+.modal-close-btn:hover{background:rgba(255,255,255,.35);}
+.modal-body{padding:20px 22px;}
+.form-group{margin-bottom:14px;}
+.form-label{display:block;font-size:.78rem;font-weight:900;color:var(--navy);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
+.form-input,.form-select{
+  width:100%;padding:11px 14px;border-radius:12px;border:2px solid #E2E8F0;
+  font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;color:var(--navy);
+  outline:none;transition:all .2s;background:white;
+}
+.form-input:focus,.form-select:focus{border-color:var(--sky);background:#F0F9FF;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.topic-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.topic-tag{
+  padding:5px 12px;border-radius:10px;border:2px solid #E2E8F0;
+  font-size:.75rem;font-weight:800;color:var(--muted);cursor:pointer;transition:all .2s;
+}
+.topic-tag.selected{border-color:var(--sky);background:#EFF6FF;color:var(--sky);}
+.save-exam-btn{
+  width:100%;padding:13px;border-radius:14px;border:none;
+  background:linear-gradient(135deg,var(--sky),var(--purple));color:white;
+  font-family:'Fredoka One',cursive;font-size:1.05rem;cursor:pointer;
+  transition:all .2s;box-shadow:0 4px 16px rgba(59,130,246,.3);margin-top:6px;
+}
+.save-exam-btn:hover{transform:translateY(-2px);}
+
+/* CONFETTI */
+.confetti-piece{position:fixed;pointer-events:none;z-index:9999;border-radius:2px;animation:confFall 1.5s ease-out forwards;}
+@keyframes confFall{0%{opacity:1;transform:translateY(0) rotate(0deg);}100%{opacity:0;transform:translateY(100vh) rotate(540deg);}}
+
+@media(max-width:600px){
+  .cal-cell{min-height:52px;}
+  .exam-card{flex-direction:column;}
+  .ec-actions{flex-direction:row;}
+  .form-row{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">ELA<span>Boost</span></div>
+  <div class="nav-right">
+    <div class="nav-student">👤 Alex · Grade 6</div>
+    <button class="add-btn" onclick="openAddModal()">+ Add Exam</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="ph-text">
+      <div class="ph-title">📅 My Exam Schedule</div>
+      <div class="ph-sub">Track school exams & platform quizzes · Auto-linked to study materials</div>
+    </div>
+    <div class="ph-stats">
+      <div class="ph-stat">
+        <div class="ph-stat-val" id="statUpcoming">0</div>
+        <div class="ph-stat-lbl">Upcoming</div>
+      </div>
+      <div class="ph-stat">
+        <div class="ph-stat-val" id="statThisWeek">0</div>
+        <div class="ph-stat-lbl">This Week</div>
+      </div>
+      <div class="ph-stat">
+        <div class="ph-stat-val" id="statReady">0%</div>
+        <div class="ph-stat-lbl">Avg Ready</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- URGENCY BANNERS -->
+  <div id="urgencyArea"></div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('list',this)">📋 List View</button>
+    <button class="tab" onclick="switchTab('calendar',this)">📅 Calendar</button>
+    <button class="tab" onclick="switchTab('reminders',this)">🔔 Study Reminders</button>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div id="tabList">
+    <div class="exam-list" id="examList"></div>
+    <div id="emptyState" style="display:none;text-align:center;padding:40px 20px;background:white;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,.06);">
+      <div style="font-size:3rem;margin-bottom:12px;">📚</div>
+      <div style="font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--navy);margin-bottom:6px;">No exams yet!</div>
+      <div style="font-size:.85rem;color:var(--muted);font-weight:700;margin-bottom:16px;">Add your school exams and platform quizzes to stay on track.</div>
+      <button onclick="openAddModal()" style="padding:11px 24px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--sky),var(--purple));color:white;font-family:'Fredoka One',cursive;font-size:.95rem;cursor:pointer;">+ Add First Exam</button>
+    </div>
+  </div>
+
+  <!-- CALENDAR VIEW -->
+  <div id="tabCalendar" style="display:none;">
+    <div class="calendar-wrap">
+      <div class="cal-header">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+          <div class="cal-month" id="calMonth">March 2026</div>
+          <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+        </div>
+        <div style="color:rgba(255,255,255,.6);font-size:.78rem;font-weight:700;">Click any date to add exam</div>
+      </div>
+      <div class="cal-grid-header">
+        ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="cal-day-name">${d}</div>`).join('')}
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
+  </div>
+
+  <!-- REMINDERS VIEW -->
+  <div id="tabReminders" style="display:none;">
+    <div class="reminder-section">
+      <div class="rs-title">🔔 Auto Study Reminders</div>
+      <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:14px;">
+        ELABoost automatically creates study reminders before each exam. You can turn them on/off below.
+      </div>
+      <div class="reminder-cards" id="reminderCards"></div>
+    </div>
+    <div class="reminder-section">
+      <div class="rs-title">⚙️ Reminder Settings</div>
+      <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:14px;">When should ELABoost remind you to study?</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        ${[
+          {label:'1 week before exam', id:'r7', checked:true},
+          {label:'3 days before exam', id:'r3', checked:true},
+          {label:'1 day before exam',  id:'r1', checked:true},
+          {label:'Morning of exam',    id:'r0', checked:false},
+        ].map(r=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;border:2px solid #E2E8F0;background:white;">
+            <div style="font-size:.87rem;font-weight:800;color:var(--navy);">${r.label}</div>
+            <button class="rc-toggle ${r.checked?'on':'off'}" id="${r.id}" onclick="toggleSetting('${r.id}',this)"></button>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ADD EXAM MODAL -->
+<div class="modal-overlay" id="addModal" onclick="closeOnBg(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-emoji">📝</div>
+      <div>
+        <div class="modal-head-title">Add Exam</div>
+        <div class="modal-head-sub">School test or platform quiz</div>
+      </div>
+      <button class="modal-close-btn" onclick="closeAddModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Exam Name</label>
+        <input class="form-input" id="fName" placeholder="e.g. Chapter 5 ELA Test, Math Quiz 3...">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Exam Date</label>
+          <input class="form-input" id="fDate" type="date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="fType">
+            <option value="school">🏫 School Exam</option>
+            <option value="platform">💻 Platform Quiz</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <select class="form-select" id="fSubject" onchange="updateTopics()">
+            <option value="ela">📖 ELA</option>
+            <option value="math">🧮 Math</option>
+            <option value="both">📚 Both</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Grade Level</label>
+          <select class="form-select" id="fGrade">
+            <option value="5">Grade 5</option>
+            <option value="6" selected>Grade 6</option>
+            <option value="7">Grade 7</option>
+            <option value="8">Grade 8</option>
+            <option value="9">Grade 9</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Topics Covered <span style="font-weight:600;text-transform:none;letter-spacing:0;color:var(--muted);">(select all that apply)</span></label>
+        <div class="topic-tags" id="topicTags"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Study Readiness</label>
+        <select class="form-select" id="fReady">
+          <option value="10">😰 Just started (10%)</option>
+          <option value="30">📖 Reading lessons (30%)</option>
+          <option value="50" selected>✏️ Doing practice (50%)</option>
+          <option value="75">💪 Almost ready (75%)</option>
+          <option value="100">✅ Fully prepared (100%)</option>
+        </select>
+      </div>
+      <button class="save-exam-btn" onclick="saveExam()">💾 Save Exam</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+const TOPICS = {
+  ela: ['Theme','Point of View','Text Evidence','Figurative Language','Central Idea','Grammar','Vocabulary','Author\'s Purpose','Argument Writing'],
+  math: ['Fractions','Equivalent Fractions','Adding Fractions','Subtracting Fractions','Mixed Numbers','Decimals','Ratios','Geometry'],
+  both: ['ELA — Theme','ELA — Text Evidence','Math — Fractions','Math — Adding','Math — Subtracting']
+};
+
+const COURSE_LINKS = {
+  'Theme':             {url:'#', lesson:'ELA Lesson 1 — Theme'},
+  'Point of View':     {url:'#', lesson:'ELA Lesson 2 — POV'},
+  'Text Evidence':     {url:'#', lesson:'ELA Lesson 3 — Evidence'},
+  'Figurative Language':{url:'#',lesson:'ELA Lesson 4 — Figurative Language'},
+  'Central Idea':      {url:'#', lesson:'ELA Lesson 5 — Central Idea'},
+  'Fractions':         {url:'#', lesson:'Math — What is a Fraction?'},
+  'Equivalent Fractions':{url:'#',lesson:'Math — Equivalent Fractions'},
+  'Adding Fractions':  {url:'#', lesson:'Math — Adding Fractions'},
+  'Subtracting Fractions':{url:'#',lesson:'Math — Subtracting Fractions'},
+};
+
+const SUBJECT_COLORS = {
+  ela:  {c:'#3B82F6', c2:'#8B5CF6', label:'ELA'},
+  math: {c:'#F97316', c2:'#F59E0B', label:'Math'},
+  both: {c:'#10B981', c2:'#14B8A6', label:'ELA+Math'},
+};
+
+// Default sample exams
+let exams = [
+  {
+    id:1, name:'ELA Chapter Test — Theme & POV', date:'2026-03-10',
+    type:'school', subject:'ela', grade:6,
+    topics:['Theme','Point of View','Text Evidence'],
+    readiness:65
+  },
+  {
+    id:2, name:'Math Fractions Quiz', date:'2026-03-13',
+    type:'school', subject:'math', grade:6,
+    topics:['Adding Fractions','Equivalent Fractions'],
+    readiness:40
+  },
+  {
+    id:3, name:'ELABoost Platform Assessment', date:'2026-03-19',
+    type:'platform', subject:'both', grade:6,
+    topics:['Theme','Fractions','Text Evidence'],
+    readiness:80
+  },
+  {
+    id:4, name:'Georgia Milestones Practice Test', date:'2026-04-05',
+    type:'school', subject:'both', grade:6,
+    topics:['Central Idea','Figurative Language','Adding Fractions','Subtracting Fractions'],
+    readiness:25
+  }
+];
+
+let calYear = 2026, calMonth = 2; // 0-indexed (2 = March)
+let selectedTopics = [];
+
+// ════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════
+function daysUntil(dateStr) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const exam  = new Date(dateStr); exam.setHours(0,0,0,0);
+  return Math.round((exam-today)/(1000*60*60*24));
+}
+
+function countdownBadge(days) {
+  if(days < 0)  return {cls:'cd-past',    text:'Past'};
+  if(days === 0)return {cls:'cd-danger',  text:'TODAY!'};
+  if(days === 1)return {cls:'cd-danger',  text:'Tomorrow!'};
+  if(days <= 3) return {cls:'cd-danger',  text:`${days} days`};
+  if(days <= 7) return {cls:'cd-warning', text:`${days} days`};
+  return             {cls:'cd-ok',       text:`${days} days`};
+}
+
+function fmtDate(dateStr) {
+  const d = new Date(dateStr+'T12:00:00');
+  return {
+    day: d.getDate(),
+    month: d.toLocaleString('en-US',{month:'short'}).toUpperCase(),
+    full: d.toLocaleString('en-US',{weekday:'short',month:'long',day:'numeric'})
+  };
+}
+
+// ════════════════════════════════════════
+// STATS
+// ════════════════════════════════════════
+function updateStats() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const upcoming = exams.filter(e=>daysUntil(e.date)>=0);
+  const thisWeek = exams.filter(e=>{const d=daysUntil(e.date);return d>=0&&d<=7;});
+  const avgReady = upcoming.length ? Math.round(upcoming.reduce((a,e)=>a+e.readiness,0)/upcoming.length) : 0;
+  document.getElementById('statUpcoming').textContent = upcoming.length;
+  document.getElementById('statThisWeek').textContent = thisWeek.length;
+  document.getElementById('statReady').textContent = avgReady+'%';
+}
+
+// ════════════════════════════════════════
+// URGENCY BANNERS
+// ════════════════════════════════════════
+function renderUrgency() {
+  const area = document.getElementById('urgencyArea');
+  area.innerHTML = '';
+  const urgent = exams.filter(e=>{const d=daysUntil(e.date);return d>=0&&d<=3&&e.readiness<80;})
+    .sort((a,b)=>daysUntil(a.date)-daysUntil(b.date));
+  const soon = exams.filter(e=>{const d=daysUntil(e.date);return d>3&&d<=7&&e.readiness<60;}).slice(0,1);
+  [...urgent.slice(0,2),...soon].forEach(e=>{
+    const d = daysUntil(e.date);
+    const isDanger = d<=3;
+    const col = SUBJECT_COLORS[e.subject];
+    area.innerHTML += `
+      <div class="urgency-banner ${isDanger?'danger':'warning'}">
+        <div class="ub-icon">${isDanger?'🚨':'⚠️'}</div>
+        <div class="ub-text">
+          <div class="ub-title">${e.name} — ${d===0?'TODAY':d===1?'Tomorrow':d+' days away'}!</div>
+          <div class="ub-sub">Study readiness: ${e.readiness}% · ${100-e.readiness}% more prep needed</div>
+        </div>
+        <button class="ub-action" onclick="openStudyNow(${e.id})">Study Now →</button>
+      </div>`;
+  });
+}
+
+function openStudyNow(id) {
+  const e = exams.find(x=>x.id===id);
+  if(!e) return;
+  const topic = e.topics[0];
+  const link = COURSE_LINKS[topic];
+  alert(`Opening study materials for: ${e.name}\n\nRecommended lessons:\n${e.topics.map(t=>COURSE_LINKS[t]?'→ '+COURSE_LINKS[t].lesson:'→ '+t).join('\n')}`);
+}
+
+// ════════════════════════════════════════
+// LIST VIEW
+// ════════════════════════════════════════
+function renderList() {
+  const list = document.getElementById('examList');
+  const empty = document.getElementById('emptyState');
+  const sorted = [...exams].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(!sorted.length){list.style.display='none';empty.style.display='block';return;}
+  list.style.display='flex';empty.style.display='none';
+
+  list.innerHTML = sorted.map(e=>{
+    const col = SUBJECT_COLORS[e.subject];
+    const d = fmtDate(e.date);
+    const days = daysUntil(e.date);
+    const cd = countdownBadge(days);
+    const topicLinks = e.topics.slice(0,4).map(t=>{
+      const l = COURSE_LINKS[t];
+      return `<button class="ec-link-btn" onclick="openLesson('${t}')" title="${l?l.lesson:t}">
+        📚 ${t}
+      </button>`;
+    }).join('');
+
+    return `
+      <div class="exam-card" style="--c:${col.c};--c2:${col.c2};" id="ec${e.id}">
+        <div class="ec-date-block" style="background:${days<0?'#94A3B8':col.c}">
+          <div class="ec-day">${d.day}</div>
+          <div class="ec-month">${d.month}</div>
+        </div>
+        <div class="ec-info">
+          <div class="ec-top">
+            <div class="ec-title">${e.name}</div>
+            <div class="ec-type-tag type-${e.type}">${e.type==='school'?'🏫 School':'💻 Platform'}</div>
+            <div class="ec-countdown ${cd.cls}">${cd.text}</div>
+          </div>
+          <div class="ec-meta">
+            <div class="ec-grade">Grade ${e.grade} · ${col.label} · ${d.full}</div>
+          </div>
+          <div class="ec-topics">${e.topics.map(t=>`<div class="topic-chip">${t}</div>`).join('')}</div>
+          <div class="ec-study-bar">
+            <div class="esb-label">
+              <span>Study Readiness</span>
+              <span style="color:${e.readiness>=75?'#10B981':e.readiness>=40?'#F59E0B':'#EF4444'}">${e.readiness}%</span>
+            </div>
+            <div class="esb-track"><div class="esb-fill" style="width:${e.readiness}%"></div></div>
+          </div>
+          ${topicLinks?`<div class="ec-links"><span style="font-size:.72rem;font-weight:800;color:var(--muted);align-self:center;">Study:</span>${topicLinks}</div>`:''}
+        </div>
+        <div class="ec-actions">
+          <button class="ec-action-btn" onclick="editReadiness(${e.id})" title="Update readiness">📊</button>
+          <button class="ec-action-btn del" onclick="deleteExam(${e.id})" title="Delete">🗑</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openLesson(topic) {
+  const l = COURSE_LINKS[topic];
+  alert(`Opening: ${l?l.lesson:topic}\n\nIn the full ELABoost platform, this would open the corresponding interactive lesson directly.`);
+}
+
+function editReadiness(id) {
+  const e = exams.find(x=>x.id===id);
+  if(!e) return;
+  const val = prompt(`Update study readiness for:\n"${e.name}"\n\nEnter a number 0-100 (current: ${e.readiness}%):`, e.readiness);
+  if(val===null) return;
+  const num = parseInt(val);
+  if(isNaN(num)||num<0||num>100){alert('Please enter a number between 0 and 100.');return;}
+  e.readiness = num;
+  renderAll();
+}
+
+function deleteExam(id) {
+  if(!confirm('Delete this exam?')) return;
+  exams = exams.filter(e=>e.id!==id);
+  renderAll();
+}
+
+// ════════════════════════════════════════
+// CALENDAR VIEW
+// ════════════════════════════════════════
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function renderCalendar() {
+  document.getElementById('calMonth').textContent = `${MONTHS[calMonth]} ${calYear}`;
+  const grid = document.getElementById('calGrid');
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+  const daysInPrev = new Date(calYear, calMonth, 0).getDate();
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  let cells = '';
+  // Prev month cells
+  for(let i=firstDay-1;i>=0;i--){
+    cells+=`<div class="cal-cell other-month"><div class="cal-date">${daysInPrev-i}</div></div>`;
+  }
+  // Current month
+  for(let d=1;d<=daysInMonth;d++){
+    const dateStr = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cellDate = new Date(calYear,calMonth,d);
+    const isToday = cellDate.getTime()===today.getTime();
+    const dayExams = exams.filter(e=>e.date===dateStr);
+    const dotHTML = dayExams.map(e=>{
+      const col = SUBJECT_COLORS[e.subject];
+      return `<div class="exam-dot" style="background:${col.c};color:white;" title="${e.name}">${e.name.slice(0,14)}${e.name.length>14?'…':''}</div>`;
+    }).join('');
+    cells+=`<div class="cal-cell${isToday?' today':''}" onclick="calDateClick('${dateStr}')">
+      <div class="cal-date">${d}</div>
+      ${dotHTML}
+    </div>`;
+  }
+  // Next month fill
+  const totalCells = firstDay + daysInMonth;
+  const remaining = totalCells%7===0?0:7-(totalCells%7);
+  for(let i=1;i<=remaining;i++){
+    cells+=`<div class="cal-cell other-month"><div class="cal-date">${i}</div></div>`;
+  }
+  grid.innerHTML = cells;
+}
+
+function changeMonth(dir) {
+  calMonth+=dir;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+}
+
+function calDateClick(dateStr) {
+  document.getElementById('fDate').value = dateStr;
+  openAddModal();
+}
+
+// ════════════════════════════════════════
+// REMINDERS
+// ════════════════════════════════════════
+function renderReminders() {
+  const cards = document.getElementById('reminderCards');
+  const upcoming = [...exams]
+    .filter(e=>daysUntil(e.date)>=0)
+    .sort((a,b)=>new Date(a.date)-new Date(b.date))
+    .slice(0,6);
+
+  if(!upcoming.length){
+    cards.innerHTML=`<div style="text-align:center;padding:20px;color:var(--muted);font-weight:700;font-size:.85rem;">No upcoming exams. Add exams to see reminders!</div>`;
+    return;
+  }
+
+  cards.innerHTML = upcoming.flatMap(e=>{
+    const col = SUBJECT_COLORS[e.subject];
+    const days = daysUntil(e.date);
+    const reminders = [];
+    if(days>=7)  reminders.push({when:'1 week before', daysLeft:days-7, active:true});
+    if(days>=3)  reminders.push({when:'3 days before', daysLeft:days-3, active:days<=10});
+    if(days>=1)  reminders.push({when:'1 day before',  daysLeft:days-1, active:days<=4});
+    if(days===0) reminders.push({when:'Today — exam day!', daysLeft:0, active:true});
+    return reminders.map(r=>`
+      <div class="reminder-card ${r.active?'active':''}">
+        <div class="rc-time">📅 ${r.when}</div>
+        <div class="rc-desc">
+          <span style="font-weight:900">${e.name}</span>
+          ${r.daysLeft>0?`<span style="color:var(--muted);font-size:.72rem;margin-left:4px;">in ${r.daysLeft} days</span>`:''}
+        </div>
+        <div class="rc-subject" style="background:${col.c}22;color:${col.c};">${col.label}</div>
+        <button class="rc-toggle ${r.active?'on':'off'}" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button>
+      </div>`);
+  }).join('');
+}
+
+function toggleSetting(id, btn) {
+  btn.classList.toggle('on');
+  btn.classList.toggle('off');
+}
+
+// ════════════════════════════════════════
+// ADD EXAM MODAL
+// ════════════════════════════════════════
+function openAddModal() {
+  if(!document.getElementById('fDate').value) {
+    const today = new Date();
+    document.getElementById('fDate').value = today.toISOString().split('T')[0];
+  }
+  updateTopics();
+  document.getElementById('addModal').classList.add('show');
+}
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('show');
+  selectedTopics = [];
+}
+function closeOnBg(e) {
+  if(e.target===document.getElementById('addModal')) closeAddModal();
+}
+
+function updateTopics() {
+  const subject = document.getElementById('fSubject').value;
+  const topicList = TOPICS[subject]||TOPICS.ela;
+  selectedTopics = selectedTopics.filter(t=>topicList.includes(t));
+  document.getElementById('topicTags').innerHTML = topicList.map(t=>`
+    <div class="topic-tag ${selectedTopics.includes(t)?'selected':''}" onclick="toggleTopic('${t}',this)">${t}</div>
+  `).join('');
+}
+
+function toggleTopic(t, el) {
+  if(selectedTopics.includes(t)){
+    selectedTopics=selectedTopics.filter(x=>x!==t);
+    el.classList.remove('selected');
+  } else {
+    selectedTopics.push(t);
+    el.classList.add('selected');
+  }
+}
+
+function saveExam() {
+  const name = document.getElementById('fName').value.trim();
+  const date = document.getElementById('fDate').value;
+  if(!name){alert('Please enter an exam name!');return;}
+  if(!date){alert('Please select a date!');return;}
+  if(!selectedTopics.length){alert('Please select at least one topic!');return;}
+
+  const newExam = {
+    id: Date.now(),
+    name,
+    date,
+    type:     document.getElementById('fType').value,
+    subject:  document.getElementById('fSubject').value,
+    grade:    parseInt(document.getElementById('fGrade').value),
+    topics:   [...selectedTopics],
+    readiness:parseInt(document.getElementById('fReady').value),
+  };
+  exams.push(newExam);
+  closeAddModal();
+  // Reset form
+  document.getElementById('fName').value='';
+  selectedTopics=[];
+  spawnConfetti();
+  renderAll();
+}
+
+// ════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tabList').style.display      = tab==='list'?'block':'none';
+  document.getElementById('tabCalendar').style.display  = tab==='calendar'?'block':'none';
+  document.getElementById('tabReminders').style.display = tab==='reminders'?'block':'none';
+  if(tab==='calendar') renderCalendar();
+  if(tab==='reminders') renderReminders();
+}
+
+// ════════════════════════════════════════
+// RENDER ALL
+// ════════════════════════════════════════
+function renderAll() {
+  updateStats();
+  renderUrgency();
+  renderList();
+  renderCalendar();
+  renderReminders();
+}
+
+// ════════════════════════════════════════
+// CONFETTI
+// ════════════════════════════════════════
+function spawnConfetti() {
+  const colors=['#3B82F6','#F59E0B','#10B981','#EF4444','#8B5CF6','#F97316'];
+  for(let i=0;i<20;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    const sz=Math.random()*10+5;
+    el.style.cssText=`left:${20+Math.random()*60}vw;top:30vh;width:${sz}px;height:${sz}px;background:${colors[~~(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'3px'};animation-delay:${Math.random()*.3}s;animation-duration:${Math.random()*.8+1.2}s;`;
+    document.body.appendChild(el);
+    el.addEventListener('animationend',()=>el.remove());
+  }
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+renderAll();
+</script>
+</body>
+</html>

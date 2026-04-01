@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>ELABoost · Grade 6 ELA · Joshua</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0F172A;--sky:#3B82F6;--purple:#8B5CF6;--orange:#F97316;--green:#10B981;--red:#EF4444;--gold:#F59E0B;
+  --rl:#8B5CF6;--ri:#3B82F6;--lang:#10B981;
+  --bg:#F0F4FF;--white:#fff;--border:#E2E8F0;--muted:#64748B;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;}
+.top-nav{background:var(--navy);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.3);}
+.nav-logo{font-family:'Fredoka One',cursive;color:#fff;font-size:1.1rem;}
+.nav-logo span{color:var(--gold);}
+.nav-grade{background:var(--purple);color:#fff;font-family:'Fredoka One',cursive;font-size:.8rem;padding:4px 12px;border-radius:14px;}
+.app{display:flex;height:calc(100vh - 54px);}
+.sidebar{width:240px;flex-shrink:0;background:var(--navy);overflow-y:auto;padding:12px 8px;}
+.sb-domain{font-family:'Fredoka One',cursive;font-size:.7rem;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:12px 10px 4px;margin-top:4px;}
+.lesson-btn{display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;border-radius:10px;border:none;background:transparent;color:rgba(255,255,255,.55);font-family:'Nunito',sans-serif;font-weight:700;font-size:.78rem;cursor:pointer;transition:all .2s;text-align:left;}
+.lesson-btn:hover{background:rgba(255,255,255,.08);color:#fff;}
+.lesson-btn.active{background:rgba(255,255,255,.14);color:#fff;}
+.lb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.main{flex:1;overflow-y:auto;padding:24px;}
+.lesson-header{border-radius:18px;padding:22px 24px;margin-bottom:22px;color:#fff;position:relative;overflow:hidden;}
+.lh-tag{font-size:.72rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;opacity:.75;margin-bottom:6px;}
+.lh-title{font-family:'Fredoka One',cursive;font-size:1.8rem;line-height:1.1;margin-bottom:4px;}
+.lh-sub{font-size:.82rem;opacity:.7;font-weight:700;}
+.lh-emoji{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:3.5rem;opacity:.25;}
+.tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;}
+.tab-btn{font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;padding:8px 16px;border-radius:10px;border:2px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .2s;}
+.tab-btn.active{border-color:currentColor;color:var(--navy);background:#fff;}
+.panel{display:none;}
+.panel.active{display:block;animation:fadeUp .3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.concept-card{background:#fff;border-radius:16px;border:2px solid var(--border);padding:20px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.05);}
+.cc-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.cc-num{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--sky));color:#fff;font-family:'Fredoka One',cursive;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cc-title{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--navy);}
+.cc-std{margin-left:auto;font-size:.65rem;font-weight:900;background:#F5F3FF;color:var(--purple);padding:2px 8px;border-radius:6px;letter-spacing:.5px;}
+.rule-card{background:linear-gradient(135deg,#F5F3FF,#EDE9FE);border:1.5px solid #C4B5FD;border-radius:12px;padding:14px 16px;margin:12px 0;display:flex;gap:10px;align-items:flex-start;}
+.rule-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+.rule-text{font-size:.85rem;color:var(--navy);line-height:1.65;font-weight:600;}
+.passage-box{background:#FFFBEB;border:2px solid #FDE68A;border-radius:14px;padding:18px 20px;margin:14px 0;font-size:.88rem;line-height:1.8;color:#1C1917;}
+.passage-box h4{font-family:'Fredoka One',cursive;font-size:.85rem;color:var(--gold);margin-bottom:10px;letter-spacing:.5px;text-transform:uppercase;}
+.example-box{background:#F8FAFC;border-left:4px solid var(--purple);border-radius:0 12px 12px 0;padding:14px 16px;margin:12px 0;}
+.ex-label{font-size:.68rem;font-weight:900;letter-spacing:1px;text-transform:uppercase;color:var(--purple);margin-bottom:6px;}
+.ex-problem{font-size:.95rem;color:var(--navy);margin-bottom:10px;font-weight:700;line-height:1.5;}
+.ex-steps{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.ex-steps li{display:flex;align-items:flex-start;gap:8px;font-size:.85rem;color:#334155;font-weight:600;}
+.step-num{width:22px;height:22px;border-radius:7px;background:var(--purple);color:#fff;font-size:.72rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.q-card{background:#fff;border-radius:16px;border:2px solid var(--border);padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:16px;}
+.q-num{font-size:.7rem;font-weight:900;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.q-text{font-family:'Fredoka One',cursive;font-size:1rem;color:var(--navy);margin-bottom:14px;line-height:1.4;}
+.opts{display:flex;flex-direction:column;gap:8px;}
+.opt-btn{text-align:left;background:#F8FAFC;border:2px solid var(--border);border-radius:12px;padding:11px 14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.88rem;color:#334155;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:10px;}
+.opt-btn:hover:not(:disabled){background:#F5F3FF;border-color:var(--purple);}
+.opt-btn.correct{background:#ECFDF5;border-color:var(--green);color:#065F46;}
+.opt-btn.wrong{background:#FEF2F2;border-color:var(--red);color:#991B1B;}
+.opt-btn:disabled{cursor:not-allowed;}
+.opt-letter{width:24px;height:24px;border-radius:8px;background:var(--border);color:var(--muted);font-size:.72rem;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .18s;}
+.opt-btn.correct .opt-letter{background:var(--green);color:#fff;}
+.opt-btn.wrong .opt-letter{background:var(--red);color:#fff;}
+.feedback-box{margin-top:10px;padding:12px 14px;border-radius:10px;font-size:.82rem;font-weight:700;line-height:1.6;display:none;}
+.feedback-box.show{display:block;}
+.feedback-box.c{background:#ECFDF5;color:#065F46;border:1.5px solid #6EE7B7;}
+.feedback-box.w{background:#FEF2F2;color:#991B1B;border:1.5px solid #FECACA;}
+.btn-next{margin-top:12px;font-family:'Fredoka One',cursive;font-size:.95rem;padding:11px 22px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--purple),var(--sky));color:#fff;cursor:pointer;display:none;transition:all .2s;}
+.btn-next.show{display:inline-flex;align-items:center;gap:6px;}
+.btn-next:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(139,92,246,.4);}
+.score-screen{text-align:center;padding:30px 20px;background:#fff;border-radius:18px;border:2px solid var(--border);}
+.score-title{font-family:'Fredoka One',cursive;font-size:2.2rem;color:var(--navy);margin-bottom:8px;}
+.score-circle{width:100px;height:100px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--sky));display:flex;flex-direction:column;align-items:center;justify-content:center;margin:16px auto;}
+.score-val{font-family:'Fredoka One',cursive;font-size:2rem;color:#fff;line-height:1;}
+.score-tot{font-size:.72rem;color:rgba(255,255,255,.8);font-weight:800;}
+.btn-retry{font-family:'Fredoka One',cursive;font-size:1rem;padding:12px 26px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--purple),var(--sky));color:#fff;cursor:pointer;margin-top:16px;}
+@media(max-width:640px){.app{flex-direction:column;height:auto;}.sidebar{width:100%;height:auto;display:flex;flex-wrap:wrap;gap:4px;padding:8px;}.sb-domain{width:100%;padding:6px 4px 2px;}.lesson-btn{width:auto;flex:0 0 auto;}.main{padding:16px;}}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-logo">ELA<span>Boost</span> · Reading</div>
+  <div style="font-family:'Fredoka One',cursive;font-size:.8rem;color:rgba(255,255,255,.5);" id="xpDisplay">⭐ 0 XP</div>
+  <div class="nav-grade">Grade 6 ELA</div>
+</nav>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="sb-domain">Reading Literature (RL)</div>
+    <button class="lesson-btn active" onclick="loadLesson('rl1',this)"><div class="lb-dot" style="background:var(--rl)"></div>Theme &amp; Central Idea</button>
+    <button class="lesson-btn" onclick="loadLesson('rl2',this)"><div class="lb-dot" style="background:var(--rl)"></div>Character Development</button>
+    <button class="lesson-btn" onclick="loadLesson('rl3',this)"><div class="lb-dot" style="background:var(--rl)"></div>Figurative Language</button>
+    <button class="lesson-btn" onclick="loadLesson('rl4',this)"><div class="lb-dot" style="background:var(--rl)"></div>Point of View</button>
+
+    <div class="sb-domain">Reading Informational (RI)</div>
+    <button class="lesson-btn" onclick="loadLesson('ri1',this)"><div class="lb-dot" style="background:var(--ri)"></div>Central Idea &amp; Summary</button>
+    <button class="lesson-btn" onclick="loadLesson('ri2',this)"><div class="lb-dot" style="background:var(--ri)"></div>Text Structure</button>
+    <button class="lesson-btn" onclick="loadLesson('ri3',this)"><div class="lb-dot" style="background:var(--ri)"></div>Author's Purpose &amp; POV</button>
+    <button class="lesson-btn" onclick="loadLesson('ri4',this)"><div class="lb-dot" style="background:var(--ri)"></div>Argument &amp; Evidence</button>
+  </div>
+
+  <div class="main" id="mainContent"></div>
+</div>
+
+<script>
+let xp=0, currentLesson='rl1', practiceIdx=0, practiceScore=0, answered=false;
+
+const DOMAIN_COLORS = {
+  rl1:'#8B5CF6',rl2:'#8B5CF6',rl3:'#8B5CF6',rl4:'#8B5CF6',
+  ri1:'#3B82F6',ri2:'#3B82F6',ri3:'#3B82F6',ri4:'#3B82F6'
+};
+
+const LESSONS = {
+
+  rl1:{
+    title:'Theme & Central Idea',
+    emoji:'💡',
+    std:'ELAGSE6RL.2',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num">1</div><div class="cc-title">What is Theme?</div><div class="cc-std">6.RL.2</div></div>
+      <p style="font-size:.88rem;font-weight:700;color:#555;margin-bottom:12px;line-height:1.65;">A <strong style="color:#8B5CF6">theme</strong> is the universal message or life lesson of a story. It is NOT the topic (courage) — it's what the story SAYS about that topic (courage means acting even when you're afraid).</p>
+      <div class="rule-card"><div class="rule-icon">💡</div><div class="rule-text">Theme is NEVER just one word. It's a complete statement about life. Ask: "What is the author trying to tell me about [topic]?" Your answer = the theme.</div></div>
+      <div class="example-box">
+        <div class="ex-label">Strong vs Weak Theme Statements</div>
+        <div class="ex-problem">Topic: Friendship</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#EF4444">✗</div>"The theme is friendship." (This is a topic, not a theme!)</li>
+          <li><div class="step-num" style="background:#10B981">✓</div>"True friendship means standing by someone even when it's difficult." (This is a theme!)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">How to Find Theme</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">🔍</div><div class="rule-text">1) Identify the main conflict · 2) Notice how the main character changes · 3) Look at what the character learns or realizes · 4) Ask: "What message does this teach about life?" → That's your theme!</div></div>
+      <div class="passage-box">
+        <h4>📖 Mini Passage</h4>
+        Marcus had always avoided his neighbor Mr. Chen, who seemed grumpy and unfriendly. But when Marcus's soccer ball broke his window, he had to face him. To his surprise, Mr. Chen invited him in for tea and told stories of his own soccer days. By the end of summer, Marcus realized that he had judged Mr. Chen before ever knowing him. He had missed months of friendship because of his assumptions.
+      </div>
+      <div class="example-box">
+        <div class="ex-label">Identifying Theme</div>
+        <ul class="ex-steps">
+          <li><div class="step-num">1</div>Conflict: Marcus avoided his neighbor due to assumptions</li>
+          <li><div class="step-num">2</div>Change: Marcus realizes he was wrong to judge</li>
+          <li><div class="step-num">3</div>Theme: <strong style="color:#8B5CF6">"Judging others before knowing them can cause you to miss valuable connections."</strong></li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'Read: "After years of failing, Elena finally won the science fair — not because she was the smartest, but because she never quit trying." What is the BEST theme?',opts:['Science is important','Hard work and persistence lead to success','Winning is everything','Being smart helps you succeed'],ans:1,exp:'The key detail is "not because she was the smartest, but because she never quit." This shows the theme is about persistence/hard work, not intelligence or winning itself.'},
+      {text:'Which is a theme statement (NOT just a topic)?',opts:['Courage','Loyalty can be tested by difficult choices','Family','Adventure'],ans:1,exp:'A theme must be a complete sentence with a message about life. "Loyalty can be tested by difficult choices" makes a claim about what loyalty means. The others are just single-word topics.'},
+      {text:'In the Marcus/Mr. Chen passage above, which detail BEST supports the theme about judging others?',opts:['Marcus played soccer','Mr. Chen was grumpy-looking','Marcus missed months of friendship because of his assumptions','Mr. Chen invited Marcus for tea'],ans:2,exp:'"He had missed months of friendship because of his assumptions" directly states the consequence of judging — this is the strongest text evidence for the theme.'},
+      {text:'A story shows a character who lies to protect a friend, but the lie causes more harm than good. What theme does this BEST suggest?',opts:['Friends should always tell the truth','Honesty, even when painful, leads to better outcomes than deception','Lying is always wrong','True friends protect each other no matter what'],ans:1,exp:'The story shows the consequences of lying even with good intentions — the result is more harm. This points to the theme that honesty leads to better outcomes than deception.'},
+    ]
+  },
+
+  rl2:{
+    title:'Character Development',
+    emoji:'🎭',
+    std:'ELAGSE6RL.3',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num">1</div><div class="cc-title">Static vs Dynamic Characters</div><div class="cc-std">6.RL.3</div></div>
+      <div class="rule-card"><div class="rule-icon">🎭</div><div class="rule-text"><strong>Dynamic character:</strong> Changes significantly during the story (learns a lesson, changes attitude, grows). <strong>Static character:</strong> Stays basically the same throughout the story.</div></div>
+      <div class="example-box">
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#10B981">D</div><strong>Dynamic:</strong> Scrooge in "A Christmas Carol" — goes from selfish miser to generous, caring person.</li>
+          <li><div class="step-num" style="background:#64748B">S</div><strong>Static:</strong> Watson in Sherlock Holmes — a helpful companion who doesn't fundamentally change.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">How Authors Develop Characters (STEAL)</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">🔍</div><div class="rule-text"><strong>S</strong>peech (what they say) · <strong>T</strong>houghts (what they think) · <strong>E</strong>ffect on others · <strong>A</strong>ctions (what they do) · <strong>L</strong>ooks (appearance)</div></div>
+      <div class="passage-box">
+        <h4>📖 Mini Passage</h4>
+        "I don't need anyone's help," Zoe snapped when her teacher offered tutoring. But that night, staring at the failing grade on her paper, she felt a cold knot in her stomach. She thought about her mom working double shifts to pay for school. Quietly, the next morning, Zoe knocked on her teacher's door. "I think... maybe I could use some help after all," she said, without meeting his eyes.
+      </div>
+    </div>`,
+    questions:[
+      {text:'In the Zoe passage, which STEAL element BEST shows her pride at the beginning?',opts:['Her thoughts about her mom','Her actions of knocking on the door','Her speech: "I don\'t need anyone\'s help"','Her appearance'],ans:2,exp:'Speech directly reveals character. "I don\'t need anyone\'s help" shows her pride and refusal to accept help — this is the clearest evidence of her prideful trait at the start.'},
+      {text:'Is Zoe a dynamic or static character? What is the BEST evidence?',opts:['Static — she stays proud throughout','Dynamic — she goes from refusing help to asking for it','Static — she was always going to ask for help','Dynamic — she changes her appearance'],ans:1,exp:'Zoe changes: she begins refusing help ("I don\'t need anyone\'s help") and ends by asking for it. This is a meaningful internal change — she overcomes her pride. That makes her dynamic.'},
+      {text:'A character appears in every chapter but always makes the same selfish choices and never reflects or grows. This character is most likely ___.',opts:['Dynamic','A protagonist','Static','A round character'],ans:2,exp:'A static character does not undergo significant change. If this character repeatedly makes the same choices without growth or reflection, they are static — regardless of how much "screen time" they have.'},
+      {text:'Which line of dialogue BEST reveals a character who values fairness?',opts:['"I\'ll take the biggest piece — I worked hardest."','"Just give me whatever\'s left."','"Let\'s divide it evenly so everyone gets the same."','"It doesn\'t matter to me either way."'],ans:2,exp:'Speech reveals character values. "Let\'s divide it evenly" shows the character actively values fairness and equal treatment. The other options show selfishness, indifference, or passivity.'},
+    ]
+  },
+
+  rl3:{
+    title:'Figurative Language',
+    emoji:'🎨',
+    std:'ELAGSE6RL.4',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num">1</div><div class="cc-title">Types of Figurative Language</div><div class="cc-std">6.RL.4</div></div>
+      <div class="rule-card"><div class="rule-icon">🎨</div>
+        <div class="rule-text">
+          <strong>Simile:</strong> comparison using "like" or "as" (Her voice was like thunder)<br>
+          <strong>Metaphor:</strong> direct comparison (Life is a rollercoaster)<br>
+          <strong>Personification:</strong> giving human traits to non-human things (The wind whispered secrets)<br>
+          <strong>Hyperbole:</strong> extreme exaggeration (I've told you a million times!)<br>
+          <strong>Alliteration:</strong> repeating beginning consonant sounds (Peter Piper picked...)<br>
+          <strong>Imagery:</strong> language that appeals to the senses
+        </div>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">Effect of Figurative Language</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">💡</div><div class="rule-text">In Grade 6, you must not only IDENTIFY figurative language, but also explain its EFFECT — what feeling or meaning does it create? How does it help the reader understand the text?</div></div>
+      <div class="example-box">
+        <div class="ex-label">Analysis Example</div>
+        <div class="ex-problem">"The old house groaned under the weight of its memories."</div>
+        <ul class="ex-steps">
+          <li><div class="step-num">1</div>Type: Personification (house "groaned" like a person)</li>
+          <li><div class="step-num">2</div>Effect: Makes the house feel alive and heavy with sadness — creates a melancholy, haunting mood.</li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'"The classroom was a zoo during the substitute\'s lesson." This is an example of ___.',opts:['Simile','Metaphor','Personification','Hyperbole'],ans:1,exp:'This is a metaphor — it directly compares the classroom TO a zoo without using "like" or "as." A simile would say "like a zoo." The comparison suggests chaos and lack of control.'},
+      {text:'"The thunder clapped its hands and stomped across the sky." What type of figurative language is this?',opts:['Hyperbole','Simile','Alliteration','Personification'],ans:3,exp:'Thunder is given human actions (clapping hands, stomping) — this is personification. It makes the thunder feel powerful and almost angry, creating a dramatic, intense feeling.'},
+      {text:'What is the EFFECT of this hyperbole: "I have a mountain of homework tonight"?',opts:['It shows exactly how much homework there is','It emphasizes how overwhelmingly much homework there is, creating a feeling of stress','It means there is literally a mountain involved','It is a metaphor about geography'],ans:1,exp:'Hyperbole uses extreme exaggeration to emphasize a feeling. "A mountain of homework" is not literal — it communicates that the amount feels overwhelming and stressful to the speaker.'},
+      {text:'Which sentence uses a simile?',opts:['The moon is a silver coin in the sky','Her laugh danced through the hallway','He ran as fast as a cheetah','The storm swallowed the town whole'],ans:2,exp:'"As fast as a cheetah" is a simile — it compares his running speed to a cheetah\'s using the word "as." The others are metaphors or personification.'},
+    ]
+  },
+
+  rl4:{
+    title:'Point of View',
+    emoji:'👁️',
+    std:'ELAGSE6RL.6',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num">1</div><div class="cc-title">Narrative Points of View</div><div class="cc-std">6.RL.6</div></div>
+      <div class="rule-card"><div class="rule-icon">👁️</div>
+        <div class="rule-text">
+          <strong>1st Person:</strong> Narrator is a character; uses I/me/my. Reader only knows what the narrator experiences.<br>
+          <strong>3rd Person Limited:</strong> Narrator is outside the story; focuses on one character's thoughts (he/she).<br>
+          <strong>3rd Person Omniscient:</strong> All-knowing narrator; can share thoughts of ALL characters.
+        </div>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">How POV Affects the Story</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">💡</div><div class="rule-text">The narrator's point of view controls what readers KNOW and DON'T KNOW. 1st person creates intimacy but limits information. Omniscient gives full information but feels more distant. Authors CHOOSE the POV to create specific effects!</div></div>
+      <div class="example-box">
+        <div class="ex-label">Same Event, Different POV</div>
+        <ul class="ex-steps">
+          <li><div class="step-num">1</div><strong>1st:</strong> "I watched him walk away, wondering if he knew how I felt." (We only know narrator's feelings)</li>
+          <li><div class="step-num">2</div><strong>Omniscient:</strong> "She watched him walk away. He thought about turning back, but kept going." (We know both characters' thoughts)</li>
+        </ul>
+      </div>
+    </div>`,
+    questions:[
+      {text:'"I pressed my back against the wall and held my breath. They couldn\'t find me here — I was sure of it." What point of view is this?',opts:['3rd Person Omniscient','3rd Person Limited','1st Person','2nd Person'],ans:2,exp:'The use of "I" and "me" identifies this as 1st Person narration — the narrator is a character in the story telling it from their own perspective. We only know what they experience.'},
+      {text:'A story is told in 1st person. The narrator\'s best friend is acting strange, but the narrator doesn\'t know why. What is a LIMITATION of this POV?',opts:['The story feels too formal','The reader cannot know the friend\'s thoughts or reasons','There are too many characters','The writing is too complicated'],ans:1,exp:'1st Person limits the reader to only what the narrator knows and experiences. Since the narrator doesn\'t know why the friend is acting strange, neither do we. This creates mystery but limits information.'},
+      {text:'"As Maya nervously took the stage, her teacher smiled encouragingly from the wings, remembering her own first performance decades ago." What POV is this?',opts:['1st Person','3rd Person Limited','3rd Person Omniscient','2nd Person'],ans:2,exp:'The narrator shows the thoughts/feelings of BOTH Maya (nervousness) AND her teacher (smiling, remembering). Being inside multiple characters\' minds = 3rd Person Omniscient.'},
+      {text:'Why might an author CHOOSE 1st person over 3rd person omniscient?',opts:['To confuse the reader','To show all characters\' perspectives equally','To create intimacy and keep the reader as close as possible to one character\'s experience','To make the story shorter'],ans:2,exp:'1st person narration puts readers directly inside one character\'s head — every thought, feeling, and observation feels immediate and personal. Authors choose it when they want readers to deeply identify with one character.'},
+    ]
+  },
+
+  ri1:{
+    title:'Central Idea & Summary',
+    emoji:'🎯',
+    std:'ELAGSE6RI.2',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#3B82F6,#60A5FA)">1</div><div class="cc-title">Central Idea vs Topic</div><div class="cc-std">6.RI.2</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-color:#BFDBFE"><div class="rule-icon">🎯</div><div class="rule-text"><strong>Topic:</strong> What the text is about (one or two words). <strong>Central idea:</strong> What the author is SAYING about the topic (a full statement). Central idea + key supporting details = summary!</div></div>
+      <div class="example-box" style="border-left-color:#3B82F6">
+        <div class="ex-label" style="color:#3B82F6">Example</div>
+        <ul class="ex-steps">
+          <li><div class="step-num" style="background:#3B82F6">T</div><strong>Topic:</strong> Ocean pollution</li>
+          <li><div class="step-num" style="background:#10B981">CI</div><strong>Central Idea:</strong> "Ocean pollution caused by plastic waste is seriously threatening marine ecosystems and requires immediate action."</li>
+        </ul>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">Writing a Summary</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">📝</div><div class="rule-text">A summary = central idea + 2-3 KEY supporting details. Leave out minor details, examples, and your own opinions. Use your OWN words — don't copy!</div></div>
+      <div class="passage-box">
+        <h4>📰 Passage: "The Problem with Fast Fashion"</h4>
+        Fast fashion — the trend of producing cheap, trendy clothing quickly — is devastating the environment. The fashion industry produces 10% of all global carbon emissions and uses enormous amounts of water. A single pair of jeans requires 1,800 gallons of water to produce. Additionally, most fast fashion clothing ends up in landfills within months of purchase, creating massive textile waste. Experts suggest buying fewer, higher-quality clothes as a solution.
+      </div>
+    </div>`,
+    questions:[
+      {text:'What is the central idea of the "Fast Fashion" passage?',opts:['Jeans require lots of water to make','Fashion is popular around the world','Fast fashion is seriously harming the environment in multiple ways','People should buy more clothes'],ans:2,exp:'The central idea is the main point the WHOLE passage makes. Every detail (emissions, water, landfills) supports the idea that fast fashion damages the environment. Option C captures this overarching argument.'},
+      {text:'Which detail from the passage is MOST important to include in a summary?',opts:['Jeans were invented in the 1800s','The fashion industry produces 10% of all global carbon emissions','Some people like to shop','Clothing comes in many colors'],ans:1,exp:'A summary includes only key supporting details for the central idea. "10% of all global carbon emissions" is a specific, impactful fact that directly supports the central idea about environmental damage. The others are off-topic or irrelevant.'},
+      {text:'A student writes: "This article is about how fast fashion is bad." Is this a good summary?',opts:['Yes — it\'s short and covers the main idea','No — it\'s too vague and doesn\'t include supporting details','Yes — summaries should always be one sentence','No — it includes too many details'],ans:1,exp:'A good summary includes the central idea AND key supporting details in your own words. This "summary" is too vague — it doesn\'t mention specifics like carbon emissions, water use, or textile waste that make the argument convincing.'},
+      {text:'Which sentence is a central idea (NOT just a topic)?',opts:['Space exploration','Technology in schools','Social media use among teenagers can negatively impact mental health','Animals in the rainforest'],ans:2,exp:'A central idea must be a complete sentence making a claim. "Social media use among teenagers can negatively impact mental health" makes a specific, arguable statement. The others are just topics.'},
+    ]
+  },
+
+  ri2:{
+    title:'Text Structure',
+    emoji:'🏗️',
+    std:'ELAGSE6RI.5',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#3B82F6,#60A5FA)">1</div><div class="cc-title">5 Informational Text Structures</div><div class="cc-std">6.RI.5</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-color:#BFDBFE">
+        <div class="rule-icon">🏗️</div>
+        <div class="rule-text">
+          <strong>Description:</strong> Describes a topic with details (clue words: for example, characteristics, such as)<br>
+          <strong>Sequence/Chronological:</strong> Events in time order (first, next, then, finally)<br>
+          <strong>Compare/Contrast:</strong> Similarities and differences (however, similarly, on the other hand)<br>
+          <strong>Cause/Effect:</strong> Why something happened and what resulted (because, as a result, therefore)<br>
+          <strong>Problem/Solution:</strong> A problem is described, then solution(s) given (the problem is, one solution, as a result)
+        </div>
+      </div>
+    </div>`,
+    questions:[
+      {text:'"Deforestation causes habitat loss. As a result, many species are becoming endangered. This leads to a collapse of biodiversity." What text structure is this?',opts:['Description','Sequence','Compare/Contrast','Cause/Effect'],ans:3,exp:'The clue words "causes," "as a result," and "leads to" signal cause-and-effect structure. Each sentence shows how one thing leads to another — a chain of causes and effects.'},
+      {text:'"Both dolphins and sharks are apex predators. However, dolphins are mammals and breathe air, while sharks are fish with gills." What text structure is this?',opts:['Problem/Solution','Compare/Contrast','Sequence','Description'],ans:1,exp:'"Both... however... while" are classic compare/contrast signal words. The author is pointing out similarities AND differences between dolphins and sharks.'},
+      {text:'A paragraph about steps to recycle correctly (first, then, next, finally) uses which text structure?',opts:['Cause/Effect','Problem/Solution','Sequence/Chronological','Compare/Contrast'],ans:2,exp:'Sequence/chronological structure presents information in a specific order (steps, instructions, timelines). "First, then, next, finally" are the key signal words.'},
+      {text:'A student reads an article about rising sea levels. The author describes the issue in detail, then proposes ways governments can respond. What structure does this use?',opts:['Compare/Contrast','Description','Sequence','Problem/Solution'],ans:3,exp:'The article presents a problem (rising sea levels) and then offers solutions (government responses). This is a Problem/Solution structure.'},
+    ]
+  },
+
+  ri3:{
+    title:"Author's Purpose & Point of View",
+    emoji:'🎭',
+    std:'ELAGSE6RI.6',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#3B82F6,#60A5FA)">1</div><div class="cc-title">Author's Purpose: PIE</div><div class="cc-std">6.RI.6</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-color:#BFDBFE"><div class="rule-icon">🥧</div><div class="rule-text"><strong>P</strong>ersuade: convince the reader to think or do something · <strong>I</strong>nform: teach facts about a topic · <strong>E</strong>ntertain: engage and amuse the reader. Most texts have a PRIMARY purpose but may include elements of others.</div></div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">Author's Point of View in Informational Text</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">🔍</div><div class="rule-text">Authors make choices about what to include, what to leave out, and what words to use — and these choices reveal their perspective. Look for: emotionally charged words, one-sided evidence, what facts are emphasized or ignored.</div></div>
+    </div>`,
+    questions:[
+      {text:'An article uses phrases like "alarming rates," "must be stopped immediately," and "our children\'s future is at stake." What is the author\'s PRIMARY purpose?',opts:['Inform readers about a topic with balanced facts','Persuade readers to take action','Entertain with an interesting story','Compare two different viewpoints'],ans:1,exp:'Emotional, urgent language like "alarming," "must be stopped," and "our children\'s future" is used to provoke strong feelings and push readers to action. This is persuasive writing, not neutral informational writing.'},
+      {text:'An encyclopedia entry about the Amazon rainforest presents facts about its size, biodiversity, and climate impact with no emotional language. The purpose is to ___.',opts:['Persuade readers to protect the rainforest','Entertain with stories about the forest','Inform readers about the rainforest\'s characteristics','Compare the Amazon to other forests'],ans:2,exp:'Neutral language, factual information, and no call to action = informational purpose. The author\'s goal is to teach about the topic, not convince or entertain.'},
+      {text:'Two articles about wolves: Article A is written by a rancher who lost livestock; Article B is by a wildlife biologist. How would their perspectives MOST LIKELY differ?',opts:['Both would have identical views since they\'re about the same topic','Article A would focus on threats; Article B would focus on ecological benefits','Article A would be more scientific; Article B would be more emotional','They would both be persuasive'],ans:1,exp:'A rancher who lost livestock would naturally view wolves as a threat. A wildlife biologist studies wolves\' role in ecosystems and would likely emphasize their ecological importance. Same topic — very different perspectives based on experience and interest.'},
+      {text:'An author writes about climate change and only includes evidence from scientists who agree that it is human-caused, ignoring any debate. This reveals ___.',opts:['The author has no point of view','The author\'s purpose is purely to inform','The author\'s perspective — they are strongly convinced of human-caused climate change','The author made a mistake'],ans:2,exp:'What an author CHOOSES to include and exclude reveals their point of view. By only including one side of evidence, the author shows they are persuaded by this position and are writing from that perspective.'},
+    ]
+  },
+
+  ri4:{
+    title:'Argument & Evidence',
+    emoji:'⚖️',
+    std:'ELAGSE6RI.8',
+    learn:`
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#3B82F6,#60A5FA)">1</div><div class="cc-title">Claim, Evidence, Reasoning</div><div class="cc-std">6.RI.8</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#EFF6FF,#DBEAFE);border-color:#BFDBFE">
+        <div class="rule-icon">⚖️</div>
+        <div class="rule-text">
+          <strong>Claim:</strong> The author's main argument or position (what they want you to believe)<br>
+          <strong>Evidence:</strong> Facts, statistics, examples, or expert quotes that support the claim<br>
+          <strong>Reasoning:</strong> The explanation of HOW the evidence supports the claim<br>
+          <strong>Counterclaim:</strong> The opposing viewpoint (and how the author addresses it)
+        </div>
+      </div>
+    </div>
+    <div class="concept-card">
+      <div class="cc-header"><div class="cc-num" style="background:linear-gradient(135deg,#F97316,#FBBF24)">2</div><div class="cc-title">Evaluating Evidence Quality</div></div>
+      <div class="rule-card" style="background:linear-gradient(135deg,#FFF7ED,#FFEDD5);border-color:#FED7AA"><div class="rule-icon">🔬</div><div class="rule-text">Not all evidence is equally strong. <strong>Strong evidence:</strong> specific statistics, expert sources, research studies. <strong>Weak evidence:</strong> personal anecdotes, vague claims, emotional appeals only, biased sources.</div></div>
+    </div>`,
+    questions:[
+      {text:'"Schools should start later because teenagers need more sleep." The claim is ___.',opts:['Teenagers need sleep','Schools should start later','Sleep is important for health','Teenagers are tired'],ans:1,exp:'The claim is the author\'s main argument — what they want you to believe or do. "Schools should start later" is the specific position being argued. "Teenagers need more sleep" is the reason/evidence supporting that claim.'},
+      {text:'Which piece of evidence BEST supports the claim that "homework improves academic performance"?',opts:['My sister always does her homework and she likes school','I personally think homework is helpful','A 2022 study of 10,000 students found that those who completed homework regularly scored 15% higher on standardized tests','Some teachers assign a lot of homework'],ans:2,exp:'The strongest evidence is specific, sourced, and data-based. A research study with specific numbers (10,000 students, 15% higher scores) is far more credible than personal opinions, anecdotes, or vague statements.'},
+      {text:'An author argues for year-round school but only presents benefits and ignores the costs, family disruptions, and student burnout. What is the weakness of this argument?',opts:['The author used too many statistics','The argument ignores counterarguments and presents only one side','The claim is unclear','The evidence is too specific'],ans:1,exp:'A strong argument acknowledges opposing viewpoints (counterclaims) and addresses them. By ignoring the other side entirely, the author\'s argument is one-sided and less credible — readers can easily point out what\'s missing.'},
+      {text:'"Many experts believe social media is harmful." Why is this WEAK evidence?',opts:['It uses the word "many"','It mentions experts','It is too long','It is vague — who are these experts? What research? How many is "many"?'],ans:3,exp:'Vague evidence like "many experts believe" is weak because it gives no specific sources, names, research, or numbers. Strong evidence names the experts, cites specific studies, and gives exact findings. Vagueness makes claims unverifiable.'},
+    ]
+  }
+};
+
+// ── RENDER ──
+function loadLesson(id, btn) {
+  currentLesson = id;
+  practiceIdx = 0; practiceScore = 0; answered = false;
+  document.querySelectorAll('.lesson-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const L = LESSONS[id];
+  const col = DOMAIN_COLORS[id];
+  document.getElementById('mainContent').innerHTML = `
+    <div class="lesson-header" style="background:linear-gradient(135deg,${col},${col}99)">
+      <div class="lh-tag">${L.std}</div>
+      <div class="lh-title">${L.title}</div>
+      <div class="lh-sub">Grade 6 · Georgia Standards of Excellence ELA</div>
+      <div class="lh-emoji">${L.emoji}</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabLearn" onclick="switchTab('Learn')" style="color:${col}">📖 Learn</button>
+      <button class="tab-btn" id="tabPractice" onclick="switchTab('Practice')" style="color:${col}">✏️ Practice</button>
+    </div>
+    <div class="panel active" id="panelLearn">${L.learn}</div>
+    <div class="panel" id="panelPractice"><div id="practiceContent"></div></div>
+  `;
+  renderQuestion();
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab'+name).classList.add('active');
+  document.getElementById('panel'+name).classList.add('active');
+  if(name === 'Practice') renderQuestion();
+}
+
+function renderQuestion() {
+  const L = LESSONS[currentLesson];
+  const pc = document.getElementById('practiceContent');
+  if(!pc) return;
+  if(practiceIdx >= L.questions.length) { showScore(); return; }
+  const q = L.questions[practiceIdx];
+  answered = false;
+  const letters = ['A','B','C','D'];
+  pc.innerHTML = `
+    <div class="q-card">
+      <div class="q-num">Question ${practiceIdx+1} of ${L.questions.length}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="opts">
+        ${q.opts.map((o,i) => `
+          <button class="opt-btn" id="opt${i}" onclick="answer(${i})">
+            <div class="opt-letter">${letters[i]}</div>${o}
+          </button>`).join('')}
+      </div>
+      <div class="feedback-box" id="feedbackBox"></div>
+      <button class="btn-next" id="btnNext" onclick="nextQ()">Next →</button>
+    </div>`;
+}
+
+function answer(idx) {
+  if(answered) return;
+  answered = true;
+  const q = LESSONS[currentLesson].questions[practiceIdx];
+  const opts = document.querySelectorAll('.opt-btn');
+  opts.forEach(b => b.disabled = true);
+  const fb = document.getElementById('feedbackBox');
+  const next = document.getElementById('btnNext');
+  if(idx === q.ans) {
+    opts[idx].classList.add('correct');
+    fb.className = 'feedback-box show c';
+    fb.innerHTML = '✅ Correct! ' + q.exp;
+    practiceScore++;
+    xp += 10;
+    document.getElementById('xpDisplay').textContent = '⭐ ' + xp + ' XP';
+    try { window.parent.postMessage({type:'addXP',amount:10},'*'); } catch(e){}
+  } else {
+    opts[idx].classList.add('wrong');
+    opts[q.ans].classList.add('correct');
+    fb.className = 'feedback-box show w';
+    fb.innerHTML = '❌ Not quite. ' + q.exp;
+  }
+  next.classList.add('show');
+}
+
+function nextQ() { practiceIdx++; renderQuestion(); }
+
+function showScore() {
+  const pc = document.getElementById('practiceContent');
+  const total = LESSONS[currentLesson].questions.length;
+  const pct = Math.round(practiceScore/total*100);
+  const msg = pct >= 80 ? '🎉 Excellent work!' : pct >= 60 ? '👍 Good effort!' : '💪 Keep practicing!';
+  pc.innerHTML = `
+    <div class="score-screen">
+      <div class="score-title">${msg}</div>
+      <div class="score-circle">
+        <div class="score-val">${practiceScore}</div>
+        <div class="score-tot">out of ${total}</div>
+      </div>
+      <p style="color:#64748B;font-weight:700;font-size:.9rem;">You scored ${pct}%</p>
+      <button class="btn-retry" onclick="retryLesson()">🔄 Try Again</button>
+    </div>`;
+}
+
+function retryLesson() { practiceIdx=0; practiceScore=0; answered=false; renderQuestion(); }
+
+loadLesson('rl1', document.querySelector('.lesson-btn'));
+</script>
+</body>
+</html>
