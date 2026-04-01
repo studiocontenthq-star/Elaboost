@@ -1190,7 +1190,7 @@ Provide feedback in this EXACT JSON format (respond with ONLY the JSON, no markd
 }`;
 
   try {
-    const GEMINI_KEY = 'AIzaSyDQ35gOH9rwCz3P5ZZ8wLCD8GjQq8S9glQ';
+    const GEMINI_KEY = 'YOUR_API_KEY_HERE';
     const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
