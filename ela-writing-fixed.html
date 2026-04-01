@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ELABoost · Writing Coach · Joshua</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a2e;
+    --paper: #faf8f3;
+    --cream: #f0ebe0;
+    --accent: #e85d26;
+    --accent2: #2e86ab;
+    --accent3: #2a9d5c;
+    --gold: #f4a229;
+    --soft: #e8e0d5;
+    --muted: #7a7060;
+    --card: #ffffff;
+    --shadow: 0 4px 24px rgba(26,26,46,0.10);
+    --radius: 18px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: #fff;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--gold); }
+  .exam-badge {
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 6px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+  #countdown {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 48px 32px 32px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 560px;
+    line-height: 1.6;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    max-width: 900px;
+    margin: 0 auto 0;
+    padding: 0 32px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 2px solid var(--soft);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+  }
+  .tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .tab-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(232,93,38,0.3);
+  }
+  .tab-btn.blue.active { background: var(--accent2); border-color: var(--accent2); box-shadow: 0 4px 14px rgba(46,134,171,0.3); }
+  .tab-btn.green.active { background: var(--accent3); border-color: var(--accent3); box-shadow: 0 4px 14px rgba(42,157,92,0.3); }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    max-width: 900px;
+    margin: 24px auto 60px;
+    padding: 0 32px;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeUp 0.35s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--soft);
+    margin-bottom: 24px;
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-title .icon { font-size: 1.3rem; }
+  .card-sub {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  /* ── STANDARD TAG ── */
+  .std-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    font-family: 'Syne', sans-serif;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: var(--cream);
+    color: var(--muted);
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── PROMPT BOX ── */
+  .prompt-box {
+    background: var(--cream);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+  .prompt-box.blue { border-left-color: var(--accent2); }
+  .prompt-box.green { border-left-color: var(--accent3); }
+
+  /* ── TEXTAREA ── */
+  .write-area {
+    width: 100%;
+    min-height: 220px;
+    border: 2px solid var(--soft);
+    border-radius: 12px;
+    padding: 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--ink);
+    background: #fff;
+    resize: vertical;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .write-area:focus { border-color: var(--accent); }
+  .write-area.blue:focus { border-color: var(--accent2); }
+  .write-area.green:focus { border-color: var(--accent3); }
+
+  .word-count {
+    text-align: right;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* ── CHECKLIST ── */
+  .checklist {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: var(--cream);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .check-item:hover { background: var(--soft); }
+  .check-item input[type=checkbox] {
+    width: 18px; height: 18px;
+    accent-color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+  }
+  .check-item.blue input { accent-color: var(--accent2); }
+  .check-item.green input { accent-color: var(--accent3); }
+
+  /* ── SUBMIT BUTTON ── */
+  .btn-submit {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 14px 28px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .btn-submit.orange { background: var(--accent); color: #fff; }
+  .btn-submit.orange:hover { background: #d44d18; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,93,38,0.35); }
+  .btn-submit.blue-btn { background: var(--accent2); color: #fff; }
+  .btn-submit.blue-btn:hover { background: #226e8f; transform: translateY(-1px); }
+  .btn-submit.green-btn { background: var(--accent3); color: #fff; }
+  .btn-submit.green-btn:hover { background: #1f7a44; transform: translateY(-1px); }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ── AI FEEDBACK ── */
+  .ai-feedback {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-top: 24px;
+    display: none;
+    animation: fadeUp 0.4s ease;
+  }
+  .ai-feedback.show { display: block; }
+  .ai-feedback-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .ai-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    background: var(--gold);
+    color: var(--ink);
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+  .ai-feedback-text {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #e0ddd8;
+    white-space: pre-wrap;
+  }
+
+  /* ── RUBRIC ── */
+  .rubric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 20px;
+  }
+  @media (max-width: 600px) { .rubric-grid { grid-template-columns: 1fr; } }
+
+  .rubric-item {
+    background: var(--cream);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .rubric-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .rubric-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .rubric-score {
+    margin-top: 10px;
+    display: flex;
+    gap: 6px;
+  }
+  .score-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 2px solid var(--soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    color: var(--muted);
+    cursor: default;
+    transition: all 0.2s;
+  }
+  .score-dot.active-1 { background: #e05252; border-color: #e05252; color: #fff; }
+  .score-dot.active-2 { background: var(--gold); border-color: var(--gold); color: #fff; }
+  .score-dot.active-3 { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  .score-dot.active-4 { background: var(--accent3); border-color: var(--accent3); color: #fff; }
+
+  /* ── TIPS SECTION ── */
+  .tips-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .tip-card {
+    background: var(--cream);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .tip-card h4 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .tip-card ul {
+    padding-left: 16px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* ── LOADING SPINNER ── */
+  .spinner {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── GRADE 6 BRIDGE ── */
+  .bridge-banner {
+    background: linear-gradient(135deg, #2e86ab, #1a5f7a);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .bridge-icon { font-size: 2.5rem; flex-shrink: 0; }
+  .bridge-text h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+  }
+  .bridge-text p { font-size: 0.88rem; opacity: 0.85; line-height: 1.5; }
+
+  /* ── PROGRESS ── */
+  .progress-bar-wrap {
+    background: var(--soft);
+    border-radius: 20px;
+    height: 8px;
+    margin: 10px 0 20px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: var(--accent);
+    transition: width 0.5s ease;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    header { padding: 16px 20px; }
+    .hero, .tabs, main { padding-left: 20px; padding-right: 20px; }
+    .card { padding: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">ELA<span>Boost</span></div>
+  <div id="countdown">⏰ Loading...</div>
+  <div class="exam-badge">📝 GA Milestone</div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Writing <em>Practice</em><br>for Joshua</h1>
+  <p>Grade 5 → Grade 6 Writing Coach. Practice all three text types with Georgia Milestone rubric scoring and AI feedback.</p>
+  <div class="progress-bar-wrap" style="margin-top:20px;">
+    <div class="progress-bar-fill" id="overallProgress" style="width:0%"></div>
+  </div>
+  <p style="font-size:0.82rem; color:var(--muted);" id="progressLabel">0 of 3 writing types practiced this session</p>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('opinion')">✊ Opinion (W.1)</button>
+  <button class="tab-btn blue" onclick="switchTab('info')">📘 Informational (W.2)</button>
+  <button class="tab-btn green" onclick="switchTab('narrative')">📖 Narrative (W.3)</button>
+  <button class="tab-btn" onclick="switchTab('rubric')" style="margin-left:auto;">📋 Rubric Guide</button>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- ═══════════════ OPINION PANEL ═══════════════ -->
+  <div class="panel active" id="panel-opinion">
+
+    <div class="card" style="border-top: 4px solid var(--accent);">
+      <div class="std-tag">ELAGSE5W1 · Opinion Writing</div>
+      <div class="card-title"><span class="icon">✊</span> Opinion Writing Practice</div>
+      <div class="card-sub">Write an opinion essay with a clear claim, at least 2 reasons with evidence, and a strong conclusion. Georgia Milestone tests this every year.</div>
+
+      <div class="prompt-box" id="opinionPrompt">
+        <strong>📝 Your Prompt:</strong><br><br>
+        <span id="opinionPromptText">Some people think students should have homework every night. Others believe homework should be optional. What is your opinion? Write an essay to convince your teacher. Use at least two reasons and examples to support your opinion.</span>
+      </div>
+
+      <button onclick="newPrompt('opinion')" style="background:none;border:1px solid var(--soft);border-radius:8px;padding:6px 14px;font-size:0.82rem;color:var(--muted);cursor:pointer;margin-bottom:18px;">🔀 New Prompt</button>
+
+      <div class="checklist" id="opinionChecklist">
+        <label class="check-item">
+          <input type="checkbox" onchange="updateProgress()"> My first sentence clearly states my opinion/claim.
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="updateProgress()"> I have at least 2 reasons that support my opinion.
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="updateProgress()"> I used evidence or examples for each reason.
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="updateProgress()"> I used linking words (because, therefore, for example, in addition).
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="updateProgress()"> My conclusion restates my opinion in a new way.
+        </label>
+        <label class="check-item">
+          <input type="checkbox" onchange="updateProgress()"> I checked spelling and punctuation.
+        </label>
+      </div>
+
+      <textarea class="write-area" id="opinionText" placeholder="Start writing your opinion essay here... Remember: State your claim clearly in the first paragraph!" oninput="wordCount('opinion')"></textarea>
+      <div class="word-count"><span id="opinionWords">0</span> words · Aim for 150–250 words</div>
+
+      <button class="btn-submit orange" onclick="submitWriting('opinion')" id="opinionBtn">
+        🤖 Get AI Feedback
+      </button>
+    </div>
+
+    <div class="ai-feedback" id="opinionFeedback">
+      <div class="ai-feedback-header">
+        <div class="ai-label">AI Coach</div>
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;">Feedback for Joshua</span>
+      </div>
+      <div class="rubric-scores-display" id="opinionRubricDisplay"></div>
+      <div class="ai-feedback-text" id="opinionFeedbackText"></div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════ INFORMATIONAL PANEL ═══════════════ -->
+  <div class="panel" id="panel-info">
+
+    <div class="card" style="border-top: 4px solid var(--accent2);">
+      <div class="std-tag">ELAGSE5W2 · Informational/Explanatory Writing</div>
+      <div class="card-title"><span class="icon">📘</span> Informational Writing Practice</div>
+      <div class="card-sub">Explain a topic clearly using facts, definitions, and details. Organize your ideas with an introduction, body paragraphs, and conclusion.</div>
+
+      <div class="prompt-box blue" id="infoPrompt">
+        <strong>📝 Your Prompt:</strong><br><br>
+        <span id="infoPromptText">Explain how the water cycle works. Include the steps of evaporation, condensation, and precipitation. Use facts and details to help the reader understand each step clearly.</span>
+      </div>
+
+      <button onclick="newPrompt('info')" style="background:none;border:1px solid var(--soft);border-radius:8px;padding:6px 14px;font-size:0.82rem;color:var(--muted);cursor:pointer;margin-bottom:18px;">🔀 New Prompt</button>
+
+      <div class="checklist">
+        <label class="check-item blue">
+          <input type="checkbox" class="blue" onchange="updateProgress()"> My introduction names the topic and grabs the reader's attention.
+        </label>
+        <label class="check-item blue">
+          <input type="checkbox" class="blue" onchange="updateProgress()"> I have at least 2 body paragraphs, each with a clear topic sentence.
+        </label>
+        <label class="check-item blue">
+          <input type="checkbox" class="blue" onchange="updateProgress()"> I used facts, definitions, or examples (not just my opinion).
+        </label>
+        <label class="check-item blue">
+          <input type="checkbox" class="blue" onchange="updateProgress()"> I used transition words (first, next, also, in addition, finally).
+        </label>
+        <label class="check-item blue">
+          <input type="checkbox" class="blue" onchange="updateProgress()"> My conclusion wraps up the topic without just repeating everything.
+        </label>
+        <label class="check-item blue">
+          <input type="checkbox" class="blue" onchange="updateProgress()"> I checked my capitalization and punctuation.
+        </label>
+      </div>
+
+      <textarea class="write-area blue" id="infoText" placeholder="Start writing your informational essay here... Begin with an interesting introduction that tells the reader what you'll explain!" oninput="wordCount('info')"></textarea>
+      <div class="word-count"><span id="infoWords">0</span> words · Aim for 150–250 words</div>
+
+      <button class="btn-submit blue-btn" onclick="submitWriting('info')" id="infoBtn">
+        🤖 Get AI Feedback
+      </button>
+    </div>
+
+    <div class="ai-feedback" id="infoFeedback">
+      <div class="ai-feedback-header">
+        <div class="ai-label">AI Coach</div>
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;">Feedback for Joshua</span>
+      </div>
+      <div class="rubric-scores-display" id="infoRubricDisplay"></div>
+      <div class="ai-feedback-text" id="infoFeedbackText"></div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════ NARRATIVE PANEL ═══════════════ -->
+  <div class="panel" id="panel-narrative">
+
+    <div class="card" style="border-top: 4px solid var(--accent3);">
+      <div class="std-tag">ELAGSE5W3 · Narrative Writing</div>
+      <div class="card-title"><span class="icon">📖</span> Narrative Writing Practice</div>
+      <div class="card-sub">Write a real or imagined story with a clear beginning, middle, and end. Use descriptive details, dialogue, and show how a character thinks or feels.</div>
+
+      <div class="prompt-box green" id="narrativePrompt">
+        <strong>📝 Your Prompt:</strong><br><br>
+        <span id="narrativePromptText">Write a story about a time when you (or a character) had to make a difficult decision. Describe what happened before, during, and after the decision. How did it change things?</span>
+      </div>
+
+      <button onclick="newPrompt('narrative')" style="background:none;border:1px solid var(--soft);border-radius:8px;padding:6px 14px;font-size:0.82rem;color:var(--muted);cursor:pointer;margin-bottom:18px;">🔀 New Prompt</button>
+
+      <div class="checklist">
+        <label class="check-item green">
+          <input type="checkbox" class="green" onchange="updateProgress()"> My story has a clear beginning that introduces the character and situation.
+        </label>
+        <label class="check-item green">
+          <input type="checkbox" class="green" onchange="updateProgress()"> I used descriptive details (sights, sounds, feelings) to paint a picture.
+        </label>
+        <label class="check-item green">
+          <input type="checkbox" class="green" onchange="updateProgress()"> I included at least one piece of dialogue (what someone said).
+        </label>
+        <label class="check-item green">
+          <input type="checkbox" class="green" onchange="updateProgress()"> My middle shows a problem or challenge the character faces.
+        </label>
+        <label class="check-item green">
+          <input type="checkbox" class="green" onchange="updateProgress()"> My ending wraps up the story and feels satisfying.
+        </label>
+        <label class="check-item green">
+          <input type="checkbox" class="green" onchange="updateProgress()"> I used transition words to show time passing (suddenly, later, after a while).
+        </label>
+      </div>
+
+      <textarea class="write-area green" id="narrativeText" placeholder="Start your story here... Try to hook the reader in the very first sentence!" oninput="wordCount('narrative')"></textarea>
+      <div class="word-count"><span id="narrativeWords">0</span> words · Aim for 150–300 words</div>
+
+      <button class="btn-submit green-btn" onclick="submitWriting('narrative')" id="narrativeBtn">
+        🤖 Get AI Feedback
+      </button>
+    </div>
+
+    <div class="ai-feedback" id="narrativeFeedback">
+      <div class="ai-feedback-header">
+        <div class="ai-label">AI Coach</div>
+        <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;">Feedback for Joshua</span>
+      </div>
+      <div class="rubric-scores-display" id="narrativeRubricDisplay"></div>
+      <div class="ai-feedback-text" id="narrativeFeedbackText"></div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════ RUBRIC GUIDE PANEL ═══════════════ -->
+  <div class="panel" id="panel-rubric">
+
+    <div class="bridge-banner">
+      <div class="bridge-icon">🌉</div>
+      <div class="bridge-text">
+        <h3>Grade 5 → Grade 6 Writing Bridge</h3>
+        <p>Master these Grade 5 skills now — they're the foundation for everything in middle school. The same rubric categories apply all the way through!</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">📋</span> Georgia Milestone Writing Rubric</div>
+      <div class="card-sub">All writing is scored on these 4 dimensions. Each is worth 1–4 points. Know these = know how to get a better score.</div>
+
+      <div class="rubric-grid">
+        <div class="rubric-item">
+          <div class="rubric-label">💡 Ideas & Content</div>
+          <div class="rubric-desc">Is your main idea clear? Do you have specific details, examples, or evidence? Does everything connect to your topic?</div>
+          <div style="margin-top:10px;font-size:0.78rem;color:var(--accent);font-weight:600;">
+            4 = Strong, specific details throughout<br>
+            3 = Mostly clear with some support<br>
+            2 = Main idea present but thin<br>
+            1 = Unclear or off-topic
+          </div>
+        </div>
+        <div class="rubric-item">
+          <div class="rubric-label">🗂️ Organization</div>
+          <div class="rubric-desc">Does your writing have a clear beginning, middle, and end? Do you use transitions? Does it flow logically?</div>
+          <div style="margin-top:10px;font-size:0.78rem;color:var(--accent2);font-weight:600;">
+            4 = Strong intro, body, conclusion + transitions<br>
+            3 = Mostly organized, minor gaps<br>
+            2 = Some structure but choppy<br>
+            1 = Hard to follow
+          </div>
+        </div>
+        <div class="rubric-item">
+          <div class="rubric-label">🎨 Style & Voice</div>
+          <div class="rubric-desc">Does your writing sound like you? Do you use interesting word choices? Is the tone right for your audience?</div>
+          <div style="margin-top:10px;font-size:0.78rem;color:var(--accent3);font-weight:600;">
+            4 = Engaging, varied sentences, strong vocab<br>
+            3 = Some personality, decent word choice<br>
+            2 = Flat or repetitive<br>
+            1 = Very basic
+          </div>
+        </div>
+        <div class="rubric-item">
+          <div class="rubric-label">✏️ Conventions</div>
+          <div class="rubric-desc">Is your spelling mostly correct? Do you use punctuation and capitalization properly? Are your sentences complete?</div>
+          <div style="margin-top:10px;font-size:0.78rem;color:var(--gold);font-weight:600;">
+            4 = Very few errors, easy to read<br>
+            3 = Some errors but readable<br>
+            2 = Frequent errors, distracting<br>
+            1 = Hard to read
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🛠️</span> Writing Tips by Type</div>
+      <div class="card-sub">Quick reminders for each essay type on the Georgia Milestone.</div>
+      <div class="tips-row">
+        <div class="tip-card">
+          <h4>✊ Opinion (W.1)</h4>
+          <ul>
+            <li>Start: "I believe that..."</li>
+            <li>Use: because, therefore, for this reason</li>
+            <li>Each body paragraph = 1 reason + evidence</li>
+            <li>End: restate opinion differently</li>
+            <li>Never say "I think I think"!</li>
+          </ul>
+        </div>
+        <div class="tip-card">
+          <h4>📘 Informational (W.2)</h4>
+          <ul>
+            <li>Hook → topic sentence → facts</li>
+            <li>Use: first, next, also, in addition</li>
+            <li>Define tricky words</li>
+            <li>No opinions — facts only!</li>
+            <li>End with a "so what" sentence</li>
+          </ul>
+        </div>
+        <div class="tip-card">
+          <h4>📖 Narrative (W.3)</h4>
+          <ul>
+            <li>Hook first sentence!</li>
+            <li>Show, don't tell feelings</li>
+            <li>Add dialogue with quotes</li>
+            <li>Use: suddenly, after a while, finally</li>
+            <li>Ending = reflection or change</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">🚀</span> Grade 6 Preview — What's Coming</div>
+      <div class="card-sub">These are the same skills, leveled up for middle school.</div>
+      <div class="tips-row">
+        <div class="tip-card" style="border-left:3px solid var(--accent);">
+          <h4>📝 Argument Writing</h4>
+          <ul>
+            <li>Same as opinion but more formal</li>
+            <li>Must acknowledge opposing view</li>
+            <li>Cite sources by name</li>
+            <li>Stronger vocabulary expected</li>
+          </ul>
+        </div>
+        <div class="tip-card" style="border-left:3px solid var(--accent2);">
+          <h4>🔬 Research Writing</h4>
+          <ul>
+            <li>Uses multiple sources</li>
+            <li>Must summarize AND paraphrase</li>
+            <li>Longer (4–5 paragraphs)</li>
+            <li>Works Cited required</li>
+          </ul>
+        </div>
+        <div class="tip-card" style="border-left:3px solid var(--accent3);">
+          <h4>📚 Literary Analysis</h4>
+          <ul>
+            <li>Write about books/stories</li>
+            <li>Use text evidence with quotes</li>
+            <li>Analyze theme + character</li>
+            <li>Academic tone required</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+// ── COUNTDOWN ──
+function updateCountdown() {
+  const exam = new Date('2026-04-21T08:00:00');
+  const now = new Date();
+  const diff = exam - now;
+  if (diff <= 0) { document.getElementById('countdown').textContent = '🎉 Exam Day!'; return; }
+  const days = Math.floor(diff / 86400000);
+  const hrs  = Math.floor((diff % 86400000) / 3600000);
+  document.getElementById('countdown').textContent = `⏰ ${days}d ${hrs}h to 4/21`;
+}
+updateCountdown();
+setInterval(updateCountdown, 60000);
+
+// ── PROMPTS ──
+const prompts = {
+  opinion: [
+    "Some people think students should have homework every night. Others believe homework should be optional. What is your opinion? Write an essay to convince your teacher. Use at least two reasons and examples to support your opinion.",
+    "Should students be allowed to use tablets instead of textbooks in school? Write an opinion essay to your principal explaining your view. Give at least two reasons with examples.",
+    "Some schools are removing recess to add more learning time. Do you think recess is important? Write an essay to persuade your teacher. Support your opinion with at least two strong reasons.",
+    "Should students have a say in creating school rules? Write an opinion essay to your principal explaining whether or not you agree. Use specific reasons and examples.",
+    "Is it better to be good at one thing or okay at many things? Write an opinion essay sharing your view. Support your claim with at least two reasons.",
+  ],
+  info: [
+    "Explain how the water cycle works. Include the steps of evaporation, condensation, and precipitation. Use facts and details to help the reader understand each step clearly.",
+    "Explain what makes a healthy diet. Include at least two food groups and explain why they are important for the body. Use facts and specific details.",
+    "Explain how volcanoes form and erupt. Use clear steps and scientific details to help a younger student understand.",
+    "Explain how the branches of the U.S. government work together. Describe the role of each branch and how they check each other's power.",
+    "Explain how animals adapt to survive in their environment. Use at least two specific animals as examples.",
+  ],
+  narrative: [
+    "Write a story about a time when you (or a character) had to make a difficult decision. Describe what happened before, during, and after the decision. How did it change things?",
+    "Write a story about a day when everything went wrong, but something unexpected made it better. Use descriptive details and dialogue.",
+    "Imagine you discover a hidden door in your school. Write a story about what happens when you open it. Include a problem and how it gets solved.",
+    "Write about a time when you helped someone (or someone helped you). Show how it felt before, during, and after. Use vivid details.",
+    "You and your best friend find a mysterious object on the playground. Write a story about what happens next.",
+  ]
+};
+
+let currentPromptIdx = { opinion: 0, info: 0, narrative: 0 };
+
+function newPrompt(type) {
+  const arr = prompts[type];
+  currentPromptIdx[type] = (currentPromptIdx[type] + 1) % arr.length;
+  document.getElementById(type + 'PromptText').textContent = arr[currentPromptIdx[type]];
+  document.getElementById(type + 'Text').value = '';
+  document.getElementById(type + 'Words').textContent = '0';
+  const fb = document.getElementById(type + 'Feedback');
+  fb.classList.remove('show');
+}
+
+// ── WORD COUNT ──
+function wordCount(type) {
+  const val = document.getElementById(type + 'Text').value.trim();
+  const words = val ? val.split(/\s+/).length : 0;
+  document.getElementById(type + 'Words').textContent = words;
+}
+
+// ── SESSION PROGRESS ──
+const practiced = { opinion: false, info: false, narrative: false };
+function markPracticed(type) {
+  practiced[type] = true;
+  updateOverallProgress();
+}
+function updateOverallProgress() {
+  const count = Object.values(practiced).filter(Boolean).length;
+  document.getElementById('overallProgress').style.width = (count / 3 * 100) + '%';
+  document.getElementById('progressLabel').textContent = `${count} of 3 writing types practiced this session`;
+}
+function updateProgress() {} // placeholder for checklist changes
+
+// ── TAB SWITCH ──
+function switchTab(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── RUBRIC DISPLAY ──
+function renderRubricScores(containerId, scores) {
+  const el = document.getElementById(containerId);
+  const labels = ['💡 Ideas', '🗂️ Organization', '🎨 Style', '✏️ Conventions'];
+  const colors = ['#e85d26','#2e86ab','#2a9d5c','#f4a229'];
+  let html = '<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">';
+  labels.forEach((label, i) => {
+    const score = scores[i] || 0;
+    html += `<div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px 16px;min-width:100px;text-align:center;">
+      <div style="font-size:0.75rem;opacity:0.7;margin-bottom:4px;">${label}</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:${colors[i]};">${score}</div>
+      <div style="font-size:0.7rem;opacity:0.5;">/ 4</div>
+    </div>`;
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ── AI SUBMIT ──
+async function submitWriting(type) {
+  const text = document.getElementById(type + 'Text').value.trim();
+  if (text.length < 30) {
+    alert('Please write a bit more before getting feedback!');
+    return;
+  }
+
+  const btn = document.getElementById(type + 'Btn');
+  const feedbackEl = document.getElementById(type + 'Feedback');
+  const feedbackText = document.getElementById(type + 'FeedbackText');
+  const prompt = document.getElementById(type + 'PromptText').textContent;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+
+  const typeLabels = {
+    opinion: 'Opinion Essay (W.1)',
+    info: 'Informational Essay (W.2)',
+    narrative: 'Narrative Story (W.3)'
+  };
+
+  const systemPrompt = `You are a warm, encouraging writing coach for a 5th grade student named Joshua who is preparing for the Georgia Milestone ELA exam on April 21, 2026. He is also preparing to transition to 6th grade.
+
+Your job is to give friendly, specific, actionable feedback on his writing. Be encouraging but honest — don't just say "great job!" Give him real suggestions he can use RIGHT NOW to improve.
+
+Always evaluate using the Georgia Milestone Writing Rubric:
+- Ideas & Content (1–4): Is the main idea clear? Are details specific and relevant?
+- Organization (1–4): Clear intro/body/conclusion? Good transitions?
+- Style & Voice (1–4): Interesting word choices? Varied sentences? Appropriate tone?
+- Conventions (1–4): Grammar, spelling, punctuation, capitalization?
+
+FORMAT your response EXACTLY like this:
+SCORES: [Ideas:X] [Organization:X] [Style:X] [Conventions:X]
+
+⭐ What Joshua Did Well:
+(2-3 specific things he did well, mention line examples if possible)
+
+🔧 Top 3 Things to Improve:
+1. (specific, actionable advice)
+2. (specific, actionable advice)  
+3. (specific, actionable advice)
+
+💡 One Sentence to Try:
+(Give Joshua an example of a sentence he could add or rewrite to make his essay stronger)
+
+🚀 Grade 6 Preview:
+(One brief tip about how this skill will be used differently in 6th grade)
+
+Keep your total response under 300 words. Use friendly, encouraging language a 5th grader can understand.`;
+
+  const userMsg = `Writing Type: ${typeLabels[type]}
+Writing Prompt: "${prompt}"
+
+Joshua's writing:
+"""
+${text}
+"""
+
+Please give Joshua specific feedback using the Georgia Milestone rubric.`;
+
+  try {
+    const response = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: systemPrompt + '\n\n' + userMsg
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Could not get feedback. Please try again.');
+    }
+
+    const raw = data.result || 'Could not get feedback. Please try again.';
+
+    const scoreMatch = raw.match(/SCORES:\s*\[Ideas:(\d)\]\s*\[Organization:(\d)\]\s*\[Style:(\d)\]\s*\[Conventions:(\d)\]/);
+    if (scoreMatch) {
+      const scores = [+scoreMatch[1], +scoreMatch[2], +scoreMatch[3], +scoreMatch[4]];
+      renderRubricScores(type + 'RubricDisplay', scores);
+    }
+
+    const cleanText = raw.replace(/SCORES:.*?\n/, '').trim();
+    feedbackText.textContent = cleanText;
+    feedbackEl.classList.add('show');
+    feedbackEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    markPracticed(type);
+
+  } catch (err) {
+    feedbackText.textContent = '⚠️ Could not connect to AI.\n\nError: ' + err.message;
+    feedbackEl.classList.add('show');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '🤖 Get AI Feedback';
+}
+</script>
+</body>
+</html>
