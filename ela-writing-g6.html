@@ -12,7 +12,7 @@
   --surface2: #1c2030;
   --border: #252a38;
   --text: #e8eaf0;
-  --muted: #6b7385;
+  --muted: #6b738
   --arg: #ff6b35;
   --arg-dim: rgba(255,107,53,0.12);
   --res: #00c9a7;
@@ -887,7 +887,7 @@ main {
       </div>
     </div>
 
-    <!-- G5 vs G6 Comparison -->
+    <!-- G5 vs G6 Comparison -
     <div class="card" style="margin-bottom:20px;">
       <div class="card-title" style="margin-bottom:14px;">⬆️ Grade 5 vs Grade 6: What's Different?</div>
       <table class="compare-table">
@@ -1140,8 +1140,7 @@ ${text}
   const GEMINI_KEY = 'AIzaSyBVQxn4-p9SCFwJ-o_r3WBqbJQVCu1BYkg';
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+    const response = await ffetch('/api/feedback'
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
